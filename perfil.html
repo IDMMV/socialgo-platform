@@ -1,16 +1,1 @@
-<!doctype html>
-<html lang="es">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Perfil · SocialGo</title><link rel="stylesheet" href="css/global.css"></head>
-<body>
-  <main class="page-shell">
-    <a class="brand" href="index.html"><span class="brand-mark">S</span><span data-brand-name>SocialGo</span></a>
-    <section class="page-card">
-      <h1>Perfil</h1>
-      <p>Publicaciones, clips, guardados, Me gusta, compartidos y configuración de privacidad.</p>
-      <p class="notice">Módulo preparado para desarrollarse en la siguiente fase.</p>
-      <a class="secondary" href="index.html">Volver al inicio</a>
-    </section>
-  </main>
-  <script type="module">import { applyBrand } from "./js/brand.js"; applyBrand();</script>
-</body></html>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mi perfil · SocialGo</title><link rel="stylesheet" href="css/global.css"></head><body><main class="page-shell"><a class="brand" href="index.html"><span class="brand-mark">S</span><span>SocialGo</span></a><section class="page-card"><h1>Mi perfil</h1><div id="loading" class="notice">Cargando…</div><form id="form" hidden><label class="field">Nombre visible<input id="displayName" required maxlength="80"></label><label class="field">Usuario<input id="username" readonly></label><label class="field">Biografía<textarea id="bio" maxlength="300"></textarea></label><label class="toggle-row"><span>Encontrarme por correo</span><input id="findByEmail" type="checkbox"></label><label class="toggle-row"><span>Encontrarme por teléfono</span><input id="findByPhone" type="checkbox"></label><div class="modal-actions"><button class="primary">Guardar</button><button type="button" class="secondary" id="logout">Cerrar sesión</button></div></form></section></main><script type="module">import{supabase,getMyProfile,signOut}from'./js/supabase.js';import{requireAuth}from'./js/session.js';const u=await requireAuth();if(u){try{const p=await getMyProfile();displayName.value=p.nombre_visible;username.value=p.username;bio.value=p.biografia||'';findByEmail.checked=p.permitir_busqueda_correo;findByPhone.checked=p.permitir_busqueda_telefono;loading.hidden=true;form.hidden=false}catch(x){loading.textContent=x.message}form.onsubmit=async e=>{e.preventDefault();const{error}=await supabase.from('perfiles').update({nombre_visible:displayName.value.trim(),biografia:bio.value.trim()||null,permitir_busqueda_correo:findByEmail.checked,permitir_busqueda_telefono:findByPhone.checked}).eq('id',u.id);alert(error?error.message:'Perfil actualizado.')};logout.onclick=()=>signOut()};</script></body></html>

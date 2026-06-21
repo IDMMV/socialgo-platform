@@ -1,13 +1,5 @@
-export const APP_CONFIG = Object.freeze({
-  version: "0.1.0",
-  environment: "development",
-  enablePWA: true,
-  enableRegistration: true,
-  enableClips: true,
-  enableMessaging: true,
-  enableLiveStreams: false,
-  enableCreatorPayments: false,
-  maxImageMB: 5,
-  maxVideoMB: 25,
-  maxClipSeconds: 60
+export const PUBLIC_ENV = Object.freeze({
+  SUPABASE_URL: "https://fhqdxethubaycijtbzry.supabase.co",
+  SUPABASE_PUBLISHABLE_KEY: "sb_publishable_0wSXACcq0lqcKsjqUf9xVQ_7a3c72oH",
+  SITE_URL: "https://socialgo-platform.vercel.app"
 });

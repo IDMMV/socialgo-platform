@@ -82,6 +82,18 @@
       <h2>Pendientes iniciales</h2>
       <div id="tasksList">Cargando…</div>
     </section>
+
+    <section class="page-card" style="margin-top:18px">
+      <h2>Reportes de contenido</h2>
+      <p class="notice">Aquí se muestran las publicaciones reportadas por los usuarios.</p>
+      <div id="reportsList" class="admin-table-wrap">Cargando reportes…</div>
+    </section>
+
+    <section class="page-card" style="margin-top:18px">
+      <h2>Bloqueos entre usuarios</h2>
+      <p class="notice">Registro de bloqueos activos.</p>
+      <div id="blocksList" class="admin-table-wrap">Cargando bloqueos…</div>
+    </section>
   </main>
 
   <section id="accessStatus" class="auth-page">
@@ -103,6 +115,8 @@
     const usersCount = document.querySelector("#usersCount");
     const tasksCount = document.querySelector("#tasksCount");
     const tasksList = document.querySelector("#tasksList");
+    const reportsList = document.querySelector("#reportsList");
+    const blocksList = document.querySelector("#blocksList");
 
     const brandForm = document.querySelector("#brandForm");
     const brandName = document.querySelector("#brandName");
@@ -161,7 +175,82 @@
         tasksList.innerHTML = "<p>No hay pendientes registrados.</p>";
       }
 
-      brandForm.addEventListener("submit", async (event) => {
+  
+    await loadReports();
+    await loadBlocks();
+
+    async function loadReports() {
+      const { data, error } = await supabase
+        .from("reportes_admin_detalle")
+        .select("*")
+        .order("creado_en", { ascending: false })
+        .limit(100);
+
+      if (error) {
+        reportsList.innerHTML = `<p class="notice">${escapeHtml(error.message)}</p>`;
+        return;
+      }
+
+      reportsList.innerHTML = data?.length ? `
+        <table class="admin-table">
+          <thead><tr><th>Fecha</th><th>Reportante</th><th>Autor</th><th>Motivo</th><th>Publicación</th><th>Estado</th></tr></thead>
+          <tbody>
+            ${data.map(report => `
+              <tr>
+                <td>${new Date(report.creado_en).toLocaleString("es-PE")}</td>
+                <td>@${escapeHtml(report.reportante_username || "usuario")}</td>
+                <td>@${escapeHtml(report.autor_username || "usuario")}</td>
+                <td>${escapeHtml(report.motivo)}</td>
+                <td>${escapeHtml((report.contenido || "[Sin texto]").slice(0, 140))}</td>
+                <td>
+                  <select data-report-status="${report.id}">
+                    ${["pendiente","revision","resuelto","descartado"].map(status =>
+                      `<option value="${status}" ${report.estado === status ? "selected" : ""}>${status}</option>`
+                    ).join("")}
+                  </select>
+                </td>
+              </tr>`).join("")}
+          </tbody>
+        </table>` : "<p>No existen reportes.</p>";
+
+      document.querySelectorAll("[data-report-status]").forEach(select => {
+        select.addEventListener("change", async () => {
+          const { error: updateError } = await supabase
+            .from("reportes_contenido")
+            .update({ estado: select.value })
+            .eq("id", select.dataset.reportStatus);
+          alert(updateError ? updateError.message : "Estado del reporte actualizado.");
+        });
+      });
+    }
+
+    async function loadBlocks() {
+      const { data, error } = await supabase
+        .from("bloqueos_admin_detalle")
+        .select("*")
+        .order("creado_en", { ascending: false })
+        .limit(100);
+
+      if (error) {
+        blocksList.innerHTML = `<p class="notice">${escapeHtml(error.message)}</p>`;
+        return;
+      }
+
+      blocksList.innerHTML = data?.length ? `
+        <table class="admin-table">
+          <thead><tr><th>Fecha</th><th>Bloqueó</th><th>Usuario bloqueado</th></tr></thead>
+          <tbody>
+            ${data.map(block => `
+              <tr>
+                <td>${new Date(block.creado_en).toLocaleString("es-PE")}</td>
+                <td>@${escapeHtml(block.bloqueador_username || "usuario")}</td>
+                <td>@${escapeHtml(block.bloqueado_username || "usuario")}</td>
+              </tr>`).join("")}
+          </tbody>
+        </table>` : "<p>No existen bloqueos activos.</p>";
+    }
+
+    brandForm.addEventListener("submit", async (event) => {
         event.preventDefault();
 
         try {

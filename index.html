@@ -110,6 +110,16 @@
         <button value="cancel" aria-label="Cerrar">✕</button>
       </header>
       <textarea id="postText" maxlength="1000" placeholder="¿Qué deseas compartir?"></textarea>
+
+      <label class="file-picker">
+        📷 Agregar imagen
+        <input id="postImage" type="file" accept="image/jpeg,image/png,image/webp">
+      </label>
+
+      <div id="postImagePreview" class="image-preview hidden">
+        <img id="postImagePreviewImg" alt="Vista previa">
+        <button type="button" id="removePostImage" aria-label="Quitar imagen">✕</button>
+      </div>
       <label class="field">
         <span>Visibilidad</span>
         <select id="postVisibility">
@@ -132,6 +142,25 @@
         <button type="button" class="primary" id="publishDemo">Publicar</button>
       </div>
     </form>
+  </dialog>
+
+
+  <dialog id="commentsDialog">
+    <section class="modal-card">
+      <header>
+        <h2>Comentarios</h2>
+        <button type="button" id="closeComments" aria-label="Cerrar">✕</button>
+      </header>
+
+      <div id="commentsList" class="comments-list">
+        <p class="notice">Cargando…</p>
+      </div>
+
+      <form id="commentForm" class="comment-form">
+        <input id="commentText" maxlength="1000" placeholder="Escribe un comentario" autocomplete="off">
+        <button class="primary" type="submit">Enviar</button>
+      </form>
+    </section>
   </dialog>
 
   <script type="module" src="js/app.js"></script>

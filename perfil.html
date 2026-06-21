@@ -1,1 +1,196 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mi perfil · SocialGo</title><link rel="stylesheet" href="css/global.css"></head><body><main class="page-shell"><a class="brand" href="index.html"><span class="brand-mark">S</span><span>SocialGo</span></a><section class="page-card"><h1>Mi perfil</h1><div id="loading" class="notice">Cargando…</div><form id="form" hidden><label class="field">Nombre visible<input id="displayName" required maxlength="80"></label><label class="field">Usuario<input id="username" readonly></label><label class="field">Biografía<textarea id="bio" maxlength="300"></textarea></label><label class="toggle-row"><span>Encontrarme por correo</span><input id="findByEmail" type="checkbox"></label><label class="toggle-row"><span>Encontrarme por teléfono</span><input id="findByPhone" type="checkbox"></label><div class="modal-actions"><button class="primary">Guardar</button><button type="button" class="secondary" id="logout">Cerrar sesión</button></div></form></section></main><script type="module">import{supabase,getMyProfile,signOut}from'./js/supabase.js';import{requireAuth}from'./js/session.js';const u=await requireAuth();if(u){try{const p=await getMyProfile();displayName.value=p.nombre_visible;username.value=p.username;bio.value=p.biografia||'';findByEmail.checked=p.permitir_busqueda_correo;findByPhone.checked=p.permitir_busqueda_telefono;loading.hidden=true;form.hidden=false}catch(x){loading.textContent=x.message}form.onsubmit=async e=>{e.preventDefault();const{error}=await supabase.from('perfiles').update({nombre_visible:displayName.value.trim(),biografia:bio.value.trim()||null,permitir_busqueda_correo:findByEmail.checked,permitir_busqueda_telefono:findByPhone.checked}).eq('id',u.id);alert(error?error.message:'Perfil actualizado.')};logout.onclick=()=>signOut()};</script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mi perfil · SocialGo</title>
+  <link rel="stylesheet" href="css/global.css">
+</head>
+<body>
+  <main class="page-shell">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
+      <a class="brand" href="index.html" style="margin:0">
+        <span class="brand-mark">S</span>
+        <span data-brand-name>SocialGo</span>
+      </a>
+
+      <a class="secondary" href="index.html" aria-label="Volver al inicio">← Volver</a>
+    </header>
+
+    <section class="page-card">
+      <h1>Mi perfil</h1>
+
+      <div id="loading" class="notice">Cargando perfil…</div>
+      <div id="message" class="notice" hidden></div>
+
+      <form id="profileForm" hidden>
+        <label class="field">
+          Nombre visible
+          <input id="displayName" maxlength="80" required>
+        </label>
+
+        <label class="field">
+          Usuario
+          <input id="username" readonly>
+          <small>El nombre de usuario es único y no puede modificarse desde esta pantalla.</small>
+        </label>
+
+        <label class="field">
+          Correo de acceso
+          <input id="email" type="email" autocomplete="email" required>
+          <small>Si cambias el correo, Supabase puede pedirte confirmar la nueva dirección.</small>
+        </label>
+
+        <label class="field">
+          Número de contacto
+          <input
+            id="phone"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            maxlength="25"
+            placeholder="+51 999 999 999">
+          <small>Este número permanecerá privado, salvo que actives la búsqueda por teléfono.</small>
+        </label>
+
+        <label class="field">
+          Biografía
+          <textarea id="bio" maxlength="300" rows="5" placeholder="Cuéntanos algo sobre ti"></textarea>
+        </label>
+
+        <label class="toggle-row">
+          <span>Permitir que me encuentren por correo</span>
+          <input id="findByEmail" type="checkbox">
+        </label>
+
+        <label class="toggle-row">
+          <span>Permitir que me encuentren por teléfono</span>
+          <input id="findByPhone" type="checkbox">
+        </label>
+
+        <div class="modal-actions" style="flex-wrap:wrap">
+          <button class="primary" id="saveButton" type="submit">Guardar cambios</button>
+          <a class="secondary" href="index.html">Cancelar y volver</a>
+          <button class="secondary" id="logoutButton" type="button">Cerrar sesión</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script type="module">
+    import { applyBrand } from "./js/brand.js";
+    import { supabase, getMyProfile, getCurrentUser } from "./js/supabase.js";
+
+    applyBrand();
+
+    const loading = document.querySelector("#loading");
+    const message = document.querySelector("#message");
+    const profileForm = document.querySelector("#profileForm");
+    const saveButton = document.querySelector("#saveButton");
+    const logoutButton = document.querySelector("#logoutButton");
+
+    const displayName = document.querySelector("#displayName");
+    const username = document.querySelector("#username");
+    const email = document.querySelector("#email");
+    const phone = document.querySelector("#phone");
+    const bio = document.querySelector("#bio");
+    const findByEmail = document.querySelector("#findByEmail");
+    const findByPhone = document.querySelector("#findByPhone");
+
+    function showMessage(text, isError = false) {
+      message.hidden = false;
+      message.textContent = text;
+      message.style.borderColor = isError ? "var(--danger)" : "var(--border)";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+      window.location.replace("login.html?next=perfil.html");
+    } else {
+      const profile = await getMyProfile();
+
+      if (!profile) {
+        loading.textContent = "No se pudo cargar tu perfil. Verifica que ejecutaste el SQL de actualización.";
+      } else {
+        displayName.value = profile.nombre_visible || "";
+        username.value = profile.username || "";
+        email.value = user.email || "";
+        phone.value = profile.telefono_contacto || "";
+        bio.value = profile.biografia || "";
+        findByEmail.checked = Boolean(profile.permitir_busqueda_correo);
+        findByPhone.checked = Boolean(profile.permitir_busqueda_telefono);
+
+        loading.hidden = true;
+        profileForm.hidden = false;
+      }
+    }
+
+    profileForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      saveButton.disabled = true;
+      saveButton.textContent = "Guardando…";
+      message.hidden = true;
+
+      try {
+        const currentUser = await getCurrentUser();
+        if (!currentUser) throw new Error("Tu sesión expiró. Inicia sesión nuevamente.");
+
+        const newEmail = email.value.trim().toLowerCase();
+        const oldEmail = String(currentUser.email || "").toLowerCase();
+
+        if (newEmail !== oldEmail) {
+          const { error: emailError } = await supabase.auth.updateUser({
+            email: newEmail
+          });
+
+          if (emailError) throw emailError;
+        }
+
+        const { error: profileError } = await supabase
+          .from("perfiles")
+          .update({
+            nombre_visible: displayName.value.trim(),
+            telefono_contacto: phone.value.trim() || null,
+            biografia: bio.value.trim() || null,
+            permitir_busqueda_correo: findByEmail.checked,
+            permitir_busqueda_telefono: findByPhone.checked
+          })
+          .eq("id", currentUser.id);
+
+        if (profileError) throw profileError;
+
+        if (newEmail !== oldEmail) {
+          showMessage("Perfil guardado. Revisa tu correo para confirmar la nueva dirección.");
+        } else {
+          showMessage("Perfil actualizado correctamente.");
+        }
+      } catch (error) {
+        showMessage(error.message || "No se pudo guardar el perfil.", true);
+      } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = "Guardar cambios";
+      }
+    });
+
+    logoutButton.addEventListener("click", async () => {
+      logoutButton.disabled = true;
+      logoutButton.textContent = "Cerrando…";
+
+      try {
+        const { error } = await supabase.auth.signOut({ scope: "local" });
+        if (error) throw error;
+
+        // Evita que el navegador vuelva al perfil usando el historial.
+        window.location.replace("login.html?logout=1");
+      } catch (error) {
+        showMessage(error.message || "No se pudo cerrar la sesión.", true);
+        logoutButton.disabled = false;
+        logoutButton.textContent = "Cerrar sesión";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="description" content="SocialGo: conecta, comparte y crece.">
+  <title>SocialGo</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/global.css">
+</head>
+<body>
+  <div id="appShell">
+    <aside class="sidebar">
+      <a class="brand" href="index.html" aria-label="Inicio">
+        <span class="brand-mark">S</span>
+        <span data-brand-name>SocialGo</span>
+      </a>
+
+      <nav class="side-nav" aria-label="Navegación principal">
+        <a class="active" href="index.html">🏠 <span>Inicio</span></a>
+        <a href="clips.html">🎬 <span>Clips</span></a>
+        <a href="explorar.html">🔎 <span>Explorar</span></a>
+        <a href="mensajes.html">💬 <span>Mensajes</span></a>
+        <a href="perfil.html">👤 <span>Perfil</span></a>
+      </nav>
+
+      <button class="primary wide" id="openComposer">＋ Crear publicación</button>
+      <div class="sidebar-footer">
+        <a href="login.html">Iniciar sesión</a>
+        <a href="registro.html">Crear cuenta</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 data-brand-name>SocialGo</h1>
+          <p data-brand-slogan>Conecta, comparte y crece.</p>
+        </div>
+        <div class="top-actions">
+          <button class="icon-button" aria-label="Buscar">🔎</button>
+          <button class="icon-button" aria-label="Notificaciones">🔔</button>
+          <a class="avatar-link" href="perfil.html" aria-label="Perfil">JH</a>
+        </div>
+      </header>
+
+      <section class="stories" aria-label="Historias">
+        <button class="story add"><span>＋</span><small>Tu historia</small></button>
+        <button class="story"><span>ML</span><small>María</small></button>
+        <button class="story"><span>CR</span><small>Carlos</small></button>
+        <button class="story"><span>AV</span><small>Aventuras</small></button>
+        <button class="story"><span>TC</span><small>Tech</small></button>
+      </section>
+
+      <section class="composer">
+        <div class="avatar">JH</div>
+        <button id="openComposer2">¿Qué tienes en mente?</button>
+        <div class="composer-actions">
+          <button>📷 Foto/Video</button>
+          <button>🎬 Clip</button>
+          <button>📊 Encuesta</button>
+        </div>
+      </section>
+
+      <section id="feed" class="feed" aria-live="polite">
+        <article class="post">
+          <header class="post-header">
+            <div class="avatar">CM</div>
+            <div>
+              <strong>Carlos Mendoza</strong>
+              <small>@carlosm · 2 h</small>
+            </div>
+            <button class="icon-button">•••</button>
+          </header>
+          <p>Lanzamos una nueva línea de productos ecológicos. Hechos con amor y pensados para un futuro mejor. 🌱</p>
+          <div class="post-media sample-media media-one">
+            <span>VIDEO DE DEMOSTRACIÓN</span>
+            <button class="play">▶</button>
+          </div>
+          <footer class="post-actions">
+            <button data-action="like">♡ <span>128</span></button>
+            <button data-action="comment">💬 <span>24</span></button>
+            <button data-action="share">↗ <span>36</span></button>
+            <button data-action="save">🔖</button>
+          </footer>
+        </article>
+
+        <article class="post">
+          <header class="post-header">
+            <div class="avatar">AR</div>
+            <div>
+              <strong>Aventuras Sin Límites</strong>
+              <small>@aventuras · 4 h</small>
+            </div>
+            <button class="icon-button">•••</button>
+          </header>
+          <p>Atardecer increíble en la montaña. 🏔️✨</p>
+          <div class="post-media sample-media media-two">
+            <span>PUBLICACIÓN DESTACADA</span>
+          </div>
+          <footer class="post-actions">
+            <button data-action="like">♡ <span>256</span></button>
+            <button data-action="comment">💬 <span>38</span></button>
+            <button data-action="share">↗ <span>52</span></button>
+            <button data-action="save">🔖</button>
+          </footer>
+        </article>
+      </section>
+    </main>
+
+    <aside class="rightbar">
+      <section class="panel">
+        <h2>Acciones rápidas</h2>
+        <div class="quick-grid">
+          <button>✍️<span>Publicar</span></button>
+          <button>🎯<span>Historia</span></button>
+          <button>📅<span>Evento</span></button>
+          <button>📣<span>Anuncio</span></button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Tu actividad</h2>
+        <ul class="stats-list">
+          <li><span>♡ Me gusta</span><strong>1,234</strong></li>
+          <li><span>🔖 Guardados</span><strong>567</strong></li>
+          <li><span>↗ Compartidos</span><strong>89</strong></li>
+          <li><span>👥 Contactos</span><strong>1,048</strong></li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h2>Sugerencias para ti</h2>
+        <div class="suggestion"><span>DH</span><div><strong>Diseño Hub</strong><small>@disenohub</small></div><button>Seguir</button></div>
+        <div class="suggestion"><span>CB</span><div><strong>Café del Barrio</strong><small>@cafedelbarrio</small></div><button>Seguir</button></div>
+      </section>
+    </aside>
+  </div>
+
+  <nav class="mobile-nav" aria-label="Navegación móvil">
+    <a class="active" href="index.html">🏠<small>Inicio</small></a>
+    <a href="explorar.html">🔎<small>Explorar</small></a>
+    <button id="mobileCreate">＋</button>
+    <a href="mensajes.html">💬<small>Mensajes</small></a>
+    <a href="perfil.html">👤<small>Perfil</small></a>
+  </nav>
+
+  <dialog id="composerDialog">
+    <form method="dialog" class="modal-card">
+      <header>
+        <h2>Crear publicación</h2>
+        <button value="cancel" aria-label="Cerrar">✕</button>
+      </header>
+      <textarea id="postText" maxlength="1000" placeholder="¿Qué deseas compartir?"></textarea>
+      <label class="field">
+        <span>Visibilidad</span>
+        <select id="postVisibility">
+          <option value="public">Público</option>
+          <option value="followers">Solo seguidores</option>
+          <option value="friends">Solo amigos</option>
+          <option value="private">Solo yo</option>
+        </select>
+      </label>
+      <label class="toggle-row">
+        <span>Permitir descargas del video</span>
+        <input type="checkbox" id="allowDownload">
+      </label>
+      <label class="toggle-row">
+        <span>Permitir comentarios</span>
+        <input type="checkbox" id="allowComments" checked>
+      </label>
+      <div class="modal-actions">
+        <button value="cancel" class="secondary">Cancelar</button>
+        <button type="button" class="primary" id="publishDemo">Publicar demostración</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "SocialGo",
+  "short_name": "SocialGo",
+  "description": "Conecta, comparte y crece.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#111827",
+  "icons": []
+}

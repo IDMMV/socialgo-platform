@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Administración · SocialGo</title><link rel="stylesheet" href="css/global.css"></head>
+<body>
+  <main class="page-shell">
+    <a class="brand" href="index.html"><span class="brand-mark">S</span><span data-brand-name>SocialGo</span></a>
+    <section class="page-card">
+      <h1>Panel de administración</h1>
+      <p class="notice">Demostración visual. El acceso real estará protegido con roles, MFA, RLS y funciones de servidor.</p>
+      <div class="admin-grid">
+        <article class="admin-card">👥 Usuarios<strong>0</strong><small>Conectar Supabase</small></article>
+        <article class="admin-card">📝 Publicaciones<strong>0</strong><small>Conectar Supabase</small></article>
+        <article class="admin-card">🛡️ Alertas<strong>0</strong><small>Seguridad inicial</small></article>
+        <article class="admin-card">📋 Pendientes<strong>12</strong><small>Proyecto y proveedores</small></article>
+      </div>
+    </section>
+
+    <section class="page-card" style="margin-top:18px">
+      <h2>Configuración de marca</h2>
+      <form id="brandForm">
+        <label class="field">Nombre<input id="brandName" maxlength="40"></label>
+        <label class="field">Eslogan<input id="brandSlogan" maxlength="90"></label>
+        <label class="field">Color principal<input id="brandPrimary" type="color"></label>
+        <label class="field">Color secundario<input id="brandSecondary" type="color"></label>
+        <button class="primary" type="submit">Guardar cambios</button>
+        <button class="secondary" type="button" onclick="window.print()">Imprimir actividad</button>
+      </form>
+    </section>
+
+    <section class="page-card" style="margin-top:18px">
+      <h2>Pendientes iniciales</h2>
+      <ul>
+        <li>Elegir nombre y dominio definitivo.</li>
+        <li>Configurar proyecto Supabase de desarrollo.</li>
+        <li>Crear políticas RLS y pruebas de acceso.</li>
+        <li>Configurar Cloudflare y Turnstile.</li>
+        <li>Evaluar proveedor de video y moderación.</li>
+        <li>Preparar documentos legales y privacidad.</li>
+      </ul>
+    </section>
+  </main>
+  <script type="module">
+    import { applyBrand, getBrand, saveBrand } from "./js/brand.js";
+    applyBrand();
+    const current = getBrand();
+    brandName.value = current.name;
+    brandSlogan.value = current.slogan;
+    brandPrimary.value = current.primary;
+    brandSecondary.value = current.secondary;
+    brandForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      saveBrand({
+        name: brandName.value.trim() || "SocialGo",
+        slogan: brandSlogan.value.trim(),
+        primary: brandPrimary.value,
+        secondary: brandSecondary.value
+      });
+      alert("Marca actualizada en este dispositivo.");
+    });
+  </script>
+</body></html>

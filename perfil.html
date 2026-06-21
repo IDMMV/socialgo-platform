@@ -100,7 +100,15 @@
     function showMessage(text, isError = false) {
       fields.message.hidden = false;
       fields.message.textContent = text;
-      fields.message.style.borderColor = isError ? "var(--danger)" : "var(--border)";
+      fields.message.style.borderColor = isError ? "var(--danger)" : "#22c55e";
+
+      document.querySelector("#profileToast")?.remove();
+      const toast = document.createElement("div");
+      toast.id = "profileToast";
+      toast.className = `toast ${isError ? "error" : "success"}`;
+      toast.textContent = text;
+      document.body.appendChild(toast);
+      window.setTimeout(() => toast.remove(), 3500);
     }
 
     function initials(value) {

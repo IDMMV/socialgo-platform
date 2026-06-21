@@ -4,9 +4,7 @@ export async function requireAuth({ redirect = "login.html" } = {}) {
   const user = await getCurrentUser();
 
   if (!user) {
-    const next = encodeURIComponent(
-      location.pathname.split("/").pop() || "index.html"
-    );
+    const next = encodeURIComponent(location.pathname.split("/").pop() || "index.html");
     window.location.replace(`${redirect}?next=${next}`);
     return null;
   }
@@ -28,8 +26,7 @@ export async function requireAdmin() {
           <p>No tienes permisos administrativos.</p>
           <a class="primary" href="index.html">Volver al inicio</a>
         </section>
-      </main>
-    `;
+      </main>`;
     return null;
   }
 
@@ -39,18 +36,17 @@ export async function requireAdmin() {
 export async function signOutAndRedirect() {
   const { error } = await supabase.auth.signOut({ scope: "local" });
   if (error) throw error;
-
   window.location.replace("login.html?logout=1");
 }
 
 export async function renderSessionControls() {
   const user = await getCurrentUser();
 
-  document.querySelectorAll("[data-auth-only]").forEach((element) => {
+  document.querySelectorAll("[data-auth-only]").forEach(element => {
     element.hidden = !user;
   });
 
-  document.querySelectorAll("[data-guest-only]").forEach((element) => {
+  document.querySelectorAll("[data-guest-only]").forEach(element => {
     element.hidden = Boolean(user);
   });
 
@@ -58,16 +54,13 @@ export async function renderSessionControls() {
 
   const profile = await getMyProfile();
 
-  document.querySelectorAll("[data-current-username]").forEach((element) => {
-    element.textContent = profile?.username
-      ? `@${profile.username}`
-      : user.email;
+  document.querySelectorAll("[data-current-username]").forEach(element => {
+    element.textContent = profile?.username ? `@${profile.username}` : user.email;
   });
 
-  document.querySelectorAll("[data-logout]").forEach((button) => {
+  document.querySelectorAll("[data-logout]").forEach(button => {
     button.addEventListener("click", async () => {
       button.disabled = true;
-
       try {
         await signOutAndRedirect();
       } catch (error) {

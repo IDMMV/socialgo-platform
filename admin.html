@@ -1,62 +1,196 @@
 <!doctype html>
 <html lang="es">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Administración · SocialGo</title><link rel="stylesheet" href="css/global.css"></head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Administración · SocialGo</title>
+  <link rel="stylesheet" href="css/global.css">
+</head>
 <body>
-  <main class="page-shell">
-    <a class="brand" href="index.html"><span class="brand-mark">S</span><span data-brand-name>SocialGo</span></a>
+  <main class="page-shell" id="adminContent" hidden>
+    <a class="brand" href="index.html">
+      <span class="brand-mark">S</span>
+      <span data-brand-name>SocialGo</span>
+    </a>
+
     <section class="page-card">
       <h1>Panel de administración</h1>
-      <p class="notice">Demostración visual. El acceso real estará protegido con roles, MFA, RLS y funciones de servidor.</p>
+      <p class="notice">
+        Acceso protegido mediante sesión y rol administrativo almacenado en Supabase.
+      </p>
+
       <div class="admin-grid">
-        <article class="admin-card">👥 Usuarios<strong>0</strong><small>Conectar Supabase</small></article>
-        <article class="admin-card">📝 Publicaciones<strong>0</strong><small>Conectar Supabase</small></article>
-        <article class="admin-card">🛡️ Alertas<strong>0</strong><small>Seguridad inicial</small></article>
-        <article class="admin-card">📋 Pendientes<strong>12</strong><small>Proyecto y proveedores</small></article>
+        <article class="admin-card">
+          👥 Usuarios
+          <strong id="usersCount">—</strong>
+          <small>Cuentas registradas</small>
+        </article>
+
+        <article class="admin-card">
+          📝 Publicaciones
+          <strong id="postsCount">0</strong>
+          <small>Fase 3</small>
+        </article>
+
+        <article class="admin-card">
+          🛡️ Alertas
+          <strong id="alertsCount">0</strong>
+          <small>Seguridad inicial</small>
+        </article>
+
+        <article class="admin-card">
+          📋 Pendientes
+          <strong id="tasksCount">—</strong>
+          <small>Proyecto y proveedores</small>
+        </article>
       </div>
     </section>
 
     <section class="page-card" style="margin-top:18px">
       <h2>Configuración de marca</h2>
+
       <form id="brandForm">
-        <label class="field">Nombre<input id="brandName" maxlength="40"></label>
-        <label class="field">Eslogan<input id="brandSlogan" maxlength="90"></label>
-        <label class="field">Color principal<input id="brandPrimary" type="color"></label>
-        <label class="field">Color secundario<input id="brandSecondary" type="color"></label>
-        <button class="primary" type="submit">Guardar cambios</button>
-        <button class="secondary" type="button" onclick="window.print()">Imprimir actividad</button>
+        <label class="field">
+          Nombre
+          <input id="brandName" maxlength="40" required>
+        </label>
+
+        <label class="field">
+          Eslogan
+          <input id="brandSlogan" maxlength="90">
+        </label>
+
+        <label class="field">
+          Color principal
+          <input id="brandPrimary" type="color">
+        </label>
+
+        <label class="field">
+          Color secundario
+          <input id="brandSecondary" type="color">
+        </label>
+
+        <div class="modal-actions">
+          <button class="primary" type="submit">Guardar cambios</button>
+          <button class="secondary" type="button" id="printAdmin">Imprimir actividad</button>
+          <button class="secondary" type="button" data-logout>Cerrar sesión</button>
+        </div>
       </form>
     </section>
 
     <section class="page-card" style="margin-top:18px">
       <h2>Pendientes iniciales</h2>
-      <ul>
-        <li>Elegir nombre y dominio definitivo.</li>
-        <li>Configurar proyecto Supabase de desarrollo.</li>
-        <li>Crear políticas RLS y pruebas de acceso.</li>
-        <li>Configurar Cloudflare y Turnstile.</li>
-        <li>Evaluar proveedor de video y moderación.</li>
-        <li>Preparar documentos legales y privacidad.</li>
-      </ul>
+      <div id="tasksList">Cargando…</div>
     </section>
   </main>
+
+  <section id="accessStatus" class="auth-page">
+    <div class="auth-card">
+      <h1>Verificando acceso</h1>
+      <p class="notice">Comprobando tu sesión y permisos administrativos…</p>
+    </div>
+  </section>
+
   <script type="module">
-    import { applyBrand, getBrand, saveBrand } from "./js/brand.js";
+    import { applyBrand, getBrand, loadBrand, saveBrand } from "./js/brand.js";
+    import { supabase } from "./js/supabase.js";
+    import { requireAdmin, renderSessionControls } from "./js/session.js";
+
     applyBrand();
-    const current = getBrand();
-    brandName.value = current.name;
-    brandSlogan.value = current.slogan;
-    brandPrimary.value = current.primary;
-    brandSecondary.value = current.secondary;
-    brandForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      saveBrand({
-        name: brandName.value.trim() || "SocialGo",
-        slogan: brandSlogan.value.trim(),
-        primary: brandPrimary.value,
-        secondary: brandSecondary.value
+
+    const adminContent = document.querySelector("#adminContent");
+    const accessStatus = document.querySelector("#accessStatus");
+    const usersCount = document.querySelector("#usersCount");
+    const tasksCount = document.querySelector("#tasksCount");
+    const tasksList = document.querySelector("#tasksList");
+
+    const brandForm = document.querySelector("#brandForm");
+    const brandName = document.querySelector("#brandName");
+    const brandSlogan = document.querySelector("#brandSlogan");
+    const brandPrimary = document.querySelector("#brandPrimary");
+    const brandSecondary = document.querySelector("#brandSecondary");
+
+    const user = await requireAdmin();
+
+    if (user) {
+      accessStatus.hidden = true;
+      adminContent.hidden = false;
+
+      await renderSessionControls();
+      await loadBrand();
+
+      const current = getBrand();
+      brandName.value = current.name || "SocialGo";
+      brandSlogan.value = current.slogan || "";
+      brandPrimary.value = current.primary || "#7c3aed";
+      brandSecondary.value = current.secondary || "#22b8f0";
+
+      const [
+        { count: users, error: usersError },
+        { data: tasks, count: tasksTotal, error: tasksError }
+      ] = await Promise.all([
+        supabase
+          .from("perfiles")
+          .select("*", { count: "exact", head: true }),
+
+        supabase
+          .from("pendientes_proyecto")
+          .select("*", { count: "exact" })
+          .order("creado_en", { ascending: false })
+          .limit(20)
+      ]);
+
+      usersCount.textContent = usersError ? "Error" : (users ?? 0);
+      tasksCount.textContent = tasksError ? "Error" : (tasksTotal ?? 0);
+
+      if (tasksError) {
+        tasksList.innerHTML = `<p class="notice">No se pudieron cargar los pendientes: ${tasksError.message}</p>`;
+      } else if (tasks?.length) {
+        tasksList.innerHTML = `
+          <ul>
+            ${tasks.map(task => `
+              <li>
+                <strong>${escapeHtml(task.titulo)}</strong>
+                — ${escapeHtml(task.estado)}
+                (${escapeHtml(task.prioridad)})
+              </li>
+            `).join("")}
+          </ul>
+        `;
+      } else {
+        tasksList.innerHTML = "<p>No hay pendientes registrados.</p>";
+      }
+
+      brandForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        try {
+          await saveBrand({
+            name: brandName.value.trim() || "SocialGo",
+            slogan: brandSlogan.value.trim(),
+            primary: brandPrimary.value,
+            secondary: brandSecondary.value
+          });
+
+          alert("Marca actualizada para toda la plataforma.");
+        } catch (error) {
+          alert(error.message || "No se pudo actualizar la marca.");
+        }
       });
-      alert("Marca actualizada en este dispositivo.");
-    });
+
+      document.querySelector("#printAdmin").addEventListener("click", () => {
+        window.print();
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
   </script>
-</body></html>
+</body>
+</html>

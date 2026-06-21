@@ -1,4 +1,5 @@
 import { supabase, getCurrentUser } from "./supabase.js";
+import { uploadUserImage, removeStorageObject } from "./media.js";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -32,30 +33,70 @@ export async function createPost({
   content,
   visibility = "public",
   allowComments = true,
-  allowDownloads = false
+  allowDownloads = false,
+  imageFile = null
 }) {
   const user = await getCurrentUser();
   if (!user) throw new Error("Debes iniciar sesión.");
 
   const cleanContent = String(content || "").trim();
-  if (!cleanContent) throw new Error("Escribe algo antes de publicar.");
+  if (!cleanContent && !imageFile) {
+    throw new Error("Escribe algo o selecciona una imagen.");
+  }
 
-  const { data, error } = await supabase
+  let upload = null;
+
+  try {
+    if (imageFile) {
+      upload = await uploadUserImage({
+        file: imageFile,
+        bucket: "publicaciones",
+        folder: "imagenes",
+        maxWidth: 1600,
+        maxHeight: 1600,
+        quality: 0.82
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("publicaciones")
+      .insert({
+        autor_id: user.id,
+        contenido: cleanContent || null,
+        tipo: imageFile ? "imagen" : "texto",
+        archivo_url: upload?.url ?? null,
+        visibilidad: visibility,
+        permitir_comentarios: allowComments,
+        permitir_descargas: allowDownloads,
+        estado_moderacion: "aprobado"
+      })
+      .select("id")
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    if (upload?.url) {
+      await removeStorageObject("publicaciones", upload.url).catch(console.error);
+    }
+    throw error;
+  }
+}
+
+export async function updatePost(postId, content) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Debes iniciar sesión.");
+
+  const clean = String(content || "").trim();
+  if (!clean) throw new Error("La publicación no puede quedar vacía.");
+
+  const { error } = await supabase
     .from("publicaciones")
-    .insert({
-      autor_id: user.id,
-      contenido: cleanContent,
-      tipo: "texto",
-      visibilidad: visibility,
-      permitir_comentarios: allowComments,
-      permitir_descargas: allowDownloads,
-      estado_moderacion: "aprobado"
-    })
-    .select("id")
-    .single();
+    .update({ contenido: clean })
+    .eq("id", postId)
+    .eq("autor_id", user.id);
 
   if (error) throw error;
-  return data;
 }
 
 export async function loadFeed(limit = 30) {
@@ -95,10 +136,7 @@ export async function toggleLike(postId) {
 
   const { error } = await supabase
     .from("me_gusta_publicaciones")
-    .insert({
-      publicacion_id: postId,
-      usuario_id: user.id
-    });
+    .insert({ publicacion_id: postId, usuario_id: user.id });
 
   if (error) throw error;
   return true;
@@ -130,10 +168,7 @@ export async function toggleSave(postId) {
 
   const { error } = await supabase
     .from("publicaciones_guardadas")
-    .insert({
-      publicacion_id: postId,
-      usuario_id: user.id
-    });
+    .insert({ publicacion_id: postId, usuario_id: user.id });
 
   if (error) throw error;
   return true;
@@ -145,15 +180,12 @@ export async function registerShare(postId) {
 
   const { error } = await supabase
     .from("publicaciones_compartidas")
-    .insert({
-      publicacion_id: postId,
-      usuario_id: user.id
-    });
+    .insert({ publicacion_id: postId, usuario_id: user.id });
 
   if (error) throw error;
 }
 
-export async function deletePost(postId) {
+export async function deletePost(postId, fileUrl = null) {
   const user = await getCurrentUser();
   if (!user) throw new Error("Debes iniciar sesión.");
 
@@ -164,11 +196,87 @@ export async function deletePost(postId) {
     .eq("autor_id", user.id);
 
   if (error) throw error;
+
+  if (fileUrl) {
+    await removeStorageObject("publicaciones", fileUrl).catch(console.error);
+  }
+}
+
+export async function loadComments(postId) {
+  const { data, error } = await supabase
+    .from("comentarios_detalle")
+    .select("*")
+    .eq("publicacion_id", postId)
+    .order("creado_en", { ascending: true });
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function createComment(postId, content) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Debes iniciar sesión.");
+
+  const clean = String(content || "").trim();
+  if (!clean) throw new Error("Escribe un comentario.");
+
+  const { error } = await supabase
+    .from("comentarios")
+    .insert({
+      publicacion_id: postId,
+      autor_id: user.id,
+      contenido: clean
+    });
+
+  if (error) throw error;
+}
+
+export async function deleteComment(commentId) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Debes iniciar sesión.");
+
+  const { error } = await supabase
+    .from("comentarios")
+    .delete()
+    .eq("id", commentId)
+    .eq("autor_id", user.id);
+
+  if (error) throw error;
+}
+
+export async function reportPost(postId, reason) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Debes iniciar sesión.");
+
+  const { error } = await supabase
+    .from("reportes_contenido")
+    .insert({
+      reportante_id: user.id,
+      publicacion_id: postId,
+      motivo: reason
+    });
+
+  if (error) throw error;
+}
+
+export async function blockUser(blockedUserId) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Debes iniciar sesión.");
+  if (blockedUserId === user.id) throw new Error("No puedes bloquearte a ti mismo.");
+
+  const { error } = await supabase
+    .from("usuarios_bloqueados")
+    .upsert({
+      bloqueador_id: user.id,
+      bloqueado_id: blockedUserId
+    });
+
+  if (error) throw error;
 }
 
 export function renderPost(post, currentUserId) {
   const isOwner = currentUserId && currentUserId === post.autor_id;
-  const avatar = escapeHtml(
+  const avatarText = escapeHtml(
     String(post.nombre_visible || post.username || "U")
       .split(/\s+/)
       .slice(0, 2)
@@ -177,18 +285,31 @@ export function renderPost(post, currentUserId) {
       .toUpperCase()
   );
 
+  const avatar = post.avatar_url
+    ? `<div class="avatar"><img src="${escapeHtml(post.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`
+    : `<div class="avatar">${avatarText}</div>`;
+
   return `
-    <article class="post" data-post-id="${post.id}">
+    <article class="post" data-post-id="${post.id}" data-author-id="${post.autor_id}" data-file-url="${escapeHtml(post.archivo_url || "")}">
       <header class="post-header">
-        <div class="avatar">${avatar}</div>
+        ${avatar}
         <div>
           <strong>${escapeHtml(post.nombre_visible || "Usuario")}</strong>
           <small>@${escapeHtml(post.username || "usuario")} · ${timeAgo(post.creado_en)}</small>
         </div>
-        ${isOwner ? `<button class="icon-button" data-delete-post="${post.id}" title="Eliminar">🗑️</button>` : `<span></span>`}
+        <button class="icon-button" data-post-menu="${post.id}" aria-label="Opciones">•••</button>
+
+        <div class="menu-popup hidden" data-menu-for="${post.id}">
+          ${isOwner ? `<button data-edit-post="${post.id}">✏️ Editar</button>
+          <button data-delete-post="${post.id}">🗑️ Eliminar</button>` : `
+          <button data-report-post="${post.id}">🚩 Reportar</button>
+          <button data-block-user="${post.autor_id}">⛔ Bloquear usuario</button>`}
+        </div>
       </header>
 
-      <p>${escapeHtml(post.contenido || "").replaceAll("\n", "<br>")}</p>
+      ${post.contenido ? `<p>${escapeHtml(post.contenido).replaceAll("\n", "<br>")}</p>` : ""}
+
+      ${post.archivo_url ? `<img class="post-image" src="${escapeHtml(post.archivo_url)}" alt="Imagen publicada por ${escapeHtml(post.username || "usuario")}" loading="lazy">` : ""}
 
       <footer class="post-actions">
         <button data-real-action="like" data-post-id="${post.id}">
@@ -207,6 +328,30 @@ export function renderPost(post, currentUserId) {
           🔖
         </button>
       </footer>
+    </article>
+  `;
+}
+
+export function renderComment(comment, currentUserId) {
+  const isOwner = currentUserId === comment.autor_id;
+  const initials = escapeHtml(
+    String(comment.nombre_visible || comment.username || "U")
+      .split(/\s+/)
+      .slice(0, 2)
+      .map(part => part.charAt(0))
+      .join("")
+      .toUpperCase()
+  );
+
+  return `
+    <article class="comment">
+      <div class="avatar">${initials}</div>
+      <div>
+        <strong>${escapeHtml(comment.nombre_visible || "Usuario")}</strong>
+        <small>@${escapeHtml(comment.username)} · ${timeAgo(comment.creado_en)}</small>
+        <p>${escapeHtml(comment.contenido).replaceAll("\n", "<br>")}</p>
+      </div>
+      ${isOwner ? `<button class="icon-button" data-delete-comment="${comment.id}">🗑️</button>` : ""}
     </article>
   `;
 }

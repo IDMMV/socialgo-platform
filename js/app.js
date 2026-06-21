@@ -70,6 +70,26 @@ removePostImage?.addEventListener("click", () => {
   postImagePreview.classList.add("hidden");
 });
 
+
+document.querySelector("#quickPhoto")?.addEventListener("click", async () => {
+  if (!await requireUser("Regístrate o inicia sesión para publicar una foto.")) return;
+  dialog?.showModal();
+  window.setTimeout(() => postImage?.click(), 150);
+});
+
+document.querySelector("#quickClip")?.addEventListener("click", async () => {
+  if (!await requireUser("Regístrate o inicia sesión para crear un clip.")) return;
+  window.location.href = "clips.html";
+});
+
+document.querySelector("#quickPoll")?.addEventListener("click", async () => {
+  if (!await requireUser("Regístrate o inicia sesión para crear una encuesta.")) return;
+  alert("La encuesta completa se habilitará en la siguiente fase. Por ahora se abrirá el editor para publicar la pregunta.");
+  dialog?.showModal();
+  if (!postText.value.trim()) postText.value = "📊 Encuesta: ";
+  postText?.focus();
+});
+
 async function refreshFeed() {
   if (!feed) return;
 

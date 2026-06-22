@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Notificaciones · SocialGo</title>
+  <link rel="stylesheet" href="css/global.css">
+</head>
+<body>
+  <main class="page-shell">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">S</span>
+        <span data-brand-name>SocialGo</span>
+      </a>
+      <a class="secondary" href="index.html">← Volver</a>
+    </header>
+
+    <section class="page-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div>
+          <h1>Notificaciones</h1>
+          <p>Me gusta, comentarios y avisos importantes.</p>
+        </div>
+        <button id="markAllRead" class="secondary" type="button">Marcar todas como leídas</button>
+      </div>
+
+      <div id="notificationsList" class="notifications-list">
+        <p class="notice">Cargando notificaciones…</p>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { applyBrand } from "./js/brand.js";
+    import { supabase, getCurrentUser } from "./js/supabase.js";
+
+    applyBrand();
+
+    const list = document.querySelector("#notificationsList");
+    const markAllButton = document.querySelector("#markAllRead");
+    const user = await getCurrentUser();
+
+    if (!user) {
+      window.location.replace("login.html?next=notificaciones.html");
+    } else {
+      await loadNotifications();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;")
+        .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function notificationText(item) {
+      const actor = item.actor_username ? `@${item.actor_username}` : "Un usuario";
+
+      if (item.tipo === "like") return `${actor} indicó que le gusta tu publicación.`;
+      if (item.tipo === "comentario") return `${actor} comentó tu publicación.`;
+      if (item.tipo === "seguimiento") return `${actor} comenzó a seguirte.`;
+      return item.mensaje || "Tienes una nueva notificación.";
+    }
+
+    async function loadNotifications() {
+      const { data, error } = await supabase
+        .from("notificaciones_detalle")
+        .select("*")
+        .order("creado_en", { ascending: false })
+        .limit(100);
+
+      if (error) {
+        list.innerHTML = `<p class="notice">${escapeHtml(error.message)}</p>`;
+        return;
+      }
+
+      list.innerHTML = data?.length
+        ? data.map(item => `
+          <article class="notification-item ${item.leida ? "" : "unread"}" data-notification-id="${item.id}">
+            <span class="avatar">${item.tipo === "like" ? "♥" : item.tipo === "comentario" ? "💬" : "🔔"}</span>
+            <div>
+              <strong>${escapeHtml(notificationText(item))}</strong>
+              <small>${new Date(item.creado_en).toLocaleString("es-PE")}</small>
+            </div>
+            ${item.leida ? "" : `<button data-read="${item.id}" title="Marcar como leída">✓</button>`}
+          </article>`).join("")
+        : `<p class="notice">No tienes notificaciones.</p>`;
+
+      document.querySelectorAll("[data-read]").forEach(button => {
+        button.addEventListener("click", async () => {
+          const { error: updateError } = await supabase
+            .from("notificaciones")
+            .update({ leida: true })
+            .eq("id", button.dataset.read)
+            .eq("usuario_id", user.id);
+
+          if (updateError) alert(updateError.message);
+          else loadNotifications();
+        });
+      });
+    }
+
+    markAllButton.addEventListener("click", async () => {
+      const { error } = await supabase
+        .from("notificaciones")
+        .update({ leida: true })
+        .eq("usuario_id", user.id)
+        .eq("leida", false);
+
+      if (error) alert(error.message);
+      else loadNotifications();
+    });
+  </script>
+</body>
+</html>

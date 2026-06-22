@@ -110,6 +110,123 @@ export async function loadFeed(limit = 30) {
   return data ?? [];
 }
 
+
+export async function createPoll({
+  question,
+  options,
+  visibility = "public",
+  durationDays = 7
+}) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Debes iniciar sesión.");
+
+  const cleanQuestion = String(question || "").trim();
+  const cleanOptions = (options || [])
+    .map(option => String(option || "").trim())
+    .filter(Boolean);
+
+  if (cleanQuestion.length < 3) {
+    throw new Error("Escribe una pregunta válida.");
+  }
+
+  if (cleanOptions.length < 2 || cleanOptions.length > 6) {
+    throw new Error("La encuesta debe tener entre 2 y 6 opciones.");
+  }
+
+  const closesAt = new Date(Date.now() + Number(durationDays) * 86400000).toISOString();
+
+  const { data: post, error: postError } = await supabase
+    .from("publicaciones")
+    .insert({
+      autor_id: user.id,
+      contenido: cleanQuestion,
+      tipo: "encuesta",
+      visibilidad: visibility,
+      permitir_comentarios: true,
+      permitir_descargas: false,
+      estado_moderacion: "aprobado"
+    })
+    .select("id")
+    .single();
+
+  if (postError) throw postError;
+
+  const { error: pollError } = await supabase
+    .from("encuestas")
+    .insert({
+      publicacion_id: post.id,
+      creador_id: user.id,
+      pregunta: cleanQuestion,
+      cierra_en: closesAt
+    });
+
+  if (pollError) {
+    await supabase.from("publicaciones").delete().eq("id", post.id);
+    throw pollError;
+  }
+
+  const rows = cleanOptions.map((text, index) => ({
+    publicacion_id: post.id,
+    texto: text,
+    orden: index + 1
+  }));
+
+  const { error: optionsError } = await supabase
+    .from("encuesta_opciones")
+    .insert(rows);
+
+  if (optionsError) {
+    await supabase.from("publicaciones").delete().eq("id", post.id);
+    throw optionsError;
+  }
+
+  return post;
+}
+
+export async function votePoll(optionId) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Debes iniciar sesión para votar.");
+
+  const { error } = await supabase.rpc("votar_encuesta", {
+    p_opcion_id: optionId
+  });
+
+  if (error) throw error;
+}
+
+export async function loadPollDetails(postIds = []) {
+  if (!postIds.length) return new Map();
+
+  const { data, error } = await supabase
+    .from("encuestas_feed")
+    .select("*")
+    .in("publicacion_id", postIds);
+
+  if (error) throw error;
+
+  const map = new Map();
+  for (const row of data || []) {
+    if (!map.has(row.publicacion_id)) {
+      map.set(row.publicacion_id, {
+        publicacion_id: row.publicacion_id,
+        pregunta: row.pregunta,
+        cierra_en: row.cierra_en,
+        total_votos: Number(row.total_votos || 0),
+        usuario_opcion_id: row.usuario_opcion_id,
+        options: []
+      });
+    }
+
+    map.get(row.publicacion_id).options.push({
+      id: row.opcion_id,
+      texto: row.opcion_texto,
+      votos: Number(row.votos_opcion || 0)
+    });
+  }
+
+  return map;
+}
+
 export async function toggleLike(postId) {
   const user = await getCurrentUser();
   if (!user) throw new Error("Debes iniciar sesión.");
@@ -274,7 +391,7 @@ export async function blockUser(blockedUserId) {
   if (error) throw error;
 }
 
-export function renderPost(post, currentUserId) {
+export function renderPost(post, currentUserId, poll = null) {
   const isOwner = currentUserId && currentUserId === post.autor_id;
   const avatarText = escapeHtml(
     String(post.nombre_visible || post.username || "U")
@@ -288,6 +405,36 @@ export function renderPost(post, currentUserId) {
   const avatar = post.avatar_url
     ? `<div class="avatar"><img src="${escapeHtml(post.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`
     : `<div class="avatar">${avatarText}</div>`;
+
+
+  const pollHtml = poll ? `
+    <section class="poll-card">
+      <strong>${escapeHtml(poll.pregunta)}</strong>
+      <div class="poll-options">
+        ${poll.options.map(option => {
+          const percent = poll.total_votos
+            ? Math.round((option.votos / poll.total_votos) * 100)
+            : 0;
+          const selected = poll.usuario_opcion_id === option.id;
+
+          return `
+            <button
+              class="poll-option ${selected ? "selected" : ""}"
+              data-poll-option-id="${option.id}"
+              ${new Date(poll.cierra_en) <= new Date() ? "disabled" : ""}>
+              <span class="poll-progress" style="width:${percent}%"></span>
+              <span>${escapeHtml(option.texto)}</span>
+              <strong>${percent}%</strong>
+            </button>`;
+        }).join("")}
+      </div>
+      <div class="poll-meta">
+        <span>${poll.total_votos} voto${poll.total_votos === 1 ? "" : "s"}</span>
+        <span>${new Date(poll.cierra_en) <= new Date()
+          ? "Encuesta cerrada"
+          : `Cierra ${new Date(poll.cierra_en).toLocaleString("es-PE")}`}</span>
+      </div>
+    </section>` : "";
 
   return `
     <article class="post" data-post-id="${post.id}" data-author-id="${post.autor_id}" data-file-url="${escapeHtml(post.archivo_url || "")}">
@@ -307,7 +454,9 @@ export function renderPost(post, currentUserId) {
         </div>
       </header>
 
-      ${post.contenido ? `<p>${escapeHtml(post.contenido).replaceAll("\n", "<br>")}</p>` : ""}
+      ${post.contenido && post.tipo !== "encuesta" ? `<p>${escapeHtml(post.contenido).replaceAll("\n", "<br>")}</p>` : ""}
+
+      ${pollHtml}
 
       ${post.archivo_url ? `<img class="post-image" src="${escapeHtml(post.archivo_url)}" alt="Imagen publicada por ${escapeHtml(post.username || "usuario")}" loading="lazy">` : ""}
 

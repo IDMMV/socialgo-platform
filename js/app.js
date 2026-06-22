@@ -16,7 +16,10 @@ import {
   reportPost,
   blockUser,
   renderPost,
-  renderComment
+  renderComment,
+  createPoll,
+  votePoll,
+  loadPollDetails
 } from "./publicaciones.js";
 
 applyBrand();
@@ -37,6 +40,15 @@ const removePostImage = document.querySelector("#removePostImage");
 const commentsList = document.querySelector("#commentsList");
 const commentForm = document.querySelector("#commentForm");
 const commentText = document.querySelector("#commentText");
+
+const pollDialog = document.querySelector("#pollDialog");
+const pollOptionsBuilder = document.querySelector("#pollOptionsBuilder");
+const pollQuestion = document.querySelector("#pollQuestion");
+const pollDuration = document.querySelector("#pollDuration");
+const pollVisibility = document.querySelector("#pollVisibility");
+const pollStatus = document.querySelector("#pollStatus");
+const publishPollButton = document.querySelector("#publishPoll");
+
 
 let selectedImage = null;
 let activeCommentsPostId = null;
@@ -84,10 +96,9 @@ document.querySelector("#quickClip")?.addEventListener("click", async () => {
 
 document.querySelector("#quickPoll")?.addEventListener("click", async () => {
   if (!await requireUser("Regístrate o inicia sesión para crear una encuesta.")) return;
-  alert("La encuesta completa se habilitará en la siguiente fase. Por ahora se abrirá el editor para publicar la pregunta.");
-  dialog?.showModal();
-  if (!postText.value.trim()) postText.value = "📊 Encuesta: ";
-  postText?.focus();
+  pollStatus.classList.add("hidden");
+  pollDialog.showModal();
+  pollQuestion.focus();
 });
 
 async function refreshFeed() {
@@ -98,6 +109,8 @@ async function refreshFeed() {
   try {
     const currentUser = await getCurrentUser();
     const posts = await loadFeed();
+    const pollPostIds = posts.filter(post => post.tipo === "encuesta").map(post => post.id);
+    const polls = await loadPollDetails(pollPostIds);
 
     if (!posts.length) {
       feed.innerHTML = `
@@ -108,7 +121,7 @@ async function refreshFeed() {
       return;
     }
 
-    feed.innerHTML = posts.map(post => renderPost(post, currentUser?.id)).join("");
+    feed.innerHTML = posts.map(post => renderPost(post, currentUser?.id, polls.get(post.id))).join("");
     bindPostActions();
   } catch (error) {
     console.error(error);
@@ -152,7 +165,24 @@ function closeAllMenus() {
   document.querySelectorAll(".menu-popup").forEach(menu => menu.classList.add("hidden"));
 }
 
+
+function bindPollActions() {
+  document.querySelectorAll("[data-poll-option-id]").forEach(button => {
+    button.addEventListener("click", async () => {
+      if (!await requireUser("Debes iniciar sesión para votar.")) return;
+
+      try {
+        await votePoll(button.dataset.pollOptionId);
+        await refreshFeed();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+  });
+}
+
 function bindPostActions() {
+  bindPollActions();
   document.querySelectorAll("[data-post-menu]").forEach(button => {
     button.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -330,9 +360,98 @@ commentForm?.addEventListener("submit", async (event) => {
   }
 });
 
+
+document.querySelector("#addPollOption")?.addEventListener("click", () => {
+  const current = pollOptionsBuilder.querySelectorAll(".poll-builder-row").length;
+  if (current >= 6) {
+    alert("Máximo 6 opciones.");
+    return;
+  }
+
+  const row = document.createElement("div");
+  row.className = "poll-builder-row";
+  row.innerHTML = `
+    <input class="poll-option-input" maxlength="120" placeholder="Opción ${current + 1}">
+    <button type="button" class="secondary">✕</button>`;
+
+  row.querySelector("button").addEventListener("click", () => row.remove());
+  pollOptionsBuilder.appendChild(row);
+  row.querySelector("input").focus();
+});
+
+pollOptionsBuilder.querySelectorAll(".poll-builder-row button").forEach(button => {
+  if (!button.disabled) {
+    button.addEventListener("click", () => button.closest(".poll-builder-row").remove());
+  }
+});
+
+publishPollButton?.addEventListener("click", async () => {
+  if (!await requireUser("Debes iniciar sesión para publicar una encuesta.")) return;
+
+  const options = [...pollOptionsBuilder.querySelectorAll(".poll-option-input")]
+    .map(input => input.value.trim())
+    .filter(Boolean);
+
+  publishPollButton.disabled = true;
+  pollStatus.classList.remove("hidden");
+  pollStatus.textContent = "Publicando encuesta…";
+
+  try {
+    await createPoll({
+      question: pollQuestion.value,
+      options,
+      visibility: pollVisibility.value,
+      durationDays: Number(pollDuration.value)
+    });
+
+    pollQuestion.value = "";
+    pollOptionsBuilder.innerHTML = `
+      <div class="poll-builder-row">
+        <input class="poll-option-input" maxlength="120" placeholder="Opción 1">
+        <button type="button" class="secondary" disabled>✕</button>
+      </div>
+      <div class="poll-builder-row">
+        <input class="poll-option-input" maxlength="120" placeholder="Opción 2">
+        <button type="button" class="secondary" disabled>✕</button>
+      </div>`;
+
+    pollStatus.textContent = "Encuesta publicada.";
+    setTimeout(() => {
+      pollDialog.close();
+      refreshFeed();
+    }, 700);
+  } catch (error) {
+    pollStatus.textContent = error.message;
+    pollStatus.style.borderColor = "var(--danger)";
+  } finally {
+    publishPollButton.disabled = false;
+  }
+});
+
+async function refreshNotificationBadge() {
+  const user = await getCurrentUser();
+  const badge = document.querySelector("#notificationBadge");
+  if (!user || !badge) return;
+
+  const { count, error } = await supabase
+    .from("notificaciones")
+    .select("id", { count: "exact", head: true })
+    .eq("usuario_id", user.id)
+    .eq("leida", false);
+
+  if (!error && count) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.hidden = false;
+  } else {
+    badge.hidden = true;
+  }
+}
+
+
 document.querySelector("#closeComments")?.addEventListener("click", () => commentsDialog.close());
 
 await refreshFeed();
+await refreshNotificationBadge();
 
 if ("serviceWorker" in navigator && APP_CONFIG.enablePWA) {
   window.addEventListener("load", () => {

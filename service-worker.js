@@ -1,4 +1,4 @@
-const CACHE_NAME = "socialgo-v0.5.0";
+const CACHE_NAME = "socialgo-v0.6.0";
 
 const CORE = [
   "./",
@@ -6,6 +6,7 @@ const CORE = [
   "./login.html",
   "./registro.html",
   "./clips.html",
+  "./notificaciones.html",
   "./recuperar.html",
   "./restablecer.html",
   "./auth-callback.html",

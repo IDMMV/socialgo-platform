@@ -110,9 +110,36 @@
 
             <section id="clipTextPanel" class="clip-text-panel hidden">
               <label class="field">
-                Texto del clip
+                Texto dentro del video
                 <input id="clipTextInput" maxlength="80" placeholder="Escribe un texto">
               </label>
+
+              <div class="text-style-grid">
+                <label>
+                  Color
+                  <input id="clipTextColor" type="color" value="#ffffff">
+                </label>
+
+                <label>
+                  Fondo
+                  <select id="clipTextBackground">
+                    <option value="dark">Oscuro</option>
+                    <option value="light">Claro</option>
+                    <option value="transparent">Sin fondo</option>
+                    <option value="purple">Morado</option>
+                    <option value="pink">Rosado</option>
+                  </select>
+                </label>
+
+                <label>
+                  Tamaño
+                  <input id="clipTextSize" type="range" min="18" max="52" value="28">
+                </label>
+              </div>
+
+              <p class="notice">
+                Arrastra el texto directamente sobre el video para colocarlo donde deseas.
+              </p>
             </section>
 
             <label class="field">
@@ -148,7 +175,7 @@
                 <span id="processingPercent">0%</span>
               </div>
               <progress id="processingProgress" max="100" value="0"></progress>
-              <small>No cierres esta ventana.</small>
+              <small id="processingHint">No cierres esta ventana. La carga puede continuar por partes.</small>
             </div>
           </div>
         </section>

@@ -189,6 +189,16 @@ async function loadFFmpeg(progressCallback) {
   return ffmpegInstance;
 }
 
+export async function preloadVideoEditor(progressCallback) {
+  try {
+    await loadFFmpeg(progressCallback);
+    return true;
+  } catch (error) {
+    console.warn("No se pudo precargar el editor:", error);
+    return false;
+  }
+}
+
 export async function trimVideo({
   file,
   start,

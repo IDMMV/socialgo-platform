@@ -15,8 +15,10 @@ import {
   readVideoMetadata,
   createTimelineThumbnails,
   captureCover,
-  trimVideo
+  trimVideo,
+  preloadVideoEditor
 } from "./clip-editor.js";
+import { uploadResumable } from "./resumable-upload.js";
 
 applyBrand();
 
@@ -43,6 +45,9 @@ const addTextButton = document.querySelector("#addClipText");
 const textPanel = document.querySelector("#clipTextPanel");
 const textInput = document.querySelector("#clipTextInput");
 const textOverlay = document.querySelector("#clipTextOverlay");
+const textColor = document.querySelector("#clipTextColor");
+const textBackground = document.querySelector("#clipTextBackground");
+const textSize = document.querySelector("#clipTextSize");
 const chooseCoverButton = document.querySelector("#chooseCover");
 const coverPanel = document.querySelector("#coverPickerPanel");
 const coverTime = document.querySelector("#coverTime");
@@ -72,6 +77,10 @@ let activeCommentsPostId = null;
 let observer = null;
 let coverBlob = null;
 let previewObjectUrl = null;
+let isProcessing = false;
+let textPosition = { x: 50, y: 48 };
+let draggingText = false;
+let dragOffset = { x: 0, y: 0 };
 
 async function requireUser(message) {
   const user = await getCurrentUser();
@@ -179,6 +188,14 @@ function resetEditor() {
   textInput.value = "";
   textOverlay.textContent = "";
   textOverlay.classList.add("hidden");
+  textPosition = { x: 50, y: 48 };
+  textOverlay.style.left = "50%";
+  textOverlay.style.top = "48%";
+  textOverlay.style.transform = "translate(-50%, -50%)";
+  textColor.value = "#ffffff";
+  textBackground.value = "dark";
+  textSize.value = "28";
+  applyTextStyle();
   textPanel.classList.add("hidden");
   coverPanel.classList.add("hidden");
   editorControls.hidden = true;
@@ -235,6 +252,15 @@ async function handleSelectedVideo(file) {
     hideStatus();
     updateTrimUI("start");
     await updateCover();
+
+    if (sourceDuration > MAX_CLIP_SECONDS) {
+      preloadVideoEditor((percent, title) => {
+        if (!isProcessing) {
+          showStatus(`${title} ${percent}%`);
+          if (percent >= 8) setTimeout(hideStatus, 700);
+        }
+      });
+    }
   } catch (error) {
     selectedFile = null;
     fileInput.value = "";
@@ -256,18 +282,18 @@ async function updateCover() {
 async function uploadClipFile(file, user) {
   const path = `${user.id}/${crypto.randomUUID()}.mp4`;
 
-  const { error } = await supabase.storage
-    .from("clips")
-    .upload(path, file, {
-      contentType: "video/mp4",
-      cacheControl: "3600",
-      upsert: false
-    });
-
-  if (error) throw error;
-
-  const { data } = supabase.storage.from("clips").getPublicUrl(path);
-  return { path, url: data.publicUrl };
+  return uploadResumable({
+    bucket: "clips",
+    path,
+    file,
+    contentType: "video/mp4",
+    onProgress(percent) {
+      updateProcessing(
+        70 + Math.round(percent * 0.27),
+        `Subiendo clip… ${percent}%`
+      );
+    }
+  });
 }
 
 async function uploadCover(user) {
@@ -313,15 +339,31 @@ async function processAndPublish() {
   let uploadedCover = null;
 
   try {
-    const processedFile = await trimVideo({
-      file: selectedFile,
-      start: trimStartValue,
-      end: trimEndValue,
-      muted,
-      progressCallback: updateProcessing
-    });
+    isProcessing = true;
 
-    updateProcessing(96, "Subiendo clip…");
+    const usesWholeVideo =
+      trimStartValue <= 0.05 &&
+      Math.abs(trimEndValue - sourceDuration) <= 0.1 &&
+      sourceDuration <= MAX_CLIP_SECONDS &&
+      !muted;
+
+    let processedFile = selectedFile;
+
+    if (usesWholeVideo && selectedFile.type === "video/mp4") {
+      updateProcessing(12, "Preparando carga rápida…");
+    } else {
+      processedFile = await trimVideo({
+        file: selectedFile,
+        start: trimStartValue,
+        end: trimEndValue,
+        muted,
+        progressCallback(percent, title) {
+          updateProcessing(Math.round(percent * 0.68), title);
+        }
+      });
+    }
+
+    updateProcessing(70, "Iniciando carga reanudable…");
     uploadedVideo = await uploadClipFile(processedFile, user);
 
     updateProcessing(98, "Subiendo portada…");
@@ -344,7 +386,15 @@ async function processAndPublish() {
         permitir_comentarios: allowComments.checked,
         permitir_descargas: allowDownload.checked,
         estado_moderacion: "aprobado",
-        duracion_segundos: Math.round(selectedDuration)
+        duracion_segundos: Math.round(selectedDuration),
+        clip_editor: {
+          text: textInput.value.trim() || null,
+          textColor: textColor.value,
+          textBackground: textBackground.value,
+          textSize: Number(textSize.value),
+          textX: textPosition.x,
+          textY: textPosition.y
+        }
       });
 
     if (error) throw error;
@@ -372,6 +422,7 @@ async function processAndPublish() {
       true
     );
   } finally {
+    isProcessing = false;
     publishButton.disabled = false;
     publishButton.textContent = "Siguiente";
   }
@@ -393,6 +444,15 @@ function renderClip(clip) {
         preload="metadata"></video>
 
       <div class="clip-gradient"></div>
+      ${clip.clip_editor?.text ? `
+        <div class="published-clip-text bg-${escapeHtml(clip.clip_editor.textBackground || "dark")}"
+             style="
+               left:${Number(clip.clip_editor.textX ?? 50)}%;
+               top:${Number(clip.clip_editor.textY ?? 48)}%;
+               color:${escapeHtml(clip.clip_editor.textColor || "#ffffff")};
+               font-size:${Number(clip.clip_editor.textSize || 28)}px;">
+          ${escapeHtml(clip.clip_editor.text)}
+        </div>` : ""}
       <div class="clip-play-overlay"><span>▶</span></div>
 
       <div class="clip-info">
@@ -554,7 +614,36 @@ async function refreshComments() {
 
 createButton?.addEventListener("click", openEditor);
 document.querySelector("#bottomCreateClip")?.addEventListener("click", openEditor);
-closeEditorButton?.addEventListener("click", () => editorDialog.close());
+
+editorDialog.addEventListener("cancel", event => {
+  if (isProcessing) {
+    event.preventDefault();
+    showStatus("La carga está en curso. Espera a que termine.", true);
+    return;
+  }
+
+  if (selectedFile && !confirm("¿Salir del editor? Se perderán los cambios no publicados.")) {
+    event.preventDefault();
+  }
+});
+
+closeEditorButton?.addEventListener("click", () => {
+  if (isProcessing) {
+    showStatus("La carga está en curso. Espera a que termine.", true);
+    return;
+  }
+
+  if (!selectedFile || confirm("¿Salir del editor? Se perderán los cambios no publicados.")) {
+    editorDialog.close();
+  }
+});
+
+window.addEventListener("beforeunload", event => {
+  if (!isProcessing) return;
+  event.preventDefault();
+  event.returnValue = "";
+});
+
 
 fileInput.addEventListener("change", () => {
   const file = fileInput.files?.[0];
@@ -582,10 +671,52 @@ addTextButton.addEventListener("click", () => {
   textInput.focus();
 });
 
+function applyTextStyle() {
+  textOverlay.style.color = textColor.value;
+  textOverlay.style.fontSize = `${textSize.value}px`;
+  textOverlay.dataset.background = textBackground.value;
+  textOverlay.className = `clip-text-overlay bg-${textBackground.value}`;
+  if (!textInput.value.trim()) textOverlay.classList.add("hidden");
+}
+
 textInput.addEventListener("input", () => {
   const text = textInput.value.trim();
   textOverlay.textContent = text;
   textOverlay.classList.toggle("hidden", !text);
+  applyTextStyle();
+});
+
+textColor.addEventListener("input", applyTextStyle);
+textBackground.addEventListener("change", applyTextStyle);
+textSize.addEventListener("input", applyTextStyle);
+
+textOverlay.addEventListener("pointerdown", event => {
+  if (!textInput.value.trim()) return;
+
+  draggingText = true;
+  textOverlay.setPointerCapture(event.pointerId);
+  const rect = textOverlay.getBoundingClientRect();
+  dragOffset.x = event.clientX - rect.left - rect.width / 2;
+  dragOffset.y = event.clientY - rect.top - rect.height / 2;
+});
+
+textOverlay.addEventListener("pointermove", event => {
+  if (!draggingText) return;
+
+  const previewRect = textOverlay.parentElement.getBoundingClientRect();
+  const x = ((event.clientX - previewRect.left - dragOffset.x) / previewRect.width) * 100;
+  const y = ((event.clientY - previewRect.top - dragOffset.y) / previewRect.height) * 100;
+
+  textPosition.x = Math.max(8, Math.min(92, x));
+  textPosition.y = Math.max(8, Math.min(92, y));
+
+  textOverlay.style.left = `${textPosition.x}%`;
+  textOverlay.style.top = `${textPosition.y}%`;
+});
+
+textOverlay.addEventListener("pointerup", event => {
+  draggingText = false;
+  try { textOverlay.releasePointerCapture(event.pointerId); } catch {}
 });
 
 chooseCoverButton.addEventListener("click", async () => {

@@ -1559,3 +1559,236 @@ dialog{
     margin-top:68px;
   }
 }
+
+
+/* ============================================================
+   SOCIALGO FASE 8.5E — PERFIL Y TRES PANELES INDEPENDIENTES
+   ============================================================ */
+
+/* Perfil */
+.profile-media-block{
+  position:relative;
+  margin-bottom:22px;
+}
+.profile-media-block .profile-cover{
+  height:230px;
+  margin-bottom:0;
+  overflow:hidden;
+  border-radius:18px;
+}
+.profile-avatar-row{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:18px;
+  align-items:center;
+  padding:0 24px;
+  margin-top:-48px;
+  position:relative;
+  z-index:4;
+}
+.profile-avatar-row .profile-avatar-large{
+  position:static;
+  width:112px;
+  height:112px;
+  flex:none;
+  border:5px solid var(--surface);
+  box-shadow:0 12px 34px rgba(0,0,0,.35);
+}
+.profile-avatar-controls{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+  padding-top:48px;
+}
+.profile-avatar-controls small{
+  color:var(--muted);
+  line-height:1.4;
+}
+.avatar-upload-button{
+  min-width:210px;
+  white-space:nowrap;
+}
+.profile-image-help{
+  display:none!important;
+}
+.avatar-action-visible{
+  display:none!important;
+}
+
+/* Tres columnas independientes */
+@media(min-width:1101px){
+  html,body{
+    height:100%;
+    overflow:hidden;
+  }
+
+  #appShell{
+    height:100dvh;
+    max-width:none;
+    width:100%;
+    margin:0;
+    padding:14px;
+    display:grid;
+    grid-template-columns:240px minmax(520px,1fr) 320px;
+    gap:16px;
+    transition:grid-template-columns .25s ease;
+  }
+
+  #appShell.left-collapsed{
+    grid-template-columns:72px minmax(520px,1fr) 320px;
+  }
+
+  #appShell.right-collapsed{
+    grid-template-columns:240px minmax(520px,1fr) 64px;
+  }
+
+  #appShell.left-collapsed.right-collapsed{
+    grid-template-columns:72px minmax(520px,1fr) 64px;
+  }
+
+  .sidebar,
+  .main,
+  .rightbar{
+    height:calc(100dvh - 28px);
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    scrollbar-width:thin;
+    scrollbar-color:#394964 transparent;
+  }
+
+  .sidebar,
+  .rightbar{
+    position:relative;
+    top:auto;
+    align-self:stretch;
+    overscroll-behavior:contain;
+  }
+
+  .main{
+    padding:0 4px 100px;
+    overscroll-behavior:contain;
+  }
+
+  .topbar{
+    top:0;
+    z-index:30;
+  }
+
+  .sidebar-collapse-button{
+    position:sticky;
+    top:0;
+    z-index:60;
+    display:grid;
+    place-items:center;
+    width:36px;
+    height:36px;
+    margin-bottom:10px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:rgba(15,27,45,.96);
+    color:white;
+    font-size:22px;
+    box-shadow:0 8px 20px rgba(0,0,0,.22);
+  }
+
+  .sidebar-collapse-left{
+    margin-left:auto;
+  }
+
+  .sidebar-collapse-right{
+    margin-right:auto;
+  }
+
+  #appShell.left-collapsed .sidebar{
+    padding:14px 10px;
+  }
+
+  #appShell.left-collapsed .sidebar .brand span:last-child,
+  #appShell.left-collapsed .sidebar .side-nav span,
+  #appShell.left-collapsed .sidebar .primary.wide,
+  #appShell.left-collapsed .sidebar .sidebar-account span:not(.avatar),
+  #appShell.left-collapsed .sidebar .sidebar-account b,
+  #appShell.left-collapsed .sidebar .premium-card,
+  #appShell.left-collapsed .sidebar .sidebar-footer{
+    display:none!important;
+  }
+
+  #appShell.left-collapsed .sidebar .brand{
+    justify-content:center;
+    padding:0;
+  }
+
+  #appShell.left-collapsed .sidebar .side-nav a{
+    justify-content:center;
+    padding:12px 8px;
+    font-size:20px;
+  }
+
+  #appShell.left-collapsed .sidebar .sidebar-profile{
+    display:flex;
+    justify-content:center;
+    padding:6px;
+  }
+
+  #appShell.right-collapsed .rightbar{
+    padding:12px 8px;
+  }
+
+  #appShell.right-collapsed .rightbar .panel{
+    display:none;
+  }
+
+  #appShell.right-collapsed .sidebar-collapse-right{
+    margin:auto;
+  }
+
+  .sidebar::-webkit-scrollbar,
+  .main::-webkit-scrollbar,
+  .rightbar::-webkit-scrollbar{
+    width:8px;
+  }
+
+  .sidebar::-webkit-scrollbar-thumb,
+  .main::-webkit-scrollbar-thumb,
+  .rightbar::-webkit-scrollbar-thumb{
+    background:#394964;
+    border-radius:999px;
+  }
+}
+
+@media(max-width:1100px){
+  .sidebar-collapse-button{
+    display:none;
+  }
+}
+
+@media(max-width:760px){
+  .profile-media-block .profile-cover{
+    height:180px;
+  }
+
+  .profile-avatar-row{
+    grid-template-columns:1fr;
+    padding:0 12px;
+    margin-top:-42px;
+    gap:8px;
+  }
+
+  .profile-avatar-row .profile-avatar-large{
+    width:96px;
+    height:96px;
+  }
+
+  .profile-avatar-controls{
+    padding-top:0;
+    display:grid;
+    gap:8px;
+  }
+
+  .avatar-upload-button{
+    width:100%;
+    min-width:0;
+  }
+}

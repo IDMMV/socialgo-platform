@@ -1,4 +1,4 @@
-const CACHE_NAME = "socialgo-v0.8.5d";
+const CACHE_NAME = "socialgo-v0.8.5e";
 
 const CORE = [
   "./",
@@ -15,6 +15,7 @@ const CORE = [
   "./perfil.html",
   "./css/global.css",
   "./js/app.js",
+  "./js/layout.js",
   "./js/auth.js",
   "./js/brand.js",
   "./js/config.js",

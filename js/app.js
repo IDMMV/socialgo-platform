@@ -1,6 +1,6 @@
 import { APP_CONFIG } from "./config.js";
 import { applyBrand } from "./brand.js";
-import { getCurrentUser } from "./supabase.js";
+import { supabase, getCurrentUser } from "./supabase.js";
 import { renderSessionControls } from "./session.js";
 import {
   createPost,
@@ -49,6 +49,55 @@ const pollVisibility = document.querySelector("#pollVisibility");
 const pollStatus = document.querySelector("#pollStatus");
 const publishPollButton = document.querySelector("#publishPoll");
 
+
+
+function escapeUi(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function initialsUi(value) {
+  return String(value || "U")
+    .split(/\s+/).slice(0, 2).map(part => part.charAt(0)).join("").toUpperCase();
+}
+
+async function loadStories() {
+  const container = document.querySelector("#storiesList");
+  if (!container) return;
+
+  const currentUser = await getCurrentUser();
+  const { data, error } = await supabase
+    .from("perfiles_publicos")
+    .select("id,username,nombre_visible,avatar_url")
+    .limit(12);
+
+  if (error) return;
+
+  const others = (data || []).filter(profile => profile.id !== currentUser?.id).slice(0, 8);
+  const cards = others.map(profile => {
+    const image = profile.avatar_url
+      ? `<img src="${escapeUi(profile.avatar_url)}" alt="" loading="lazy">`
+      : `<b>${escapeUi(initialsUi(profile.nombre_visible || profile.username))}</b>`;
+    return `<a class="story" href="usuario.html?u=${encodeURIComponent(profile.username)}"><span>${image}</span><small>${escapeUi(profile.nombre_visible || profile.username)}</small></a>`;
+  }).join("");
+
+  container.insertAdjacentHTML("beforeend", cards);
+}
+
+function bindImageFallbacks() {
+  document.querySelectorAll(".post-image").forEach(image => {
+    image.addEventListener("error", () => {
+      const fallback = document.createElement("div");
+      fallback.className = "post-image-fallback";
+      fallback.innerHTML = "<span>🖼️</span><strong>La imagen no está disponible</strong><small>Puede haber sido eliminada o su enlace venció.</small>";
+      image.replaceWith(fallback);
+    }, { once: true });
+  });
+}
 
 let selectedImage = null;
 let activeCommentsPostId = null;
@@ -123,6 +172,7 @@ async function refreshFeed() {
 
     feed.innerHTML = posts.map(post => renderPost(post, currentUser?.id, polls.get(post.id))).join("");
     bindPostActions();
+    bindImageFallbacks();
   } catch (error) {
     console.error(error);
     feed.innerHTML = `<div class="notice">No se pudo cargar el feed: ${error.message}</div>`;
@@ -472,6 +522,7 @@ async function refreshNotificationBadge() {
 
 document.querySelector("#closeComments")?.addEventListener("click", () => commentsDialog.close());
 
+await loadStories();
 await refreshFeed();
 await refreshNotificationBadge();
 await refreshMessagesBadge();

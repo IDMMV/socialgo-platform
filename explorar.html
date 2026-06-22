@@ -1,16 +1,141 @@
 <!doctype html>
 <html lang="es">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Explorar · SocialGo</title><link rel="stylesheet" href="css/global.css"></head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Explorar personas · SocialGo</title>
+  <link rel="stylesheet" href="css/global.css">
+</head>
 <body>
   <main class="page-shell">
-    <a class="brand" href="index.html"><span class="brand-mark">S</span><span data-brand-name>SocialGo</span></a>
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">S</span>
+        <span data-brand-name>SocialGo</span>
+      </a>
+      <a class="secondary" href="index.html">← Volver</a>
+    </header>
+
     <section class="page-card">
-      <h1>Explorar</h1>
-      <p>Búsqueda de personas, negocios, grupos, tendencias y contactos.</p>
-      <p class="notice">Módulo preparado para desarrollarse en la siguiente fase.</p>
-      <a class="secondary" href="index.html">Volver al inicio</a>
+      <h1>Explorar personas</h1>
+      <form id="searchForm" class="comment-form">
+        <input id="searchInput" maxlength="50" placeholder="Buscar por nombre o usuario">
+        <button class="primary" type="submit">Buscar</button>
+      </form>
+    </section>
+
+    <section class="page-card" style="margin-top:18px">
+      <div id="peopleList" class="people-grid">
+        <p class="notice">Cargando usuarios…</p>
+      </div>
     </section>
   </main>
-  <script type="module">import { applyBrand } from "./js/brand.js"; applyBrand();</script>
-</body></html>
+
+  <script type="module">
+    import { applyBrand } from "./js/brand.js";
+    import { supabase, getCurrentUser } from "./js/supabase.js";
+
+    applyBrand();
+
+    const form = document.querySelector("#searchForm");
+    const input = document.querySelector("#searchInput");
+    const list = document.querySelector("#peopleList");
+    const currentUser = await getCurrentUser();
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;")
+        .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function initials(value) {
+      return String(value || "U").split(/\s+/).slice(0,2).map(p => p[0]).join("").toUpperCase();
+    }
+
+    async function loadPeople(term = "") {
+      list.innerHTML = `<p class="notice">Buscando…</p>`;
+
+      let query = supabase
+        .from("perfiles_publicos")
+        .select("*")
+        .order("nombre_visible", { ascending: true })
+        .limit(40);
+
+      if (term.trim()) {
+        query = query.or(`username.ilike.%${term.trim()}%,nombre_visible.ilike.%${term.trim()}%`);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        list.innerHTML = `<p class="notice">${escapeHtml(error.message)}</p>`;
+        return;
+      }
+
+      const filtered = (data || []).filter(person => person.id !== currentUser?.id);
+
+      list.innerHTML = filtered.length
+        ? filtered.map(person => `
+          <article class="person-card">
+            ${person.avatar_url
+              ? `<img class="avatar" src="${escapeHtml(person.avatar_url)}" alt="">`
+              : `<div class="avatar">${escapeHtml(initials(person.nombre_visible))}</div>`}
+            <div>
+              <strong>${escapeHtml(person.nombre_visible || "Usuario")}</strong>
+              <small>@${escapeHtml(person.username)}</small>
+              <p>${escapeHtml(person.biografia || "")}</p>
+            </div>
+            <div class="person-card-actions">
+              <a class="secondary" href="usuario.html?u=${encodeURIComponent(person.username)}">Ver perfil</a>
+              ${currentUser ? `<button class="primary" data-follow="${person.id}" data-following="${person.siguiendo ? "1" : "0"}">
+                ${person.siguiendo ? "Dejar de seguir" : "Seguir"}
+              </button>
+              <button class="secondary" data-message="${person.id}">Mensaje</button>` : ""}
+            </div>
+          </article>`).join("")
+        : `<p class="notice">No se encontraron usuarios.</p>`;
+
+      bindActions();
+    }
+
+    function bindActions() {
+      document.querySelectorAll("[data-follow]").forEach(button => {
+        button.addEventListener("click", async () => {
+          const target = button.dataset.follow;
+          const following = button.dataset.following === "1";
+
+          const result = following
+            ? await supabase.from("seguidores").delete()
+                .eq("seguidor_id", currentUser.id).eq("seguido_id", target)
+            : await supabase.from("seguidores").insert({
+                seguidor_id: currentUser.id,
+                seguido_id: target
+              });
+
+          if (result.error) alert(result.error.message);
+          else loadPeople(input.value);
+        });
+      });
+
+      document.querySelectorAll("[data-message]").forEach(button => {
+        button.addEventListener("click", async () => {
+          const { data, error } = await supabase.rpc("crear_o_obtener_conversacion", {
+            p_otro_usuario: button.dataset.message
+          });
+
+          if (error) alert(error.message);
+          else window.location.href = `mensajes.html?c=${data}`;
+        });
+      });
+    }
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      loadPeople(input.value);
+    });
+
+    await loadPeople();
+  </script>
+</body>
+</html>

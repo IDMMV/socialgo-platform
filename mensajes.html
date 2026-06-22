@@ -1,16 +1,198 @@
 <!doctype html>
 <html lang="es">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mensajes · SocialGo</title><link rel="stylesheet" href="css/global.css"></head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mensajes · SocialGo</title>
+  <link rel="stylesheet" href="css/global.css">
+</head>
 <body>
   <main class="page-shell">
-    <a class="brand" href="index.html"><span class="brand-mark">S</span><span data-brand-name>SocialGo</span></a>
-    <section class="page-card">
-      <h1>Mensajes</h1>
-      <p>Chat privado y grupal en tiempo real. Se conectará con Supabase Realtime.</p>
-      <p class="notice">Módulo preparado para desarrollarse en la siguiente fase.</p>
-      <a class="secondary" href="index.html">Volver al inicio</a>
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">S</span>
+        <span data-brand-name>SocialGo</span>
+      </a>
+      <a class="secondary" href="index.html">← Volver</a>
+    </header>
+
+    <section class="chat-layout">
+      <aside id="conversationsList" class="conversations-list">
+        <p class="notice">Cargando conversaciones…</p>
+      </aside>
+
+      <section class="chat-panel">
+        <header id="chatHeader" class="chat-header">
+          <strong>Selecciona una conversación</strong>
+        </header>
+
+        <div id="messagesList" class="messages-list">
+          <p class="notice">No hay conversación seleccionada.</p>
+        </div>
+
+        <form id="messageForm" class="message-form">
+          <input id="messageInput" maxlength="2000" placeholder="Escribe un mensaje" disabled>
+          <button id="sendButton" class="primary" type="submit" disabled>Enviar</button>
+        </form>
+      </section>
     </section>
   </main>
-  <script type="module">import { applyBrand } from "./js/brand.js"; applyBrand();</script>
-</body></html>
+
+  <script type="module">
+    import { applyBrand } from "./js/brand.js";
+    import { supabase, getCurrentUser } from "./js/supabase.js";
+
+    applyBrand();
+
+    const user = await getCurrentUser();
+    if (!user) window.location.replace("login.html?next=mensajes.html");
+
+    const conversationsList = document.querySelector("#conversationsList");
+    const messagesList = document.querySelector("#messagesList");
+    const chatHeader = document.querySelector("#chatHeader");
+    const form = document.querySelector("#messageForm");
+    const input = document.querySelector("#messageInput");
+    const sendButton = document.querySelector("#sendButton");
+
+    let activeConversationId = new URLSearchParams(location.search).get("c");
+    let realtimeChannel = null;
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;")
+        .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    async function loadConversations() {
+      const { data, error } = await supabase
+        .from("conversaciones_detalle")
+        .select("*")
+        .order("ultimo_mensaje_en", { ascending: false });
+
+      if (error) {
+        conversationsList.innerHTML = `<p class="notice">${escapeHtml(error.message)}</p>`;
+        return;
+      }
+
+      conversationsList.innerHTML = data?.length
+        ? data.map(item => `
+          <article class="conversation-item ${item.conversacion_id === activeConversationId ? "active" : ""}"
+                   data-conversation="${item.conversacion_id}">
+            ${item.otro_avatar_url
+              ? `<img class="avatar" src="${escapeHtml(item.otro_avatar_url)}" alt="">`
+              : `<div class="avatar">${escapeHtml((item.otro_nombre || "U").charAt(0).toUpperCase())}</div>`}
+            <div>
+              <strong>${escapeHtml(item.otro_nombre || item.otro_username)}</strong>
+              <small>@${escapeHtml(item.otro_username)}</small>
+              <p>${escapeHtml((item.ultimo_mensaje || "Sin mensajes").slice(0,80))}</p>
+            </div>
+          </article>`).join("")
+        : `<p class="notice">Todavía no tienes conversaciones.</p>`;
+
+      document.querySelectorAll("[data-conversation]").forEach(item => {
+        item.addEventListener("click", () => openConversation(item.dataset.conversation));
+      });
+
+      if (activeConversationId) await openConversation(activeConversationId, false);
+    }
+
+    async function openConversation(id, updateUrl = true) {
+      activeConversationId = id;
+      if (updateUrl) history.replaceState(null, "", `mensajes.html?c=${id}`);
+
+      document.querySelectorAll("[data-conversation]").forEach(item => {
+        item.classList.toggle("active", item.dataset.conversation === id);
+      });
+
+      input.disabled = false;
+      sendButton.disabled = false;
+
+      const current = [...document.querySelectorAll("[data-conversation]")]
+        .find(item => item.dataset.conversation === id);
+
+      chatHeader.innerHTML = current
+        ? current.querySelector("div").innerHTML
+        : "<strong>Conversación</strong>";
+
+      await loadMessages();
+      subscribeRealtime();
+      input.focus();
+    }
+
+    async function loadMessages() {
+      messagesList.innerHTML = `<p class="notice">Cargando mensajes…</p>`;
+
+      const { data, error } = await supabase
+        .from("mensajes")
+        .select("id,remitente_id,contenido,creado_en")
+        .eq("conversacion_id", activeConversationId)
+        .order("creado_en", { ascending: true })
+        .limit(300);
+
+      if (error) {
+        messagesList.innerHTML = `<p class="notice">${escapeHtml(error.message)}</p>`;
+        return;
+      }
+
+      messagesList.innerHTML = data?.length
+        ? data.map(renderMessage).join("")
+        : `<p class="notice">Aún no hay mensajes. Escribe el primero.</p>`;
+
+      messagesList.scrollTop = messagesList.scrollHeight;
+    }
+
+    function renderMessage(message) {
+      const mine = message.remitente_id === user.id;
+      return `
+        <div class="message-row ${mine ? "mine" : ""}">
+          <div class="message-bubble">
+            <span>${escapeHtml(message.contenido)}</span>
+            <small>${new Date(message.creado_en).toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"})}</small>
+          </div>
+        </div>`;
+    }
+
+    function subscribeRealtime() {
+      if (realtimeChannel) supabase.removeChannel(realtimeChannel);
+
+      realtimeChannel = supabase
+        .channel(`conversation-${activeConversationId}`)
+        .on("postgres_changes", {
+          event: "INSERT",
+          schema: "public",
+          table: "mensajes",
+          filter: `conversacion_id=eq.${activeConversationId}`
+        }, payload => {
+          if (messagesList.querySelector(".notice")) messagesList.innerHTML = "";
+          messagesList.insertAdjacentHTML("beforeend", renderMessage(payload.new));
+          messagesList.scrollTop = messagesList.scrollHeight;
+          loadConversations();
+        })
+        .subscribe();
+    }
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      const content = input.value.trim();
+      if (!content || !activeConversationId) return;
+
+      sendButton.disabled = true;
+
+      const { error } = await supabase.from("mensajes").insert({
+        conversacion_id: activeConversationId,
+        remitente_id: user.id,
+        contenido: content
+      });
+
+      if (error) alert(error.message);
+      else input.value = "";
+
+      sendButton.disabled = false;
+      input.focus();
+    });
+
+    await loadConversations();
+  </script>
+</body>
+</html>

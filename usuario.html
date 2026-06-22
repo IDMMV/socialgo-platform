@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Perfil · SocialGo</title>
+  <link rel="stylesheet" href="css/global.css">
+</head>
+<body>
+  <main class="page-shell">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">S</span>
+        <span data-brand-name>SocialGo</span>
+      </a>
+      <a class="secondary" href="explorar.html">← Explorar</a>
+    </header>
+
+    <section class="page-card" id="profileBox">
+      <p class="notice">Cargando perfil…</p>
+    </section>
+
+    <section class="page-card" style="margin-top:18px">
+      <h2>Publicaciones</h2>
+      <div id="userPosts" class="activity-grid">
+        <p class="notice">Cargando publicaciones…</p>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { applyBrand } from "./js/brand.js";
+    import { supabase, getCurrentUser } from "./js/supabase.js";
+
+    applyBrand();
+
+    const params = new URLSearchParams(location.search);
+    const username = params.get("u");
+    const profileBox = document.querySelector("#profileBox");
+    const postsBox = document.querySelector("#userPosts");
+    const currentUser = await getCurrentUser();
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;")
+        .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    if (!username) {
+      profileBox.innerHTML = `<p class="notice">Usuario no especificado.</p>`;
+    } else {
+      const { data: profile, error } = await supabase
+        .from("perfiles_publicos")
+        .select("*")
+        .eq("username", username)
+        .maybeSingle();
+
+      if (error || !profile) {
+        profileBox.innerHTML = `<p class="notice">Perfil no encontrado.</p>`;
+      } else {
+        document.title = `${profile.nombre_visible || profile.username} · SocialGo`;
+
+        profileBox.innerHTML = `
+          <div class="public-profile-header">
+            <div class="public-profile-avatar">
+              ${profile.avatar_url
+                ? `<img src="${escapeHtml(profile.avatar_url)}" alt="">`
+                : escapeHtml((profile.nombre_visible || "U").charAt(0).toUpperCase())}
+            </div>
+            <div>
+              <h1>${escapeHtml(profile.nombre_visible || "Usuario")}</h1>
+              <p>@${escapeHtml(profile.username)}</p>
+              <p>${escapeHtml(profile.biografia || "")}</p>
+              <div class="profile-stats">
+                <span><strong>${profile.total_seguidores || 0}</strong> seguidores</span>
+                <span><strong>${profile.total_seguidos || 0}</strong> seguidos</span>
+              </div>
+              ${currentUser && currentUser.id !== profile.id ? `
+                <div class="modal-actions" style="justify-content:flex-start;margin-top:12px">
+                  <button id="followButton" class="primary">${profile.siguiendo ? "Dejar de seguir" : "Seguir"}</button>
+                  <button id="messageButton" class="secondary">Enviar mensaje</button>
+                </div>` : ""}
+            </div>
+          </div>`;
+
+        document.querySelector("#followButton")?.addEventListener("click", async () => {
+          const result = profile.siguiendo
+            ? await supabase.from("seguidores").delete()
+                .eq("seguidor_id", currentUser.id).eq("seguido_id", profile.id)
+            : await supabase.from("seguidores").insert({
+                seguidor_id: currentUser.id,
+                seguido_id: profile.id
+              });
+
+          if (result.error) alert(result.error.message);
+          else location.reload();
+        });
+
+        document.querySelector("#messageButton")?.addEventListener("click", async () => {
+          const { data, error } = await supabase.rpc("crear_o_obtener_conversacion", {
+            p_otro_usuario: profile.id
+          });
+
+          if (error) alert(error.message);
+          else location.href = `mensajes.html?c=${data}`;
+        });
+
+        const { data: posts, error: postsError } = await supabase
+          .from("publicaciones")
+          .select("id,contenido,archivo_url,tipo,creado_en")
+          .eq("autor_id", profile.id)
+          .eq("visibilidad", "public")
+          .eq("estado_moderacion", "aprobado")
+          .order("creado_en", { ascending: false });
+
+        postsBox.innerHTML = postsError
+          ? `<p class="notice">${escapeHtml(postsError.message)}</p>`
+          : posts?.length
+            ? posts.map(post => `
+              <article class="mini-post">
+                <small>${new Date(post.creado_en).toLocaleString("es-PE")}</small>
+                ${post.contenido ? `<p>${escapeHtml(post.contenido)}</p>` : ""}
+                ${post.archivo_url && post.tipo === "imagen"
+                  ? `<img class="post-image" src="${escapeHtml(post.archivo_url)}" alt="">`
+                  : ""}
+              </article>`).join("")
+            : `<p class="notice">Este usuario todavía no tiene publicaciones públicas.</p>`;
+      }
+    }
+  </script>
+</body>
+</html>

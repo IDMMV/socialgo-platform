@@ -9,22 +9,54 @@ import {
   deleteComment,
   renderComment
 } from "./publicaciones.js";
+import {
+  MAX_CLIP_SECONDS,
+  formatTime,
+  readVideoMetadata,
+  createTimelineThumbnails,
+  captureCover,
+  trimVideo
+} from "./clip-editor.js";
 
 applyBrand();
 
 const feed = document.querySelector("#clipsFeed");
 const createButton = document.querySelector("#createClipButton");
-const uploadDialog = document.querySelector("#clipUploadDialog");
-const uploadForm = document.querySelector("#clipUploadForm");
+const bottomCreateButton = document.querySelector("#bottomCreateClip");
+const editorDialog = document.querySelector("#clipUploadDialog");
+const closeEditorButton = document.querySelector("#closeClipEditor");
 const fileInput = document.querySelector("#clipFile");
-const preview = document.querySelector("#clipPreview");
 const previewVideo = document.querySelector("#clipPreviewVideo");
+const publishButton = document.querySelector("#publishClipButton");
+const emptyState = document.querySelector("#editorEmptyState");
+const editorControls = document.querySelector("#editorControls");
+const originalDurationLabel = document.querySelector("#originalDuration");
+const selectedDurationLabel = document.querySelector("#selectedDuration");
+const timeline = document.querySelector("#thumbnailTimeline");
+const trimStart = document.querySelector("#trimStart");
+const trimEnd = document.querySelector("#trimEnd");
+const trimStartTime = document.querySelector("#trimStartTime");
+const trimEndTime = document.querySelector("#trimEndTime");
+const resetTrimButton = document.querySelector("#resetTrim");
+const toggleMuteButton = document.querySelector("#toggleMute");
+const addTextButton = document.querySelector("#addClipText");
+const textPanel = document.querySelector("#clipTextPanel");
+const textInput = document.querySelector("#clipTextInput");
+const textOverlay = document.querySelector("#clipTextOverlay");
+const chooseCoverButton = document.querySelector("#chooseCover");
+const coverPanel = document.querySelector("#coverPickerPanel");
+const coverTime = document.querySelector("#coverTime");
+const coverTimeLabel = document.querySelector("#coverTimeLabel");
+const coverCanvas = document.querySelector("#coverCanvas");
 const description = document.querySelector("#clipDescription");
 const visibility = document.querySelector("#clipVisibility");
 const allowComments = document.querySelector("#clipAllowComments");
 const allowDownload = document.querySelector("#clipAllowDownload");
-const publishButton = document.querySelector("#publishClipButton");
 const uploadStatus = document.querySelector("#clipUploadStatus");
+const processingBox = document.querySelector("#processingBox");
+const processingTitle = document.querySelector("#processingTitle");
+const processingPercent = document.querySelector("#processingPercent");
+const processingProgress = document.querySelector("#processingProgress");
 
 const commentsDialog = document.querySelector("#clipCommentsDialog");
 const commentsList = document.querySelector("#clipCommentsList");
@@ -32,26 +64,25 @@ const commentForm = document.querySelector("#clipCommentForm");
 const commentText = document.querySelector("#clipCommentText");
 
 let selectedFile = null;
-let selectedDuration = 0;
+let sourceDuration = 0;
+let trimStartValue = 0;
+let trimEndValue = 0;
+let muted = false;
 let activeCommentsPostId = null;
 let observer = null;
+let coverBlob = null;
+let previewObjectUrl = null;
 
 async function requireUser(message) {
   const user = await getCurrentUser();
 
   if (!user) {
     alert(message);
-    window.location.href = "registro.html";
+    location.href = "registro.html";
     return null;
   }
 
   return user;
-}
-
-function showUploadStatus(message, isError = false) {
-  uploadStatus.classList.remove("hidden");
-  uploadStatus.textContent = message;
-  uploadStatus.style.borderColor = isError ? "var(--danger)" : "#22c55e";
 }
 
 function escapeHtml(value) {
@@ -72,8 +103,281 @@ function initials(value) {
     .toUpperCase();
 }
 
+function showStatus(message, isError = false) {
+  uploadStatus.classList.remove("hidden");
+  uploadStatus.textContent = message;
+  uploadStatus.style.borderColor = isError ? "var(--danger)" : "#22c55e";
+}
+
+function hideStatus() {
+  uploadStatus.classList.add("hidden");
+}
+
+function updateProcessing(percent, title) {
+  processingBox.classList.remove("hidden");
+  processingProgress.value = percent;
+  processingPercent.textContent = `${percent}%`;
+  processingTitle.textContent = title;
+}
+
+function updateTrimUI(changed = "start") {
+  let start = Number(trimStart.value);
+  let end = Number(trimEnd.value);
+
+  if (changed === "start" && start > end - 0.1) {
+    start = Math.max(0, end - 0.1);
+    trimStart.value = start;
+  }
+
+  if (changed === "end" && end < start + 0.1) {
+    end = Math.min(sourceDuration, start + 0.1);
+    trimEnd.value = end;
+  }
+
+  if (end - start > MAX_CLIP_SECONDS) {
+    if (changed === "start") {
+      end = Math.min(sourceDuration, start + MAX_CLIP_SECONDS);
+      trimEnd.value = end;
+    } else {
+      start = Math.max(0, end - MAX_CLIP_SECONDS);
+      trimStart.value = start;
+    }
+  }
+
+  trimStartValue = start;
+  trimEndValue = end;
+
+  const selected = end - start;
+  trimStartTime.value = formatTime(start, true);
+  trimEndTime.value = formatTime(end, true);
+  selectedDurationLabel.textContent =
+    `${formatTime(selected)} / ${formatTime(MAX_CLIP_SECONDS)}`;
+
+  previewVideo.currentTime = Math.min(start, Math.max(0, sourceDuration - 0.05));
+
+  selectedDurationLabel.classList.toggle(
+    "trim-invalid",
+    selected > MAX_CLIP_SECONDS
+  );
+}
+
+async function openEditor() {
+  if (!await requireUser("Regístrate o inicia sesión para crear un clip.")) return;
+  resetEditor();
+  editorDialog.showModal();
+}
+
+function resetEditor() {
+  selectedFile = null;
+  sourceDuration = 0;
+  trimStartValue = 0;
+  trimEndValue = 0;
+  muted = false;
+  coverBlob = null;
+  fileInput.value = "";
+  description.value = "";
+  textInput.value = "";
+  textOverlay.textContent = "";
+  textOverlay.classList.add("hidden");
+  textPanel.classList.add("hidden");
+  coverPanel.classList.add("hidden");
+  editorControls.hidden = true;
+  emptyState.hidden = false;
+  processingBox.classList.add("hidden");
+  hideStatus();
+
+  if (previewObjectUrl) {
+    URL.revokeObjectURL(previewObjectUrl);
+    previewObjectUrl = null;
+  }
+
+  previewVideo.removeAttribute("src");
+  previewVideo.load();
+  timeline.innerHTML = "";
+  publishButton.textContent = "Siguiente";
+  publishButton.disabled = false;
+}
+
+async function handleSelectedVideo(file) {
+  hideStatus();
+  processingBox.classList.add("hidden");
+
+  try {
+    const metadata = await readVideoMetadata(file);
+    selectedFile = file;
+    sourceDuration = metadata.duration;
+
+    trimStartValue = 0;
+    trimEndValue = Math.min(sourceDuration, MAX_CLIP_SECONDS);
+
+    trimStart.max = sourceDuration;
+    trimEnd.max = sourceDuration;
+    trimStart.value = 0;
+    trimEnd.value = trimEndValue;
+    coverTime.max = sourceDuration;
+    coverTime.value = Math.min(1, sourceDuration);
+
+    originalDurationLabel.textContent = formatTime(sourceDuration);
+    emptyState.hidden = true;
+    editorControls.hidden = false;
+
+    if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+    previewObjectUrl = URL.createObjectURL(file);
+    previewVideo.src = previewObjectUrl;
+    previewVideo.muted = muted;
+
+    showStatus("Generando línea de tiempo…");
+    const frames = await createTimelineThumbnails(file, sourceDuration, 10);
+    timeline.innerHTML = frames
+      .map(frame => `<img src="${frame}" alt="">`)
+      .join("");
+
+    hideStatus();
+    updateTrimUI("start");
+    await updateCover();
+  } catch (error) {
+    selectedFile = null;
+    fileInput.value = "";
+    showStatus(error.message, true);
+  }
+}
+
+async function updateCover() {
+  if (!selectedFile || !previewVideo.duration) return;
+
+  coverTimeLabel.textContent = formatTime(Number(coverTime.value));
+  coverBlob = await captureCover(
+    previewVideo,
+    coverCanvas,
+    Number(coverTime.value)
+  );
+}
+
+async function uploadClipFile(file, user) {
+  const path = `${user.id}/${crypto.randomUUID()}.mp4`;
+
+  const { error } = await supabase.storage
+    .from("clips")
+    .upload(path, file, {
+      contentType: "video/mp4",
+      cacheControl: "3600",
+      upsert: false
+    });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage.from("clips").getPublicUrl(path);
+  return { path, url: data.publicUrl };
+}
+
+async function uploadCover(user) {
+  if (!coverBlob) return null;
+
+  const path = `${user.id}/portadas/${crypto.randomUUID()}.jpg`;
+
+  const { error } = await supabase.storage
+    .from("clips")
+    .upload(path, coverBlob, {
+      contentType: "image/jpeg",
+      cacheControl: "3600",
+      upsert: false
+    });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage.from("clips").getPublicUrl(path);
+  return { path, url: data.publicUrl };
+}
+
+async function processAndPublish() {
+  const user = await requireUser("Debes iniciar sesión para publicar.");
+  if (!user) return;
+
+  if (!selectedFile) {
+    showStatus("Selecciona o graba un video.", true);
+    return;
+  }
+
+  const selectedDuration = trimEndValue - trimStartValue;
+
+  if (selectedDuration <= 0 || selectedDuration > MAX_CLIP_SECONDS) {
+    showStatus("Selecciona un fragmento de hasta 3 minutos.", true);
+    return;
+  }
+
+  publishButton.disabled = true;
+  publishButton.textContent = "Procesando…";
+  hideStatus();
+
+  let uploadedVideo = null;
+  let uploadedCover = null;
+
+  try {
+    const processedFile = await trimVideo({
+      file: selectedFile,
+      start: trimStartValue,
+      end: trimEndValue,
+      muted,
+      progressCallback: updateProcessing
+    });
+
+    updateProcessing(96, "Subiendo clip…");
+    uploadedVideo = await uploadClipFile(processedFile, user);
+
+    updateProcessing(98, "Subiendo portada…");
+    uploadedCover = await uploadCover(user);
+
+    const descriptionText = [
+      textInput.value.trim(),
+      description.value.trim()
+    ].filter(Boolean).join("\n");
+
+    const { error } = await supabase
+      .from("publicaciones")
+      .insert({
+        autor_id: user.id,
+        contenido: descriptionText || null,
+        tipo: "clip",
+        archivo_url: uploadedVideo.url,
+        miniatura_url: uploadedCover?.url ?? null,
+        visibilidad: visibility.value,
+        permitir_comentarios: allowComments.checked,
+        permitir_descargas: allowDownload.checked,
+        estado_moderacion: "aprobado",
+        duracion_segundos: Math.round(selectedDuration)
+      });
+
+    if (error) throw error;
+
+    updateProcessing(100, "Clip publicado.");
+    showStatus("Clip publicado correctamente.");
+
+    setTimeout(async () => {
+      editorDialog.close();
+      resetEditor();
+      await loadClips();
+    }, 900);
+  } catch (error) {
+    if (uploadedVideo?.path) {
+      await supabase.storage.from("clips").remove([uploadedVideo.path]);
+    }
+
+    if (uploadedCover?.path) {
+      await supabase.storage.from("clips").remove([uploadedCover.path]);
+    }
+
+    showStatus(
+      `${error.message || "No se pudo procesar el video."} ` +
+      "En celulares con poca memoria, usa un video más corto o de menor resolución.",
+      true
+    );
+  } finally {
+    publishButton.disabled = false;
+    publishButton.textContent = "Siguiente";
+  }
+}
+
 function renderClip(clip) {
-  const canDownload = Boolean(clip.permitir_descargas);
   const avatar = clip.avatar_url
     ? `<img src="${escapeHtml(clip.avatar_url)}" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover">`
     : `<span class="avatar">${escapeHtml(initials(clip.nombre_visible))}</span>`;
@@ -82,12 +386,11 @@ function renderClip(clip) {
     <article class="clip-card paused" data-clip-id="${clip.id}">
       <video
         src="${escapeHtml(clip.archivo_url)}"
+        poster="${escapeHtml(clip.miniatura_url || "")}"
         playsinline
         muted
         loop
-        preload="metadata"
-        controlslist="nodownload"
-        onerror="this.closest('.clip-card').innerHTML='<div class=&quot;clip-empty&quot;><div class=&quot;notice&quot;>Este video no puede reproducirse. Puede ser un formato no compatible o un archivo eliminado.</div></div>'"></video>
+        preload="metadata"></video>
 
       <div class="clip-gradient"></div>
       <div class="clip-play-overlay"><span>▶</span></div>
@@ -109,37 +412,21 @@ function renderClip(clip) {
           <span>${clip.usuario_dio_me_gusta ? "♥" : "♡"}</span>
           <small>${clip.total_me_gusta ?? 0}</small>
         </button>
-
         <button data-clip-action="comment" data-post-id="${clip.id}">
-          <span>💬</span>
-          <small>${clip.total_comentarios ?? 0}</small>
+          <span>💬</span><small>${clip.total_comentarios ?? 0}</small>
         </button>
-
         <button data-clip-action="share" data-post-id="${clip.id}">
-          <span>↗</span>
-          <small>${clip.total_compartidos ?? 0}</small>
+          <span>↗</span><small>${clip.total_compartidos ?? 0}</small>
         </button>
-
         <button data-clip-action="save" data-post-id="${clip.id}" class="${clip.usuario_guardo ? "active" : ""}">
-          <span>🔖</span>
-          <small>Guardar</small>
+          <span>🔖</span><small>Guardar</small>
         </button>
-
-        ${canDownload ? `
-          <button data-clip-action="download" data-url="${escapeHtml(clip.archivo_url)}" data-name="clip-${clip.id}.mp4">
-            <span>⬇️</span>
-            <small>Descargar</small>
-          </button>` : ""}
       </div>
-    </article>
-  `;
+    </article>`;
 }
 
 async function loadClips() {
-  feed.innerHTML = `
-    <section class="clip-empty">
-      <div class="notice">Cargando clips…</div>
-    </section>`;
+  feed.innerHTML = `<section class="clip-empty"><div class="notice">Cargando clips…</div></section>`;
 
   const { data, error } = await supabase
     .from("clips_feed")
@@ -148,21 +435,12 @@ async function loadClips() {
     .limit(50);
 
   if (error) {
-    feed.innerHTML = `
-      <section class="clip-empty">
-        <div class="notice">No se pudieron cargar los clips: ${escapeHtml(error.message)}</div>
-      </section>`;
+    feed.innerHTML = `<section class="clip-empty"><div class="notice">${escapeHtml(error.message)}</div></section>`;
     return;
   }
 
   if (!data?.length) {
-    feed.innerHTML = `
-      <section class="clip-empty">
-        <section class="page-card">
-          <h1>Todavía no hay clips</h1>
-          <p>Presiona ＋ para publicar el primer video.</p>
-        </section>
-      </section>`;
+    feed.innerHTML = `<section class="clip-empty"><section class="page-card"><h1>Todavía no hay clips</h1><p>Presiona Crear para publicar el primero.</p></section></section>`;
     return;
   }
 
@@ -174,7 +452,7 @@ async function loadClips() {
 function startVideoObserver() {
   observer?.disconnect();
 
-  observer = new IntersectionObserver((entries) => {
+  observer = new IntersectionObserver(entries => {
     for (const entry of entries) {
       const card = entry.target;
       const video = card.querySelector("video");
@@ -218,26 +496,16 @@ function bindClipActions() {
   document.querySelectorAll('[data-clip-action="like"]').forEach(button => {
     button.addEventListener("click", async () => {
       if (!await requireUser("Regístrate para dar Me gusta.")) return;
-
-      try {
-        await toggleLike(button.dataset.postId);
-        await loadClips();
-      } catch (error) {
-        alert(error.message);
-      }
+      await toggleLike(button.dataset.postId);
+      await loadClips();
     });
   });
 
   document.querySelectorAll('[data-clip-action="save"]').forEach(button => {
     button.addEventListener("click", async () => {
       if (!await requireUser("Regístrate para guardar clips.")) return;
-
-      try {
-        const saved = await toggleSave(button.dataset.postId);
-        button.classList.toggle("active", saved);
-      } catch (error) {
-        alert(error.message);
-      }
+      const saved = await toggleSave(button.dataset.postId);
+      button.classList.toggle("active", saved);
     });
   });
 
@@ -254,49 +522,14 @@ function bindClipActions() {
     button.addEventListener("click", async () => {
       if (!await requireUser("Regístrate para compartir clips.")) return;
 
-      try {
-        await registerShare(button.dataset.postId);
+      await registerShare(button.dataset.postId);
+      const url = `${location.origin}/clips.html?clip=${button.dataset.postId}`;
 
-        const url = `${location.origin}/clips.html?clip=${button.dataset.postId}`;
-        const shareData = {
-          title: document.title,
-          text: "Mira este clip",
-          url
-        };
-
-        if (navigator.share) {
-          await navigator.share(shareData);
-        } else {
-          await navigator.clipboard.writeText(url);
-          alert("Enlace copiado.");
-        }
-
-        await loadClips();
-      } catch (error) {
-        if (error?.name !== "AbortError") alert(error.message);
-      }
-    });
-  });
-
-  document.querySelectorAll('[data-clip-action="download"]').forEach(button => {
-    button.addEventListener("click", async () => {
-      if (!await requireUser("Regístrate para descargar videos.")) return;
-
-      try {
-        const response = await fetch(button.dataset.url);
-        if (!response.ok) throw new Error("No se pudo descargar el video.");
-
-        const blob = await response.blob();
-        const objectUrl = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = objectUrl;
-        link.download = button.dataset.name;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        URL.revokeObjectURL(objectUrl);
-      } catch (error) {
-        alert(error.message);
+      if (navigator.share) {
+        await navigator.share({ title: document.title, text: "Mira este clip", url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        alert("Enlace copiado.");
       }
     });
   });
@@ -304,192 +537,85 @@ function bindClipActions() {
 
 async function refreshComments() {
   const user = await getCurrentUser();
-  commentsList.innerHTML = `<p class="notice">Cargando comentarios…</p>`;
+  const comments = await loadComments(activeCommentsPostId);
 
-  try {
-    const comments = await loadComments(activeCommentsPostId);
+  commentsList.innerHTML = comments.length
+    ? comments.map(comment => renderComment(comment, user?.id)).join("")
+    : `<p class="notice">Todavía no hay comentarios.</p>`;
 
-    commentsList.innerHTML = comments.length
-      ? comments.map(comment => renderComment(comment, user?.id)).join("")
-      : `<p class="notice">Todavía no hay comentarios.</p>`;
-
-    document.querySelectorAll("[data-delete-comment]").forEach(button => {
-      button.addEventListener("click", async () => {
-        if (!confirm("¿Eliminar este comentario?")) return;
-        await deleteComment(button.dataset.deleteComment);
-        await refreshComments();
-        await loadClips();
-      });
+  document.querySelectorAll("[data-delete-comment]").forEach(button => {
+    button.addEventListener("click", async () => {
+      if (!confirm("¿Eliminar este comentario?")) return;
+      await deleteComment(button.dataset.deleteComment);
+      await refreshComments();
     });
-  } catch (error) {
-    commentsList.innerHTML = `<p class="notice">${escapeHtml(error.message)}</p>`;
-  }
-}
-
-async function getVideoDuration(file) {
-  return new Promise((resolve, reject) => {
-    const video = document.createElement("video");
-    const url = URL.createObjectURL(file);
-
-    video.preload = "metadata";
-    video.onloadedmetadata = () => {
-      const duration = Number(video.duration || 0);
-      URL.revokeObjectURL(url);
-      resolve(duration);
-    };
-    video.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("No se pudo leer el video."));
-    };
-    video.src = url;
   });
 }
 
-async function uploadClip() {
-  const user = await requireUser("Debes iniciar sesión para publicar.");
-  if (!user) return;
+createButton?.addEventListener("click", openEditor);
+document.querySelector("#bottomCreateClip")?.addEventListener("click", openEditor);
+closeEditorButton?.addEventListener("click", () => editorDialog.close());
 
-  if (!selectedFile) {
-    showUploadStatus("Selecciona o graba un video.", true);
-    return;
-  }
-
-  publishButton.disabled = true;
-  publishButton.textContent = "Subiendo…";
-  showUploadStatus("Subiendo el video. No cierres esta ventana.");
-
-  let uploadedPath = null;
-
-  try {
-    const extension =
-      selectedFile.type === "video/webm" ? "webm" :
-      selectedFile.type === "video/quicktime" ? "mov" : "mp4";
-
-    uploadedPath = `${user.id}/${crypto.randomUUID()}.${extension}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("clips")
-      .upload(uploadedPath, selectedFile, {
-        contentType: selectedFile.type || "video/mp4",
-        cacheControl: "3600",
-        upsert: false
-      });
-
-    if (uploadError) throw uploadError;
-
-    const { data: publicData } = supabase.storage
-      .from("clips")
-      .getPublicUrl(uploadedPath);
-
-    const { error: insertError } = await supabase
-      .from("publicaciones")
-      .insert({
-        autor_id: user.id,
-        contenido: description.value.trim() || null,
-        tipo: "clip",
-        archivo_url: publicData.publicUrl,
-        visibilidad: visibility.value,
-        permitir_comentarios: allowComments.checked,
-        permitir_descargas: allowDownload.checked,
-        estado_moderacion: "aprobado",
-        duracion_segundos: Math.round(selectedDuration)
-      });
-
-    if (insertError) throw insertError;
-
-    showUploadStatus("Clip publicado correctamente.");
-    uploadForm.reset();
-    selectedFile = null;
-    selectedDuration = 0;
-    preview.classList.add("hidden");
-    previewVideo.removeAttribute("src");
-
-    window.setTimeout(() => {
-      uploadDialog.close();
-      loadClips();
-    }, 800);
-  } catch (error) {
-    if (uploadedPath) {
-      await supabase.storage.from("clips").remove([uploadedPath]).catch(console.error);
-    }
-    showUploadStatus(error.message || "No se pudo publicar el clip.", true);
-  } finally {
-    publishButton.disabled = false;
-    publishButton.textContent = "Publicar clip";
-  }
-}
-
-document.querySelector("#bottomCreateClip")?.addEventListener("click", async () => {
-  if (!await requireUser("Regístrate o inicia sesión para crear un clip.")) return;
-  uploadStatus.classList.add("hidden");
-  uploadDialog.showModal();
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files?.[0];
+  if (file) handleSelectedVideo(file);
 });
 
-createButton.addEventListener("click", async () => {
-  if (!await requireUser("Regístrate o inicia sesión para crear un clip.")) return;
-  uploadStatus.classList.add("hidden");
-  uploadDialog.showModal();
+trimStart.addEventListener("input", () => updateTrimUI("start"));
+trimEnd.addEventListener("input", () => updateTrimUI("end"));
+
+resetTrimButton.addEventListener("click", () => {
+  trimStart.value = 0;
+  trimEnd.value = Math.min(sourceDuration, MAX_CLIP_SECONDS);
+  updateTrimUI("start");
 });
 
-fileInput.addEventListener("change", async () => {
-  selectedFile = fileInput.files?.[0] ?? null;
-  uploadStatus.classList.add("hidden");
+toggleMuteButton.addEventListener("click", () => {
+  muted = !muted;
+  previewVideo.muted = muted;
+  toggleMuteButton.firstChild.textContent = muted ? "🔇" : "🔊";
+  toggleMuteButton.querySelector("small").textContent = muted ? "Silenciado" : "Sonido";
+});
 
-  if (!selectedFile) {
-    preview.classList.add("hidden");
-    return;
+addTextButton.addEventListener("click", () => {
+  textPanel.classList.toggle("hidden");
+  textInput.focus();
+});
+
+textInput.addEventListener("input", () => {
+  const text = textInput.value.trim();
+  textOverlay.textContent = text;
+  textOverlay.classList.toggle("hidden", !text);
+});
+
+chooseCoverButton.addEventListener("click", async () => {
+  coverPanel.classList.toggle("hidden");
+  if (!coverPanel.classList.contains("hidden")) await updateCover();
+});
+
+coverTime.addEventListener("input", updateCover);
+
+previewVideo.addEventListener("timeupdate", () => {
+  if (previewVideo.currentTime < trimStartValue) {
+    previewVideo.currentTime = trimStartValue;
   }
 
-  if (!["video/mp4", "video/webm", "video/quicktime"].includes(selectedFile.type)) {
-    selectedFile = null;
-    fileInput.value = "";
-    showUploadStatus("Formato no permitido. Usa MP4, WebM o MOV.", true);
-    return;
-  }
-
-  if (selectedFile.size > 25 * 1024 * 1024) {
-    selectedFile = null;
-    fileInput.value = "";
-    showUploadStatus("El video supera el máximo de 25 MB.", true);
-    return;
-  }
-
-  try {
-    selectedDuration = await getVideoDuration(selectedFile);
-
-    if (selectedDuration <= 0 || selectedDuration > 60.5) {
-      selectedFile = null;
-      fileInput.value = "";
-      showUploadStatus("El video debe durar como máximo 60 segundos.", true);
-      return;
-    }
-
-    previewVideo.src = URL.createObjectURL(selectedFile);
-    preview.classList.remove("hidden");
-    showUploadStatus(`Video listo: ${Math.round(selectedDuration)} segundos.`);
-  } catch (error) {
-    selectedFile = null;
-    fileInput.value = "";
-    showUploadStatus(error.message, true);
+  if (previewVideo.currentTime >= trimEndValue) {
+    previewVideo.pause();
+    previewVideo.currentTime = trimStartValue;
   }
 });
 
-publishButton.addEventListener("click", uploadClip);
+publishButton.addEventListener("click", processAndPublish);
 
-commentForm.addEventListener("submit", async (event) => {
+commentForm.addEventListener("submit", async event => {
   event.preventDefault();
-
-  try {
-    await createComment(activeCommentsPostId, commentText.value);
-    commentText.value = "";
-    await refreshComments();
-    await loadClips();
-  } catch (error) {
-    alert(error.message);
-  }
+  await createComment(activeCommentsPostId, commentText.value);
+  commentText.value = "";
+  await refreshComments();
 });
 
-document.querySelector("#closeClipComments").addEventListener("click", () => {
+document.querySelector("#closeClipComments")?.addEventListener("click", () => {
   commentsDialog.close();
 });
 

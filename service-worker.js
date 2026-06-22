@@ -1,10 +1,11 @@
-const CACHE_NAME = "socialgo-v0.4.2";
+const CACHE_NAME = "socialgo-v0.5.0";
 
 const CORE = [
   "./",
   "./index.html",
   "./login.html",
   "./registro.html",
+  "./clips.html",
   "./recuperar.html",
   "./restablecer.html",
   "./auth-callback.html",
@@ -18,7 +19,8 @@ const CORE = [
   "./js/session.js",
   "./js/supabase.js",
   "./js/publicaciones.js",
-  "./js/media.js"
+  "./js/media.js",
+  "./js/clips.js"
 ];
 
 self.addEventListener("install", (event) => {

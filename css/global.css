@@ -281,3 +281,157 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(5px)}
 .admin-table th,.admin-table td{padding:11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
 .admin-table th{color:var(--muted);font-size:13px}
 .admin-table select,.admin-table button{padding:8px 10px;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:white}
+
+
+/* ===== FASE 5: CLIPS ===== */
+.clips-page{
+  min-height:100vh;
+  background:#030712;
+}
+.clips-header{
+  position:fixed;
+  z-index:50;
+  top:0;
+  left:0;
+  right:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 16px;
+  background:linear-gradient(to bottom,rgba(0,0,0,.88),transparent);
+  pointer-events:none;
+}
+.clips-header > *{pointer-events:auto}
+.clips-header .brand{margin:0}
+.clips-feed{
+  height:100vh;
+  overflow-y:auto;
+  scroll-snap-type:y mandatory;
+  scrollbar-width:none;
+}
+.clips-feed::-webkit-scrollbar{display:none}
+.clip-card{
+  position:relative;
+  width:min(520px,100%);
+  height:100vh;
+  min-height:620px;
+  margin:0 auto;
+  scroll-snap-align:start;
+  background:#000;
+  overflow:hidden;
+}
+.clip-card video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  background:#000;
+}
+.clip-gradient{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(to top,rgba(0,0,0,.82) 0%,transparent 46%),
+    linear-gradient(to bottom,rgba(0,0,0,.42),transparent 20%);
+  pointer-events:none;
+}
+.clip-info{
+  position:absolute;
+  z-index:3;
+  left:16px;
+  right:88px;
+  bottom:28px;
+}
+.clip-info strong{display:block;font-size:17px}
+.clip-info p{margin:8px 0;line-height:1.45}
+.clip-info small{color:#d1d5db}
+.clip-actions{
+  position:absolute;
+  z-index:4;
+  right:12px;
+  bottom:26px;
+  display:grid;
+  gap:14px;
+}
+.clip-actions button,
+.clip-actions a{
+  display:grid;
+  place-items:center;
+  gap:3px;
+  width:58px;
+  min-height:54px;
+  border:0;
+  border-radius:16px;
+  color:white;
+  background:rgba(15,23,42,.66);
+  backdrop-filter:blur(10px);
+}
+.clip-actions button.active{background:rgba(124,58,237,.82)}
+.clip-actions small{font-size:11px}
+.clip-play-overlay{
+  position:absolute;
+  z-index:2;
+  inset:0;
+  display:grid;
+  place-items:center;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .18s;
+}
+.clip-play-overlay span{
+  display:grid;
+  place-items:center;
+  width:74px;
+  height:74px;
+  border-radius:50%;
+  background:rgba(0,0,0,.55);
+  font-size:32px;
+}
+.clip-card.paused .clip-play-overlay{opacity:1}
+.clip-empty{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+}
+.clip-upload-card{
+  width:min(620px,calc(100% - 24px));
+}
+.video-preview{
+  margin:14px 0;
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  background:#000;
+}
+.video-preview video{
+  display:block;
+  width:100%;
+  max-height:58vh;
+  object-fit:contain;
+}
+.clip-create-button{
+  position:fixed;
+  z-index:55;
+  right:18px;
+  top:70px;
+  width:52px;
+  height:52px;
+  border:0;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  color:white;
+  font-size:26px;
+  box-shadow:var(--shadow);
+}
+.clip-status{
+  position:fixed;
+  z-index:100;
+  left:50%;
+  top:82px;
+  transform:translateX(-50%);
+  width:min(440px,calc(100% - 30px));
+}
+@media(min-width:760px){
+  .clip-card{border-left:1px solid #1f2937;border-right:1px solid #1f2937}
+}

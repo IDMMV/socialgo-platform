@@ -50,9 +50,22 @@ export async function renderSessionControls() {
     element.hidden = Boolean(user);
   });
 
+  document.querySelectorAll("[data-admin-only]").forEach(element => {
+    element.hidden = true;
+  });
+
   if (!user) return;
 
-  const profile = await getMyProfile();
+  const [{ data: isAdmin, error: adminError }, profile] = await Promise.all([
+    supabase.rpc("is_admin"),
+    getMyProfile()
+  ]);
+
+  if (!adminError && isAdmin) {
+    document.querySelectorAll("[data-admin-only]").forEach(element => {
+      element.hidden = false;
+    });
+  }
 
   document.querySelectorAll("[data-current-username]").forEach(element => {
     element.textContent = profile?.username ? `@${profile.username}` : user.email;

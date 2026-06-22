@@ -1,16 +1,104 @@
 <!doctype html>
 <html lang="es">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Clips · SocialGo</title><link rel="stylesheet" href="css/global.css"></head>
-<body>
-  <main class="page-shell">
-    <a class="brand" href="index.html"><span class="brand-mark">S</span><span data-brand-name>SocialGo</span></a>
-    <section class="page-card">
-      <h1>Clips</h1>
-      <p>Aquí aparecerán los videos verticales, filtros, música, guardados y permisos de descarga.</p>
-      <p class="notice">Módulo preparado para desarrollarse en la siguiente fase.</p>
-      <a class="secondary" href="index.html">Volver al inicio</a>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#030712">
+  <title>Clips · SocialGo</title>
+  <link rel="stylesheet" href="css/global.css">
+</head>
+<body class="clips-page">
+  <header class="clips-header">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">S</span>
+      <span data-brand-name>SocialGo</span>
+    </a>
+    <a class="secondary" href="index.html">← Inicio</a>
+  </header>
+
+  <button id="createClipButton" class="clip-create-button" type="button" aria-label="Crear clip">＋</button>
+
+  <main id="clipsFeed" class="clips-feed" aria-live="polite">
+    <section class="clip-empty">
+      <div class="notice">Cargando clips…</div>
     </section>
   </main>
-  <script type="module">import { applyBrand } from "./js/brand.js"; applyBrand();</script>
-</body></html>
+
+  <dialog id="clipUploadDialog">
+    <form method="dialog" class="modal-card clip-upload-card" id="clipUploadForm">
+      <header>
+        <h2>Crear clip</h2>
+        <button value="cancel" aria-label="Cerrar">✕</button>
+      </header>
+
+      <p class="notice">
+        Duración máxima: 60 segundos. Tamaño máximo: 25 MB.
+        En el celular puedes grabar con la cámara o elegir un video.
+      </p>
+
+      <label class="file-picker">
+        🎥 Grabar o elegir video
+        <input
+          id="clipFile"
+          type="file"
+          accept="video/mp4,video/webm,video/quicktime"
+          capture="user">
+      </label>
+
+      <div id="clipPreview" class="video-preview hidden">
+        <video id="clipPreviewVideo" controls playsinline></video>
+      </div>
+
+      <label class="field">
+        Descripción
+        <textarea id="clipDescription" maxlength="1000" rows="4" placeholder="Escribe una descripción"></textarea>
+      </label>
+
+      <label class="field">
+        Visibilidad
+        <select id="clipVisibility">
+          <option value="public">Público</option>
+          <option value="followers">Solo seguidores</option>
+          <option value="friends">Solo amigos</option>
+          <option value="private">Solo yo</option>
+        </select>
+      </label>
+
+      <label class="toggle-row">
+        <span>Permitir comentarios</span>
+        <input id="clipAllowComments" type="checkbox" checked>
+      </label>
+
+      <label class="toggle-row">
+        <span>Permitir descargar el video</span>
+        <input id="clipAllowDownload" type="checkbox">
+      </label>
+
+      <div id="clipUploadStatus" class="notice hidden"></div>
+
+      <div class="modal-actions">
+        <button value="cancel" class="secondary">Cancelar</button>
+        <button id="publishClipButton" type="button" class="primary">Publicar clip</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="clipCommentsDialog">
+    <section class="modal-card">
+      <header>
+        <h2>Comentarios</h2>
+        <button type="button" id="closeClipComments">✕</button>
+      </header>
+      <div id="clipCommentsList" class="comments-list">
+        <p class="notice">Cargando…</p>
+      </div>
+      <form id="clipCommentForm" class="comment-form">
+        <input id="clipCommentText" maxlength="1000" placeholder="Escribe un comentario">
+        <button class="primary" type="submit">Enviar</button>
+      </form>
+    </section>
+  </dialog>
+
+  <script type="module" src="js/clips.js"></script>
+</body>
+</html>

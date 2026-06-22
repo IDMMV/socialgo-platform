@@ -9,11 +9,15 @@
 </head>
 <body class="clips-page">
   <header class="clips-header">
-    <a class="brand" href="index.html">
+    <a class="clips-logo" href="index.html">
       <span class="brand-mark">S</span>
-      <span data-brand-name>SocialGo</span>
+      <strong data-brand-name>SocialGo</strong>
     </a>
-    <a class="secondary" href="index.html">← Inicio</a>
+    <nav class="clips-tabs">
+      <button class="active" type="button">Para ti</button>
+      <button type="button">Siguiendo</button>
+    </nav>
+    <a class="clips-search" href="explorar.html" aria-label="Buscar">⌕</a>
   </header>
 
   <button id="createClipButton" class="clip-create-button" type="button" aria-label="Crear clip">＋</button>
@@ -98,6 +102,14 @@
       </form>
     </section>
   </dialog>
+
+  <nav class="clips-bottom-nav">
+    <a href="index.html">⌂<small>Inicio</small></a>
+    <a href="explorar.html">⌕<small>Explorar</small></a>
+    <button id="bottomCreateClip" type="button">＋<small>Crear</small></button>
+    <a class="active" href="clips.html">▶<small>Clips</small></a>
+    <a href="perfil.html">◉<small>Perfil</small></a>
+  </nav>
 
   <script type="module" src="js/clips.js"></script>
 </body>

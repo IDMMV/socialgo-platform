@@ -299,7 +299,7 @@ function bindPostActions() {
 
 document.addEventListener("click", closeAllMenus);
 
-for (const id of ["openComposer", "openComposer2", "mobileCreate"]) {
+for (const id of ["openComposer", "openComposer2", "mobileCreate", "topCreate"]) {
   document.querySelector(`#${id}`)?.addEventListener("click", async () => {
     if (await requireUser("Regístrate o inicia sesión para publicar.")) {
       dialog?.showModal();
@@ -428,6 +428,28 @@ publishPollButton?.addEventListener("click", async () => {
   }
 });
 
+
+async function refreshMessagesBadge() {
+  const user = await getCurrentUser();
+  const badge = document.querySelector("#messagesBadge");
+  if (!user || !badge) return;
+  const { count, error } = await supabase
+    .from("mensajes")
+    .select("id", { count: "exact", head: true })
+    .neq("remitente_id", user.id)
+    .eq("leido", false);
+  if (!error && count) {
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.hidden = false;
+
+    const topBadge = document.querySelector("#topNotificationBadge");
+    if (topBadge) {
+      topBadge.textContent = badge.textContent;
+      topBadge.hidden = false;
+    }
+  } else badge.hidden = true;
+}
+
 async function refreshNotificationBadge() {
   const user = await getCurrentUser();
   const badge = document.querySelector("#notificationBadge");
@@ -452,6 +474,7 @@ document.querySelector("#closeComments")?.addEventListener("click", () => commen
 
 await refreshFeed();
 await refreshNotificationBadge();
+await refreshMessagesBadge();
 
 if ("serviceWorker" in navigator && APP_CONFIG.enablePWA) {
   window.addEventListener("load", () => {

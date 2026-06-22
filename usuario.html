@@ -79,6 +79,7 @@
               ${currentUser && currentUser.id !== profile.id ? `
                 <div class="modal-actions" style="justify-content:flex-start;margin-top:12px">
                   <button id="followButton" class="primary">${profile.siguiendo ? "Dejar de seguir" : "Seguir"}</button>
+                  <button id="friendButton" class="secondary">${profile.estado_amistad === "aceptada" ? "Amigos" : profile.estado_amistad === "pendiente" ? "Solicitud enviada" : "Agregar amigo"}</button>
                   <button id="messageButton" class="secondary">Enviar mensaje</button>
                 </div>` : ""}
             </div>
@@ -95,6 +96,11 @@
 
           if (result.error) alert(result.error.message);
           else location.reload();
+        });
+
+        document.querySelector("#friendButton")?.addEventListener("click", async () => {
+          const { error } = await supabase.rpc("enviar_solicitud_amistad", { p_destinatario: profile.id });
+          if (error) alert(error.message); else location.reload();
         });
 
         document.querySelector("#messageButton")?.addEventListener("click", async () => {

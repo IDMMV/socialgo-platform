@@ -125,7 +125,7 @@
 
       const { data, error } = await supabase
         .from("mensajes")
-        .select("id,remitente_id,contenido,creado_en")
+        .select("id,remitente_id,contenido,creado_en,leido,leido_en")
         .eq("conversacion_id", activeConversationId)
         .order("creado_en", { ascending: true })
         .limit(300);
@@ -139,6 +139,8 @@
         ? data.map(renderMessage).join("")
         : `<p class="notice">Aún no hay mensajes. Escribe el primero.</p>`;
 
+      await supabase.from("mensajes").update({ leido: true, leido_en: new Date().toISOString() }).eq("conversacion_id", activeConversationId).neq("remitente_id", user.id).eq("leido", false);
+
       messagesList.scrollTop = messagesList.scrollHeight;
     }
 
@@ -148,7 +150,7 @@
         <div class="message-row ${mine ? "mine" : ""}">
           <div class="message-bubble">
             <span>${escapeHtml(message.contenido)}</span>
-            <small>${new Date(message.creado_en).toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"})}</small>
+            <small>${new Date(message.creado_en).toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"})}${mine ? `<span class="message-status">${message.leido ? "✓✓" : "✓"}</span>` : ""}</small>
           </div>
         </div>`;
     }

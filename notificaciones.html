@@ -60,6 +60,9 @@
       if (item.tipo === "like") return `${actor} indicó que le gusta tu publicación.`;
       if (item.tipo === "comentario") return `${actor} comentó tu publicación.`;
       if (item.tipo === "seguimiento") return `${actor} comenzó a seguirte.`;
+      if (item.tipo === "solicitud_amistad") return `${actor} te envió una solicitud de amistad.`;
+      if (item.tipo === "amistad_aceptada") return `${actor} aceptó tu solicitud de amistad.`;
+      if (item.tipo === "mensaje") return `${actor} te envió un mensaje.`;
       return item.mensaje || "Tienes una nueva notificación.";
     }
 

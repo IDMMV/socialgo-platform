@@ -91,7 +91,8 @@
               ${currentUser ? `<button class="primary" data-follow="${person.id}" data-following="${person.siguiendo ? "1" : "0"}">
                 ${person.siguiendo ? "Dejar de seguir" : "Seguir"}
               </button>
-              <button class="secondary" data-message="${person.id}">Mensaje</button>` : ""}
+              <button class="secondary" data-message="${person.id}">Mensaje</button>
+              <button class="secondary" data-friend="${person.id}">${person.estado_amistad === "aceptada" ? "Amigos" : person.estado_amistad === "pendiente" ? "Solicitud enviada" : "Agregar amigo"}</button>` : ""}
             </div>
           </article>`).join("")
         : `<p class="notice">No se encontraron usuarios.</p>`;
@@ -115,6 +116,13 @@
 
           if (result.error) alert(result.error.message);
           else loadPeople(input.value);
+        });
+      });
+
+      document.querySelectorAll("[data-friend]").forEach(button => {
+        button.addEventListener("click", async () => {
+          const { error } = await supabase.rpc("enviar_solicitud_amistad", { p_destinatario: button.dataset.friend });
+          if (error) alert(error.message); else loadPeople(input.value);
         });
       });
 

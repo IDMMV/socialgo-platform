@@ -21,13 +21,31 @@
         <a class="active" href="index.html">🏠 <span>Inicio</span></a>
         <a href="clips.html">🎬 <span>Clips</span></a>
         <a href="explorar.html">🔎 <span>Explorar</span></a>
-        <a href="mensajes.html">💬 <span>Mensajes</span></a>
+        <a href="mensajes.html" class="notifications-button">💬 <span>Mensajes</span><span id="messagesBadge" class="notification-badge" hidden>0</span></a>
+        <a href="amistades.html">🤝 <span>Amigos</span></a>
         <a href="perfil.html">👤 <span>Perfil</span></a>
         <a href="notificaciones.html" class="notifications-button">🔔 <span>Notificaciones</span><span id="notificationBadge" class="notification-badge" hidden>0</span></a>
+        <a href="admin.html" data-admin-only hidden>🛡️ <span>Panel administrativo</span></a>
       </nav>
 
       <button class="primary wide" id="openComposer">＋ Crear publicación</button>
-      <div class="sidebar-footer">
+      <div class="sidebar-account" data-auth-only hidden>
+        <a href="perfil.html" class="sidebar-profile">
+          <span class="avatar">SG</span>
+          <span>
+            <strong data-current-username>Mi perfil</strong>
+            <small>Ver perfil</small>
+          </span>
+          <b>›</b>
+        </a>
+      </div>
+
+      <div class="premium-card">
+        <strong>♛ SocialGo Premium</strong>
+        <small>Próximamente: estadísticas y herramientas exclusivas.</small>
+      </div>
+
+      <div class="sidebar-footer" data-guest-only>
         <a href="login.html">Iniciar sesión</a>
         <a href="registro.html">Crear cuenta</a>
       </div>
@@ -35,24 +53,35 @@
 
     <main class="main">
       <header class="topbar">
-        <div>
-          <h1 data-brand-name>SocialGo</h1>
-          <p data-brand-slogan>Conecta, comparte y crece.</p>
-        </div>
+        <a class="mobile-brand" href="index.html">
+          <span class="brand-mark">S</span>
+          <strong data-brand-name>SocialGo</strong>
+        </a>
+
+        <label class="global-search">
+          <span>⌕</span>
+          <input type="search" placeholder="Buscar en SocialGo" aria-label="Buscar en SocialGo">
+        </label>
+
         <div class="top-actions">
-          <button class="icon-button" aria-label="Buscar">🔎</button>
-          <button class="icon-button" aria-label="Notificaciones">🔔</button>
-          <a class="avatar-link" href="perfil.html" aria-label="Perfil">JH</a>
+          <button class="icon-button" id="topCreate" aria-label="Crear publicación">＋</button>
+          <a class="icon-button notifications-button" href="mensajes.html" aria-label="Mensajes">💬
+            <span id="topMessagesBadge" class="notification-badge" hidden>0</span>
+          </a>
+          <a class="icon-button notifications-button" href="notificaciones.html" aria-label="Notificaciones">🔔
+            <span id="topNotificationBadge" class="notification-badge" hidden>0</span>
+          </a>
+          <a class="avatar-link" href="perfil.html" aria-label="Perfil">SG</a>
         </div>
       </header>
 
-      <section class="stories" aria-label="Historias">
+      <section class="stories-wrap"><div class="section-title"><strong>Historias</strong><a href="#">Ver todas</a></div><section class="stories" aria-label="Historias">
         <button class="story add"><span>＋</span><small>Tu historia</small></button>
         <button class="story"><span>ML</span><small>María</small></button>
         <button class="story"><span>CR</span><small>Carlos</small></button>
         <button class="story"><span>AV</span><small>Aventuras</small></button>
         <button class="story"><span>TC</span><small>Tech</small></button>
-      </section>
+      </section></section>
 
       <section class="composer">
         <div class="avatar">JH</div>
@@ -69,29 +98,46 @@
 
     <aside class="rightbar">
       <section class="panel">
-        <h2>Acciones rápidas</h2>
-        <div class="quick-grid">
-          <button>✍️<span>Publicar</span></button>
-          <button>🎯<span>Historia</span></button>
-          <button>📅<span>Evento</span></button>
-          <button>📣<span>Anuncio</span></button>
+        <div class="panel-heading">
+          <h2>Solicitudes de amistad</h2>
+          <a href="amistades.html">Ver todas</a>
+        </div>
+        <div class="right-list">
+          <div class="right-person">
+            <span class="avatar">LT</span>
+            <div><strong>Laura Torres</strong><small>3 amigos en común</small></div>
+            <a href="amistades.html">Revisar</a>
+          </div>
+          <div class="right-person">
+            <span class="avatar">AM</span>
+            <div><strong>Andrés Martínez</strong><small>5 amigos en común</small></div>
+            <a href="amistades.html">Revisar</a>
+          </div>
         </div>
       </section>
 
       <section class="panel">
-        <h2>Tu actividad</h2>
-        <ul class="stats-list">
-          <li><span>♡ Me gusta</span><strong>1,234</strong></li>
-          <li><span>🔖 Guardados</span><strong>567</strong></li>
-          <li><span>↗ Compartidos</span><strong>89</strong></li>
-          <li><span>👥 Contactos</span><strong>1,048</strong></li>
-        </ul>
+        <div class="panel-heading">
+          <h2>Amigos conectados</h2>
+          <a href="amistades.html">Ver todos</a>
+        </div>
+        <div class="online-list">
+          <a href="amistades.html"><span class="avatar">JP</span><span>Juan Pérez<small><i></i> En línea</small></span></a>
+          <a href="amistades.html"><span class="avatar">VG</span><span>Valentina Gómez<small><i></i> En línea</small></span></a>
+          <a href="amistades.html"><span class="avatar">AM</span><span>Alex Mendoza<small><i></i> En línea</small></span></a>
+        </div>
       </section>
 
       <section class="panel">
-        <h2>Sugerencias para ti</h2>
-        <div class="suggestion"><span>DH</span><div><strong>Diseño Hub</strong><small>@disenohub</small></div><button>Seguir</button></div>
-        <div class="suggestion"><span>CB</span><div><strong>Café del Barrio</strong><small>@cafedelbarrio</small></div><button>Seguir</button></div>
+        <div class="panel-heading">
+          <h2>Tendencias</h2>
+          <a href="explorar.html">Ver más</a>
+        </div>
+        <ol class="trends-list">
+          <li><strong>#ViveElMomento</strong><small>12.5K publicaciones</small></li>
+          <li><strong>#SocialGoClips</strong><small>8.7K publicaciones</small></li>
+          <li><strong>#Viajes</strong><small>7.1K publicaciones</small></li>
+        </ol>
       </section>
     </aside>
   </div>

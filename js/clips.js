@@ -83,6 +83,7 @@ function renderClip(clip) {
       <video
         src="${escapeHtml(clip.archivo_url)}"
         playsinline
+        muted
         loop
         preload="metadata"></video>
 
@@ -415,6 +416,12 @@ async function uploadClip() {
     publishButton.textContent = "Publicar clip";
   }
 }
+
+document.querySelector("#bottomCreateClip")?.addEventListener("click", async () => {
+  if (!await requireUser("Regístrate o inicia sesión para crear un clip.")) return;
+  uploadStatus.classList.add("hidden");
+  uploadDialog.showModal();
+});
 
 createButton.addEventListener("click", async () => {
   if (!await requireUser("Regístrate o inicia sesión para crear un clip.")) return;

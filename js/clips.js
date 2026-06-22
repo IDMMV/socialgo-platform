@@ -416,9 +416,12 @@ async function processAndPublish() {
       await supabase.storage.from("clips").remove([uploadedCover.path]);
     }
 
+    const message = String(error?.message || "No se pudo procesar el video.");
+
     showStatus(
-      `${error.message || "No se pudo procesar el video."} ` +
-      "En celulares con poca memoria, usa un video más corto o de menor resolución.",
+      message.includes("Worker")
+        ? "No se pudo iniciar el editor de video. Actualiza la página y vuelve a intentarlo."
+        : `${message} En celulares con poca memoria, usa un video más corto o de menor resolución.`,
       true
     );
   } finally {
@@ -429,8 +432,9 @@ async function processAndPublish() {
 }
 
 function renderClip(clip) {
-  const avatar = clip.avatar_url
-    ? `<img src="${escapeHtml(clip.avatar_url)}" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover">`
+  const profileImage = clip.avatar_url || clip.portada_url || null;
+  const avatar = profileImage
+    ? `<img src="${escapeHtml(profileImage)}" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover">`
     : `<span class="avatar">${escapeHtml(initials(clip.nombre_visible))}</span>`;
 
   return `

@@ -177,9 +177,19 @@ async function loadFFmpeg(progressCallback) {
 
   const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
 
+  const ffmpegPackageURL =
+    "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm";
+
+  const [classWorkerURL, coreURL, wasmURL] = await Promise.all([
+    toBlobURL(`${ffmpegPackageURL}/worker.js`, "text/javascript"),
+    toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+    toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm")
+  ]);
+
   await ffmpeg.load({
-    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm")
+    classWorkerURL,
+    coreURL,
+    wasmURL
   });
 
   ffmpegInstance = { ffmpeg, fetchFile };

@@ -20,11 +20,19 @@
       <div class="profile-cover">
         <img id="coverImage" alt="" hidden>
         <div id="avatarBox" class="profile-avatar-large">U</div>
-        <button id="changeAvatar" class="avatar-action" type="button" title="Cambiar foto">📷</button>
-        <button id="changeCover" class="cover-action" type="button">🖼️ Cambiar portada</button>
+        <button id="changeAvatar" class="avatar-action avatar-action-visible" type="button">
+          📷 Cambiar foto de perfil
+        </button>
+        <button id="changeCover" class="cover-action" type="button">
+          🖼️ Cambiar portada
+        </button>
         <input id="avatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
         <input id="coverInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
       </div>
+
+      <p class="profile-image-help">
+        La foto de perfil aparece dentro de las burbujas. La portada aparece como imagen grande.
+      </p>
 
       <h1>Mi perfil</h1>
 

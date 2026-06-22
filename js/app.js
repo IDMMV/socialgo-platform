@@ -32,7 +32,7 @@ async function applyCurrentProfileVisuals() {
 
     const { data: profile } = await supabase
       .from("perfiles")
-      .select("username,nombre_visible,avatar_url")
+      .select("username,nombre_visible,avatar_url,portada_url")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -45,9 +45,14 @@ async function applyCurrentProfileVisuals() {
       .join("")
       .toUpperCase();
 
-    document.querySelectorAll(".composer .avatar, .avatar-link").forEach(element => {
-      if (profile.avatar_url) {
-        element.innerHTML = `<img src="${profile.avatar_url}?v=${Date.now()}" alt="Mi foto" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    const profileImage = profile.avatar_url || profile.portada_url || null;
+
+    document.querySelectorAll(".composer .avatar, .avatar-link, .sidebar-profile .avatar").forEach(element => {
+      if (profileImage) {
+        element.innerHTML = `<img
+          src="${profileImage}?v=${Date.now()}"
+          alt="Mi foto"
+          style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
       } else {
         element.textContent = initials;
       }
@@ -106,15 +111,16 @@ async function loadStories() {
   const currentUser = await getCurrentUser();
   const { data, error } = await supabase
     .from("perfiles_publicos")
-    .select("id,username,nombre_visible,avatar_url")
+    .select("id,username,nombre_visible,avatar_url,portada_url")
     .limit(12);
 
   if (error) return;
 
   const others = (data || []).filter(profile => profile.id !== currentUser?.id).slice(0, 8);
   const cards = others.map(profile => {
-    const image = profile.avatar_url
-      ? `<img src="${escapeUi(profile.avatar_url)}" alt="" loading="lazy">`
+    const storyImage = profile.avatar_url || profile.portada_url || null;
+    const image = storyImage
+      ? `<img src="${escapeUi(storyImage)}" alt="" loading="lazy">`
       : `<b>${escapeUi(initialsUi(profile.nombre_visible || profile.username))}</b>`;
     return `<a class="story" href="usuario.html?u=${encodeURIComponent(profile.username)}"><span>${image}</span><small>${escapeUi(profile.nombre_visible || profile.username)}</small></a>`;
   }).join("");

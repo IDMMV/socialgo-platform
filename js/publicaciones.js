@@ -402,8 +402,9 @@ export function renderPost(post, currentUserId, poll = null) {
       .toUpperCase()
   );
 
-  const avatar = post.avatar_url
-    ? `<div class="avatar"><img src="${escapeHtml(post.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`
+  const profileImage = post.avatar_url || post.portada_url || null;
+  const avatar = profileImage
+    ? `<div class="avatar"><img src="${escapeHtml(profileImage)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`
     : `<div class="avatar">${avatarText}</div>`;
 
 

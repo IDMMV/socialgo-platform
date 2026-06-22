@@ -8,10 +8,13 @@
 </head>
 <body>
   <main class="page-shell" id="adminContent" hidden>
-    <a class="brand" href="index.html">
-      <span class="brand-mark">S</span>
-      <span data-brand-name>SocialGo</span>
-    </a>
+    <header class="admin-toolbar">
+      <a class="brand" href="index.html" style="margin:0">
+        <span class="brand-mark">S</span>
+        <span data-brand-name>SocialGo</span>
+      </a>
+      <a class="secondary" href="index.html">← Volver al inicio</a>
+    </header>
 
     <section class="page-card">
       <h1>Panel de administración</h1>
@@ -124,7 +127,26 @@
     const brandPrimary = document.querySelector("#brandPrimary");
     const brandSecondary = document.querySelector("#brandSecondary");
 
-    const user = await requireAdmin();
+    let user = null;
+
+    try {
+      user = await Promise.race([
+        requireAdmin(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("La verificación tardó demasiado.")), 8000)
+        )
+      ]);
+    } catch (error) {
+      accessStatus.innerHTML = `
+        <div class="auth-card">
+          <h1>No se pudo verificar el acceso</h1>
+          <p class="notice">${escapeHtml(error.message)}</p>
+          <div class="modal-actions">
+            <a class="primary" href="admin.html">Reintentar</a>
+            <a class="secondary" href="index.html">Volver al inicio</a>
+          </div>
+        </div>`;
+    }
 
     if (user) {
       accessStatus.hidden = true;

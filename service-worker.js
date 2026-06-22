@@ -1,4 +1,4 @@
-const CACHE_NAME = "socialgo-v0.8.3";
+const CACHE_NAME = "socialgo-v0.8.4";
 
 const CORE = [
   "./",

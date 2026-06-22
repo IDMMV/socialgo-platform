@@ -458,7 +458,17 @@ export function renderPost(post, currentUserId, poll = null) {
 
       ${pollHtml}
 
-      ${post.archivo_url ? `<img class="post-image" src="${escapeHtml(post.archivo_url)}" alt="Imagen publicada por ${escapeHtml(post.username || "usuario")}" loading="lazy">` : ""}
+      ${post.archivo_url && post.tipo === "clip"
+        ? `<video class="post-video" src="${escapeHtml(post.archivo_url)}" controls playsinline preload="metadata">
+             Tu navegador no puede reproducir este video.
+           </video>`
+        : post.archivo_url
+          ? `<img class="post-image"
+                 src="${escapeHtml(post.archivo_url)}"
+                 alt="Imagen publicada por ${escapeHtml(post.username || "usuario")}"
+                 loading="lazy"
+                 onerror="this.outerHTML='<div class=&quot;media-unavailable&quot;>La imagen ya no está disponible.</div>'">`
+          : ""}
 
       <footer class="post-actions">
         <button data-real-action="like" data-post-id="${post.id}">

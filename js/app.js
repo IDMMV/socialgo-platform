@@ -25,6 +25,40 @@ import {
 applyBrand();
 await renderSessionControls();
 
+async function applyCurrentProfileVisuals() {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return;
+
+    const { data: profile } = await supabase
+      .from("perfiles")
+      .select("username,nombre_visible,avatar_url")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (!profile) return;
+
+    const initials = String(profile.nombre_visible || profile.username || "U")
+      .split(/\s+/)
+      .slice(0, 2)
+      .map(part => part.charAt(0))
+      .join("")
+      .toUpperCase();
+
+    document.querySelectorAll(".composer .avatar, .avatar-link").forEach(element => {
+      if (profile.avatar_url) {
+        element.innerHTML = `<img src="${profile.avatar_url}?v=${Date.now()}" alt="Mi foto" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      } else {
+        element.textContent = initials;
+      }
+    });
+  } catch (error) {
+    console.warn("No se pudo aplicar la foto de perfil:", error);
+  }
+}
+
+await applyCurrentProfileVisuals();
+
 const dialog = document.querySelector("#composerDialog");
 const commentsDialog = document.querySelector("#commentsDialog");
 const feed = document.querySelector("#feed");

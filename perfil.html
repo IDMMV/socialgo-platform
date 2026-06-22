@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/global.css">
 </head>
 <body>
-  <main class="page-shell">
+  <main class="compact-page">
     <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
       <a class="brand" href="index.html" style="margin:0">
         <span class="brand-mark">S</span>
@@ -16,7 +16,7 @@
       <a class="secondary" href="index.html">← Volver</a>
     </header>
 
-    <section class="page-card">
+    <section class="page-card profile-edit-card">
       <div class="profile-cover">
         <img id="coverImage" alt="" hidden>
         <div id="avatarBox" class="profile-avatar-large">U</div>
@@ -32,16 +32,46 @@
       <div id="message" class="notice" hidden></div>
 
       <form id="profileForm" hidden>
-        <label class="field">Nombre visible<input id="displayName" maxlength="80" required></label>
-        <label class="field">Usuario<input id="username" readonly><small>El nombre de usuario es único.</small></label>
-        <label class="field">Correo de acceso<input id="email" type="email" required></label>
-        <label class="field">Número de contacto<input id="phone" type="tel" inputmode="tel" maxlength="25" placeholder="+51 999 999 999"></label>
-        <label class="field">Biografía<textarea id="bio" maxlength="300" rows="5"></textarea></label>
+        <div class="profile-form-grid">
+          <label class="field">
+            Nombre visible
+            <input id="displayName" maxlength="80" required>
+          </label>
 
-        <label class="toggle-row"><span>Permitir que me encuentren por correo</span><input id="findByEmail" type="checkbox"></label>
-        <label class="toggle-row"><span>Permitir que me encuentren por teléfono</span><input id="findByPhone" type="checkbox"></label>
+          <label class="field">
+            Usuario
+            <input id="username" readonly>
+            <small>Tu usuario es único.</small>
+          </label>
 
-        <div class="modal-actions" style="flex-wrap:wrap">
+          <label class="field">
+            Correo de acceso
+            <input id="email" type="email" required>
+          </label>
+
+          <label class="field">
+            Número de contacto
+            <input id="phone" type="tel" inputmode="tel" maxlength="25" placeholder="+51 999 999 999">
+          </label>
+
+          <label class="field full">
+            Biografía
+            <textarea id="bio" maxlength="300" rows="4" placeholder="Cuéntanos algo sobre ti"></textarea>
+          </label>
+        </div>
+
+        <div class="profile-privacy">
+          <label class="toggle-row">
+            <span>Permitir que me encuentren por correo</span>
+            <input id="findByEmail" type="checkbox">
+          </label>
+          <label class="toggle-row">
+            <span>Permitir que me encuentren por teléfono</span>
+            <input id="findByPhone" type="checkbox">
+          </label>
+        </div>
+
+        <div class="profile-actions">
           <button class="primary" id="saveButton" type="submit">Guardar cambios</button>
           <a class="secondary" href="index.html">Cancelar y volver</a>
           <button class="secondary" id="logoutButton" type="button">Cerrar sesión</button>
@@ -132,13 +162,13 @@
       fields.findByPhone.checked = Boolean(currentProfile.permitir_busqueda_telefono);
 
       if (currentProfile.avatar_url) {
-        fields.avatarBox.innerHTML = `<img src="${currentProfile.avatar_url}" alt="Foto de perfil">`;
+        fields.avatarBox.innerHTML = `<img src="${currentProfile.avatar_url}?v=${Date.now()}" alt="Foto de perfil">`;
       } else {
         fields.avatarBox.textContent = initials(currentProfile.nombre_visible);
       }
 
       if (currentProfile.portada_url) {
-        fields.coverImage.src = currentProfile.portada_url;
+        fields.coverImage.src = `${currentProfile.portada_url}?v=${Date.now()}`;
         fields.coverImage.hidden = false;
       }
 

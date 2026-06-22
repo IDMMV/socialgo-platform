@@ -45,7 +45,10 @@
     applyBrand();
 
     const user = await getCurrentUser();
-    if (!user) window.location.replace("login.html?next=mensajes.html");
+    if (!user) {
+      window.location.replace("login.html?next=mensajes.html");
+      throw new Error("Sesión no disponible");
+    }
 
     const conversationsList = document.querySelector("#conversationsList");
     const messagesList = document.querySelector("#messagesList");
@@ -94,7 +97,11 @@
         item.addEventListener("click", () => openConversation(item.dataset.conversation));
       });
 
-      if (activeConversationId) await openConversation(activeConversationId, false);
+      if (activeConversationId) {
+        await openConversation(activeConversationId, false);
+      } else if (data?.length) {
+        await openConversation(data[0].conversacion_id, false);
+      }
     }
 
     async function openConversation(id, updateUrl = true) {
@@ -187,8 +194,17 @@
         contenido: content
       });
 
-      if (error) alert(error.message);
-      else input.value = "";
+      if (error) {
+        const detail = error.details || error.hint || error.message;
+        messagesList.insertAdjacentHTML(
+          "beforeend",
+          `<div class="chat-error">No se pudo enviar: ${escapeHtml(detail)}</div>`
+        );
+      } else {
+        input.value = "";
+        await loadMessages();
+        await loadConversations();
+      }
 
       sendButton.disabled = false;
       input.focus();

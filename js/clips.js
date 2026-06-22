@@ -85,7 +85,9 @@ function renderClip(clip) {
         playsinline
         muted
         loop
-        preload="metadata"></video>
+        preload="metadata"
+        controlslist="nodownload"
+        onerror="this.closest('.clip-card').innerHTML='<div class=&quot;clip-empty&quot;><div class=&quot;notice&quot;>Este video no puede reproducirse. Puede ser un formato no compatible o un archivo eliminado.</div></div>'"></video>
 
       <div class="clip-gradient"></div>
       <div class="clip-play-overlay"><span>▶</span></div>

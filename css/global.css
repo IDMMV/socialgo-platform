@@ -1095,3 +1095,98 @@ dialog{
   .clip-actions{bottom:96px}
 }
 \n\n/* ============================================================\n   SOCIALGO FASE 8.3 — RECONSTRUCCIÓN MÓVIL REAL\n   ============================================================ */\n.post-image-fallback{\n  display:grid;place-items:center;gap:5px;min-height:210px;margin-top:10px;\n  border-radius:14px;border:1px dashed #31415b;background:#080e19;color:#d7deea;text-align:center\n}\n.post-image-fallback span{font-size:34px}.post-image-fallback small{color:var(--muted)}\n.story span img{width:100%;height:100%;object-fit:cover;border-radius:50%}.story span b{font-size:17px}\n@media(max-width:760px){\n  html,body{width:100%;overflow-x:hidden}\n  body{background:#050914;padding-bottom:76px}\n  #appShell{display:block;width:100%;padding:0}\n  .main{width:100%;max-width:none;padding:0}\n  .topbar{\n    position:sticky;top:0;z-index:60;height:64px;padding:10px 14px;\n    display:flex;align-items:center;justify-content:space-between;\n    border-bottom:1px solid #18253a;background:rgba(5,9,20,.96);backdrop-filter:blur(18px)\n  }\n  .mobile-brand{display:flex;align-items:center;gap:9px;font-size:22px}.mobile-brand .brand-mark{width:39px;height:39px}\n  .top-actions{display:flex;align-items:center}.top-actions #topCreate{width:44px;height:44px;font-size:26px}\n  .top-actions .icon-button{width:40px;height:40px;font-size:20px}\n  .top-actions>a:nth-of-type(1){display:none}.avatar-link{display:none}.global-search{display:none}\n  .stories-wrap{margin:0;border:0;border-bottom:1px solid #18253a;border-radius:0;background:#07101f}\n  .section-title{padding:18px 20px 8px;font-size:19px}.section-title a{font-size:13px}\n  .stories{display:flex;gap:15px;padding:12px 18px 20px;overflow-x:auto}.story{min-width:66px}\n  .story span{width:66px;height:66px}.story small{max-width:70px;font-size:12px;margin-top:7px}\n  .composer{\n    margin:16px 14px 20px;padding:14px 14px 8px;border-radius:20px;\n    grid-template-columns:48px 1fr;background:#0a1424\n  }\n  .composer .avatar{width:48px;height:48px;font-size:17px}.composer>button{min-height:48px;border-radius:999px;font-size:16px}\n  .composer-actions{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);margin-top:12px;padding:12px 0 2px}\n  .composer-actions button{font-size:14px;padding:10px 4px}\n  .feed{display:grid;gap:16px;padding:0 12px 18px}\n  .post{margin:0;padding:0;border-radius:20px;overflow:hidden;background:#091220;border-color:#1c2a40}\n  .post-header{padding:15px 15px 4px}.post>p{padding:0 15px;margin:12px 0 10px;font-size:16px;line-height:1.45}\n  .post-image{width:100%;max-height:none;height:auto;margin:8px 0 0;border-radius:0;object-fit:cover;background:#05080d}\n  .post-image-fallback{margin:8px 0 0;border-radius:0;border-left:0;border-right:0}\n  .poll-card{margin:10px 14px 14px}\n  .post-actions{display:grid;grid-template-columns:repeat(4,1fr);margin:0;padding:8px 8px 10px;border-top:1px solid #18253a}\n  .post-actions button{min-height:44px;padding:7px 2px;font-size:13px}.post-actions button span{font-size:12px}\n  .menu-popup{right:12px;top:58px}\n  .mobile-nav{height:72px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(4,8,17,.98)}\n  .mobile-nav a{font-size:21px}.mobile-nav small{font-size:11px}.mobile-nav button{width:58px;height:58px;margin-top:-18px;font-size:32px}\n}\n
+
+/* ============================================================
+   SOCIALGO FASE 8.4 — CORRECCIÓN INTEGRAL
+   ============================================================ */
+[hidden]{display:none!important}
+
+.compact-page{
+  width:min(1080px,100%);
+  margin:0 auto;
+  padding:18px;
+}
+.compact-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+.profile-edit-card{
+  width:min(820px,100%);
+  margin:0 auto;
+}
+.profile-form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.profile-form-grid .full{grid-column:1/-1}
+.profile-form-grid textarea{min-height:120px;max-height:220px}
+.profile-privacy{
+  margin-top:12px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+}
+.profile-actions{
+  position:sticky;
+  bottom:10px;
+  z-index:12;
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:16px;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:rgba(8,14,25,.94);
+  backdrop-filter:blur(14px);
+}
+.admin-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+.media-unavailable{
+  display:grid;
+  place-items:center;
+  min-height:180px;
+  padding:22px;
+  border:1px dashed var(--border);
+  border-radius:14px;
+  background:var(--surface-2);
+  color:var(--muted);
+  text-align:center;
+}
+.post-video{
+  display:block;
+  width:100%;
+  max-height:650px;
+  margin-top:12px;
+  border-radius:14px;
+  background:#000;
+  object-fit:contain;
+}
+.chat-error{
+  padding:12px;
+  border:1px solid #ef4444;
+  border-radius:12px;
+  background:rgba(239,68,68,.08);
+  color:#fecaca;
+}
+@media(max-width:760px){
+  .compact-page{padding:10px}
+  .profile-form-grid{grid-template-columns:1fr}
+  .profile-form-grid .full{grid-column:auto}
+  .profile-actions{
+    position:static;
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .profile-actions>*{width:100%;text-align:center}
+}

@@ -68,6 +68,7 @@
           <span style="font-size:9px;font-weight:700;color:var(--vd);display:flex;align-items:center;gap:3px">
             <span style="width:6px;height:6px;background:var(--vd);border-radius:50%;animation:blink 1.5s ease-in-out infinite;display:inline-block"></span> En vivo
           </span>
+          <span id="mapZoneInfo" style="font-size:9px;font-weight:700;color:var(--az2);background:#EEF2FF;border:1px solid #D8E1FF;padding:4px 8px;border-radius:999px;display:none">Radio: 1.5 km</span>
           <span id="mapCount" style="font-size:10px;font-weight:700;color:var(--txt2)">0 alertas</span>
         </div>
       </div>
@@ -115,7 +116,8 @@ import { PUBLIC_ENV } from './js/env.public.js';
 const sb = supabase.createClient(PUBLIC_ENV.SUPABASE_URL, PUBLIC_ENV.SUPABASE_PUBLISHABLE_KEY);
 
 const colores = {robo:'#E24B4A',accidente:'#f59e0b',agua:'#185FA5',luz:'#185FA5',mascota:'#d97706',incendio:'#ef4444',persona:'#9b5cf6',otro:'#8b5cf6'};
-let mapaInst = null, todosMarkers = [], miPos = null;
+const RADIO_ZONA_METROS = 1500;
+let mapaInst = null, todosMarkers = [], miPos = null, alertasCache = [], filtroActual = 'todas';
 
 function crearIcono(tipo, verificada) {
   const color = verificada ? '#1D9E75' : (colores[tipo] || '#8b5cf6');
@@ -137,13 +139,33 @@ window.usarUbicacion = function() {
   navigator.geolocation.getCurrentPosition(pos => {
     const {latitude:lat, longitude:lng} = pos.coords;
     miPos = [lat,lng];
-    mapaInst.setView([lat,lng],16);
+    mapaInst.setView([lat,lng],15);
+
     if (window._miPosMarker) mapaInst.removeLayer(window._miPosMarker);
+    if (window._miZonaCircle) mapaInst.removeLayer(window._miZonaCircle);
+
     const ico = L.divIcon({
       html:`<div style="width:16px;height:16px;background:#E24B4A;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 5px rgba(220,38,38,.25)"></div>`,
       iconSize:[16,16],iconAnchor:[8,8],className:''
     });
-    window._miPosMarker = L.marker([lat,lng],{icon:ico}).addTo(mapaInst).bindPopup('<b>📍 Tú estás aquí</b>');
+
+    window._miPosMarker = L.marker([lat,lng],{icon:ico}).addTo(mapaInst).bindPopup(`<b>📍 Tú estás aquí</b><br><span style="font-size:12px;color:#64748b">Radio mostrado: ${Math.round(RADIO_ZONA_METROS/100)/10} km</span>`);
+    window._miZonaCircle = L.circle([lat,lng], {
+      radius: RADIO_ZONA_METROS,
+      color: '#7c3aed',
+      weight: 2,
+      opacity: 0.95,
+      fillColor: '#7c3aed',
+      fillOpacity: 0.08,
+      dashArray: '8 6'
+    }).addTo(mapaInst).bindPopup(`<b>Zona mostrada</b><br>Mostrando alertas en un radio de ${Math.round(RADIO_ZONA_METROS/100)/10} km.`);
+
+    const info = document.getElementById('mapZoneInfo');
+    info.style.display = 'inline-flex';
+    info.textContent = `Radio: ${Math.round(RADIO_ZONA_METROS/100)/10} km`;
+
+    renderAlertas();
+
     // Actualizar distrito aproximado
     fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es`)
       .then(r=>r.json())
@@ -160,18 +182,37 @@ async function cargarAlertas() {
   try {
     const {data} = await sb.from('alertas').select('*').in('estado',['reportada','verificada','en_revision']).not('latitud','is',null).order('created_at',{ascending:false}).limit(100);
     if (data?.length) {
-      cargarEnMapa(data.map(a=>({lat:parseFloat(a.latitud),lng:parseFloat(a.longitud),tipo:a.categoria,titulo:a.titulo,meta:`${a.zona_referencia||a.distrito||''} · ${timeAgo(a.created_at)}`,verificada:a.estado==='verificada',conf:a.total_confirmaciones||0,id:a.id})));
+      alertasCache = data.map(a=>({lat:parseFloat(a.latitud),lng:parseFloat(a.longitud),tipo:a.categoria,titulo:a.titulo,meta:`${a.zona_referencia||a.distrito||''} · ${timeAgo(a.created_at)}`,verificada:a.estado==='verificada',conf:a.total_confirmaciones||0,id:a.id}));
+      renderAlertas();
       return;
     }
   } catch(e){}
   // Demo si no hay datos reales
-  cargarEnMapa([
+  alertasCache = [
     {lat:-12.046,lng:-77.043,tipo:'robo',titulo:'Robo de celular',meta:'Jr. Las Palmeras · Hace 12 min',verificada:false,conf:3},
     {lat:-12.042,lng:-77.039,tipo:'agua',titulo:'Corte de agua — Sedapal',meta:'Av. Universitaria · Hoy',verificada:true,conf:0},
     {lat:-12.05,lng:-77.047,tipo:'mascota',titulo:'Mascota perdida — Max',meta:'Parque · Hace 2h',verificada:false,conf:1},
     {lat:-12.048,lng:-77.041,tipo:'robo',titulo:'Moto robada',meta:'Av. Naranjal · Hace 45 min',verificada:true,conf:6},
     {lat:-12.044,lng:-77.045,tipo:'accidente',titulo:'Accidente de tránsito',meta:'Cruce · Hace 30 min',verificada:false,conf:2},
-  ]);
+  ];
+  renderAlertas();
+}
+
+
+function filtrarPorZona(alertas) {
+  if (!miPos || !mapaInst) return alertas;
+  return alertas.filter(a => {
+    const distancia = mapaInst.distance(miPos, [a.lat, a.lng]);
+    a._dist = distancia;
+    return distancia <= RADIO_ZONA_METROS;
+  });
+}
+
+function renderAlertas() {
+  let alertas = Array.isArray(alertasCache) ? [...alertasCache] : [];
+  alertas = filtrarPorZona(alertas);
+  if (filtroActual !== 'todas') alertas = alertas.filter(a => a.tipo === filtroActual);
+  cargarEnMapa(alertas);
 }
 
 function cargarEnMapa(alertas) {
@@ -182,21 +223,25 @@ function cargarEnMapa(alertas) {
     m.bindPopup(`<div style="min-width:200px;font-family:inherit">
       <div style="font-size:8px;font-weight:700;background:${a.verificada?'#f0fdf4':'#fef2f2'};color:${a.verificada?'#14532d':'#991b1b'};border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:5px">${a.verificada?'✓ Verificada':'Sin verificar · '+a.conf+' confirmaron'}</div>
       <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:3px">${a.titulo}</div>
-      <div style="font-size:10px;color:#94a3b8;margin-bottom:8px">${a.meta}</div>
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:4px">${a.meta}</div>
+      ${a._dist ? `<div style="font-size:9px;color:#7c3aed;font-weight:700;margin-bottom:8px">📍 A ${Math.round(a._dist)} m de tu ubicación</div>` : ''}
       <button onclick="this.textContent='✓ Confirmado';this.style.background='#1D9E75'" style="width:100%;background:#185FA5;color:#fff;border:none;border-radius:6px;padding:6px;font-size:10px;font-weight:700;cursor:pointer;margin-bottom:5px">✓ También lo vi</button>
       <button onclick="if(navigator.share){navigator.share({title:'MiZona',text:'${a.titulo}',url:location.href})}" style="width:100%;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:6px;padding:5px;font-size:10px;cursor:pointer">📱 Compartir</button>
     </div>`);
     m._tipo = a.tipo; todosMarkers.push(m);
   });
-  document.getElementById('mapCount').textContent = `${alertas.length} alertas activas`;
+  const tieneUbicacion = !!miPos;
+  document.getElementById('mapCount').textContent = tieneUbicacion
+    ? `${alertas.length} alertas en tu radio`
+    : `${alertas.length} alertas activas`;
 }
 
+
 window.filtrar = function(tipo, btn) {
+  filtroActual = tipo;
   document.querySelectorAll('.mz-map-filtro').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.color='';b.style.borderColor='';});
   btn.classList.add('active');
-  todosMarkers.forEach(m=>{tipo==='todas'||m._tipo===tipo?mapaInst.addLayer(m):mapaInst.removeLayer(m);});
-  const vis = tipo==='todas'?todosMarkers.length:todosMarkers.filter(m=>m._tipo===tipo).length;
-  document.getElementById('mapCount').textContent = `${vis} alertas`;
+  renderAlertas();
 };
 
 function timeAgo(s){const d=(Date.now()-new Date(s))/60000;if(d<60)return`Hace ${Math.floor(d)} min`;if(d<1440)return`Hace ${Math.floor(d/60)} h`;return`Hace ${Math.floor(d/1440)} días`;}

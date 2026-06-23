@@ -137,6 +137,23 @@ const RADIO_PREDETERMINADO = 1500;
 let radioZonaMetros = RADIO_PREDETERMINADO;
 let mapaInst = null, todosMarkers = [], miPos = null, alertasCache = [], filtroActual = 'todas';
 
+function normalizarTipo(valor) {
+  const t = String(valor || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  if (!t) return 'otro';
+  if (['robo','robos','hurto','hurtos','delito','delitos','asalto','asaltos'].includes(t)) return 'robo';
+  if (['accidente','accidentes','choque','choques','atropello','siniestro'].includes(t)) return 'accidente';
+  if (['agua','luz','agua/luz','agua-luz','corte de agua','corte de luz','servicios basicos'].includes(t)) return 'agua';
+  if (['mascota','mascotas','animal','animales'].includes(t)) return 'mascota';
+  if (['persona','personas','desaparecido','desaparecidos'].includes(t)) return 'persona';
+  if (['incendio','incendios','fuego'].includes(t)) return 'incendio';
+  return t;
+}
+
+function coincideConFiltro(tipo, filtro) {
+  if (filtro === 'todas') return true;
+  return normalizarTipo(tipo) === filtro;
+}
+
 function crearIcono(tipo, verificada) {
   const color = verificada ? '#1D9E75' : (colores[tipo] || '#8b5cf6');
   return L.divIcon({
@@ -234,7 +251,7 @@ async function cargarAlertas() {
   try {
     const {data} = await sb.from('alertas').select('*').in('estado',['reportada','verificada','en_revision']).not('latitud','is',null).order('created_at',{ascending:false}).limit(100);
     if (data?.length) {
-      alertasCache = data.map(a=>({lat:parseFloat(a.latitud),lng:parseFloat(a.longitud),tipo:a.categoria,titulo:a.titulo,meta:`${a.zona_referencia||a.distrito||''} · ${timeAgo(a.created_at)}`,verificada:a.estado==='verificada',conf:a.total_confirmaciones||0,id:a.id}));
+      alertasCache = data.map(a=>({lat:parseFloat(a.latitud),lng:parseFloat(a.longitud),tipo:normalizarTipo(a.categoria),titulo:a.titulo,meta:`${a.zona_referencia||a.distrito||''} · ${timeAgo(a.created_at)}`,verificada:a.estado==='verificada',conf:a.total_confirmaciones||0,id:a.id}));
       renderAlertas();
       return;
     }
@@ -263,7 +280,7 @@ function filtrarPorZona(alertas) {
 function renderAlertas() {
   let alertas = Array.isArray(alertasCache) ? [...alertasCache] : [];
   alertas = filtrarPorZona(alertas);
-  if (filtroActual !== 'todas') alertas = alertas.filter(a => a.tipo === filtroActual);
+  if (filtroActual !== 'todas') alertas = alertas.filter(a => coincideConFiltro(a.tipo, filtroActual));
   cargarEnMapa(alertas);
 }
 
@@ -280,12 +297,13 @@ function cargarEnMapa(alertas) {
       <button onclick="this.textContent='✓ Confirmado';this.style.background='#1D9E75'" style="width:100%;background:#185FA5;color:#fff;border:none;border-radius:6px;padding:6px;font-size:10px;font-weight:700;cursor:pointer;margin-bottom:5px">✓ También lo vi</button>
       <button onclick="if(navigator.share){navigator.share({title:'MiZona',text:'${a.titulo}',url:location.href})}" style="width:100%;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:6px;padding:5px;font-size:10px;cursor:pointer">📱 Compartir</button>
     </div>`);
-    m._tipo = a.tipo; todosMarkers.push(m);
+    m._tipo = normalizarTipo(a.tipo); todosMarkers.push(m);
   });
   const tieneUbicacion = !!miPos;
+  const filtroTxt = filtroActual === 'todas' ? 'eventos' : filtroActual + (filtroActual.endsWith('s') ? '' : 's');
   document.getElementById('mapCount').textContent = tieneUbicacion && radioZonaMetros
-    ? `${alertas.length} alertas en ${etiquetaRadio(radioZonaMetros)}`
-    : `${alertas.length} alertas activas`;
+    ? `${alertas.length} ${filtroTxt} en ${etiquetaRadio(radioZonaMetros)}`
+    : `${alertas.length} ${filtroTxt}`;
 }
 
 

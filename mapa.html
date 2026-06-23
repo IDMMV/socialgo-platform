@@ -12,17 +12,43 @@
 <style>
 #mapaCompleto{height:calc(100vh - 180px);min-height:500px;width:100%}
 .mz-map-filtros{padding:8px 12px;background:#fff;border-bottom:1px solid var(--bd);display:flex;gap:6px;flex-wrap:wrap}
-.mz-map-filtro{padding:4px 12px;border-radius:20px;font-size:9px;font-weight:700;border:1px solid var(--bd);background:var(--bg);color:var(--txt2);cursor:pointer;transition:all .15s}
+.mz-map-filtro{padding:4px 12px;border-radius:20px;font-size:9px;font-weight:700;border:1px solid var(--bd);background:var(--bg);color:var(--txt2);cursor:pointer;transition:all .15s;flex:0 0 auto}
 .mz-map-filtro.active{background:var(--az);color:#fff;border-color:var(--az)}
 .mz-map-radio-bar{padding:8px 12px;background:#fff;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.mz-map-radio-label{font-size:10px;font-weight:800;color:var(--txt);margin-right:2px}
-.mz-radio-btn{padding:5px 10px;border-radius:999px;border:1px solid var(--bd);background:var(--bg);color:var(--txt2);font-size:9px;font-weight:800;cursor:pointer;transition:.15s}
+.mz-map-radio-label{font-size:10px;font-weight:800;color:var(--txt);margin-right:2px;flex:0 0 auto}
+.mz-radio-btn{padding:5px 10px;border-radius:999px;border:1px solid var(--bd);background:var(--bg);color:var(--txt2);font-size:9px;font-weight:800;cursor:pointer;transition:.15s;flex:0 0 auto}
 .mz-radio-btn:hover{border-color:#9b5cf6;color:#6d28d9}
 .mz-radio-btn.active{background:#7c3aed;color:#fff;border-color:#7c3aed;box-shadow:0 3px 10px rgba(124,58,237,.22)}
-.mz-map-radio-help{font-size:9px;color:var(--txt3);margin-left:auto}
+.mz-map-radio-help{font-size:9px;color:var(--txt3);margin-left:auto;flex:0 0 auto}
 .mz-map-leyenda{padding:8px 12px;background:var(--bg);border-top:1px solid var(--bd);display:flex;gap:12px;flex-wrap:wrap;font-size:9px;color:var(--txt2)}
 .mz-ley-item{display:flex;align-items:center;gap:4px}
 .mz-ley-dot{width:10px;height:10px;border-radius:50%}
+
+@media (max-width: 768px){
+  body{overflow-x:hidden}
+  .mz-feed{padding-bottom:calc(82px + env(safe-area-inset-bottom))}
+  .mz-topbar{position:sticky;top:0;z-index:1200;background:#fff;display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;border-bottom:1px solid var(--bd)}
+  .mz-topbar > div:first-child{min-width:100%;flex:1 0 100%}
+  .mz-topbar button{order:2}
+  .mz-topbar .mz-dist-tag{order:3}
+  .mz-card{margin:8px !important;border-radius:14px !important;overflow:hidden}
+  .mz-map-filtros{position:sticky;top:74px;z-index:1190;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-ms-overflow-style:none}
+  .mz-map-filtros::-webkit-scrollbar,.mz-map-radio-bar::-webkit-scrollbar{display:none}
+  .mz-map-radio-bar{position:sticky;top:120px;z-index:1180;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap}
+  .mz-map-radio-help{display:none}
+  #mapaCompleto{height:calc(100dvh - 310px - env(safe-area-inset-bottom));min-height:300px}
+  .mz-map-leyenda{position:sticky;bottom:calc(66px + env(safe-area-inset-bottom));z-index:1170;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;padding-right:18px}
+  .leaflet-control-container .leaflet-top{top:4px}
+  .leaflet-control-container .leaflet-bottom{bottom:8px}
+  .leaflet-pane,.leaflet-control,.leaflet-top,.leaflet-bottom{z-index:500}
+  .mz-bottom-nav{z-index:3000}
+}
+
+@media (max-width: 480px){
+  #mapaCompleto{height:calc(100dvh - 328px - env(safe-area-inset-bottom));min-height:260px}
+  .mz-map-filtro,.mz-radio-btn{font-size:11px;padding:7px 12px}
+  .mz-map-radio-label{font-size:11px}
+}
 </style>
 <link rel="stylesheet" href="css/mizona-unified.css">
 <link rel="stylesheet" href="css/mizona-phase2.css">
@@ -153,6 +179,82 @@ function coincideConFiltro(tipo, filtro) {
   if (filtro === 'todas') return true;
   return normalizarTipo(tipo) === filtro;
 }
+
+
+function textoConfirmaciones(n) {
+  const total = Number(n || 0);
+  if (total === 1) return '1 persona lo confirmó';
+  return `${total} personas lo confirmaron`;
+}
+
+function escaparTexto(valor) {
+  return String(valor ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+window.compartirAlertaMapa = async function(textoCodificado){
+  const texto = decodeURIComponent(textoCodificado || '');
+  const payload = { title:'MiZona', text:texto, url:location.href };
+  try {
+    if (navigator.share) await navigator.share(payload);
+    else if (navigator.clipboard) {
+      await navigator.clipboard.writeText(location.href);
+      alert('Enlace copiado');
+    }
+  } catch(_) {}
+};
+
+window.confirmarAlertaMapa = async function(alertaId, button) {
+  if (!alertaId) {
+    alert('Esta es una alerta de demostración.');
+    return;
+  }
+
+  const { data:authData } = await sb.auth.getUser();
+  const user = authData?.user;
+  if (!user) {
+    location.href = `login.html?next=${encodeURIComponent(location.pathname + location.search)}`;
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = 'Guardando...';
+
+  try {
+    const coords = await new Promise(resolve => {
+      if (!navigator.geolocation) return resolve(null);
+      navigator.geolocation.getCurrentPosition(
+        pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => resolve(null),
+        { enableHighAccuracy:false, timeout:5000, maximumAge:300000 }
+      );
+    });
+
+    const { data, error } = await sb.rpc('confirmar_alerta', {
+      p_alerta_id: alertaId,
+      p_latitud: coords?.lat ?? null,
+      p_longitud: coords?.lng ?? null
+    });
+
+    if (error) throw error;
+
+    const nuevoTotal = Number(data?.total || 0);
+    button.textContent = '✓ Confirmado';
+    button.style.background = '#1D9E75';
+
+    const badge = document.getElementById(`badge-${alertaId}`);
+    const info = document.getElementById(`confirmaciones-${alertaId}`);
+    if (badge) badge.textContent = `Sin verificar · ${textoConfirmaciones(nuevoTotal)}`;
+    if (info) info.textContent = `👥 ${textoConfirmaciones(nuevoTotal)}`;
+
+    alertasCache = alertasCache.map(a => String(a.id) === String(alertaId)
+      ? { ...a, conf: nuevoTotal, total_confirmaciones: nuevoTotal }
+      : a);
+  } catch (error) {
+    alert(error.message || 'No se pudo guardar la confirmación');
+    button.disabled = false;
+    button.textContent = '✓ También lo vi';
+  }
+};
 
 function crearIcono(tipo, verificada) {
   const color = verificada ? '#1D9E75' : (colores[tipo] || '#8b5cf6');
@@ -289,13 +391,16 @@ function cargarEnMapa(alertas) {
   alertas.forEach(a=>{
     if(!a.lat||!a.lng) return;
     const m = L.marker([a.lat,a.lng],{icon:crearIcono(a.tipo,a.verificada)}).addTo(mapaInst);
-    m.bindPopup(`<div style="min-width:200px;font-family:inherit">
-      <div style="font-size:8px;font-weight:700;background:${a.verificada?'#f0fdf4':'#fef2f2'};color:${a.verificada?'#14532d':'#991b1b'};border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:5px">${a.verificada?'✓ Verificada':'Sin verificar · '+a.conf+' confirmaron'}</div>
-      <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:3px">${a.titulo}</div>
-      <div style="font-size:10px;color:#94a3b8;margin-bottom:4px">${a.meta}</div>
-      ${Number.isFinite(a._dist) ? `<div style="font-size:9px;color:#7c3aed;font-weight:700;margin-bottom:8px">📍 A ${a._dist >= 1000 ? (a._dist/1000).toFixed(1)+' km' : Math.round(a._dist)+' m'} de tu ubicación</div>` : ''}
-      <button onclick="this.textContent='✓ Confirmado';this.style.background='#1D9E75'" style="width:100%;background:#185FA5;color:#fff;border:none;border-radius:6px;padding:6px;font-size:10px;font-weight:700;cursor:pointer;margin-bottom:5px">✓ También lo vi</button>
-      <button onclick="if(navigator.share){navigator.share({title:'MiZona',text:'${a.titulo}',url:location.href})}" style="width:100%;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:6px;padding:5px;font-size:10px;cursor:pointer">📱 Compartir</button>
+    const shareText = encodeURIComponent(String(a.titulo || 'Alerta MiZona'));
+    const alertaId = a.id ? String(a.id) : '';
+    m.bindPopup(`<div style="min-width:240px;font-family:inherit">
+      <div id="badge-${alertaId}" style="font-size:8px;font-weight:700;background:${a.verificada?'#f0fdf4':'#fef2f2'};color:${a.verificada?'#14532d':'#991b1b'};border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:5px">${a.verificada?'✓ Verificada':'Sin verificar · ' + textoConfirmaciones(a.conf)}</div>
+      <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:3px">${escaparTexto(a.titulo)}</div>
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:4px">${escaparTexto(a.meta)}</div>
+      ${Number.isFinite(a._dist) ? `<div style="font-size:9px;color:#7c3aed;font-weight:700;margin-bottom:6px">📍 A ${a._dist >= 1000 ? (a._dist/1000).toFixed(1)+' km' : Math.round(a._dist)+' m'} de tu ubicación</div>` : ''}
+      <div id="confirmaciones-${alertaId}" style="font-size:10px;color:#475569;font-weight:700;margin-bottom:8px">👥 ${textoConfirmaciones(a.conf)}</div>
+      <button onclick="confirmarAlertaMapa('${alertaId}', this)" ${alertaId ? '' : 'disabled'} style="width:100%;background:${alertaId ? '#185FA5' : '#94a3b8'};color:#fff;border:none;border-radius:6px;padding:6px;font-size:10px;font-weight:700;cursor:${alertaId ? 'pointer' : 'not-allowed'};margin-bottom:5px">✓ También lo vi</button>
+      <button onclick="compartirAlertaMapa('${shareText}')" style="width:100%;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:6px;padding:5px;font-size:10px;cursor:pointer">📱 Compartir</button>
     </div>`);
     m._tipo = normalizarTipo(a.tipo); todosMarkers.push(m);
   });

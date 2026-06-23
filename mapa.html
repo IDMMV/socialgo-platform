@@ -1,69 +1,209 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#050b16">
-<title>Mapa | MiZona.pe</title>
+<meta name="theme-color" content="#111827">
+<title>Mapa de alertas — MiZona.pe</title>
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="css/mizona-dark.css">
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+<link rel="stylesheet" href="css/mizona.css">
+<style>
+#mapaCompleto{height:calc(100vh - 180px);min-height:500px;width:100%}
+.mz-map-filtros{padding:8px 12px;background:#fff;border-bottom:1px solid var(--bd);display:flex;gap:6px;flex-wrap:wrap}
+.mz-map-filtro{padding:4px 12px;border-radius:20px;font-size:9px;font-weight:700;border:1px solid var(--bd);background:var(--bg);color:var(--txt2);cursor:pointer;transition:all .15s}
+.mz-map-filtro.active{background:var(--az);color:#fff;border-color:var(--az)}
+.mz-map-leyenda{padding:8px 12px;background:var(--bg);border-top:1px solid var(--bd);display:flex;gap:12px;flex-wrap:wrap;font-size:9px;color:var(--txt2)}
+.mz-ley-item{display:flex;align-items:center;gap:4px}
+.mz-ley-dot{width:10px;height:10px;border-radius:50%}
+</style>
 </head>
 <body>
-<div class="mz-app">
-<aside class="mz-sidebar">
-  <a class="mz-brand" href="index.html">
-    <span class="mz-brand-badge">MZ</span>
-    <span><strong>MiZona<span>.pe</span></strong><small>Tu zona más segura.</small></span>
-  </a>
-  <nav class="mz-nav"><a class="" href="index.html"><span>⌂</span><span>Inicio</span></a><a class="" href="alertas.html"><span>◔</span><span>Alertas</span></a><a class="active" href="mapa.html"><span>⌖</span><span>Mapa</span></a><a class="" href="servicios.html"><span>▣</span><span>Servicios</span></a><a class="" href="solicitudes.html"><span>▤</span><span>Solicitudes</span></a><a class="" href="perfil.html"><span>♙</span><span>Perfil</span></a></nav>
-  <section class="mz-side-card"><strong>Comunidad verificada</strong><p>Vecinos, negocios e instituciones colaborando para una zona más segura.</p></section>
-  <section class="mz-side-card"><strong>Privacidad primero</strong><p>Las alertas muestran zonas aproximadas. Los datos sensibles se mantienen protegidos.</p></section>
-</aside>
-<main class="mz-main">
-<header class="mz-topbar">
-  <button class="mz-btn ghost mz-menu-btn" data-menu>☰</button>
-  <button class="mz-zone" data-change-zone>📍 <span data-zone>Ventanilla, Callao</span></button>
-  <label class="mz-search"><input type="search" placeholder="Buscar en MiZona..."></label>
-  <div class="mz-actions">
-    <a class="mz-btn danger" href="alertas.html#reportar">＋ <span class="text">Reportar alerta</span></a>
-    <a class="mz-btn ghost" href="notificaciones.html">🔔</a>
-    <a class="mz-btn ghost" href="perfil.html">Perfil</a>
-  </div>
-</header>
-<div class="mz-content">
-<div class="mz-page-title">
-  <div><h1>Mapa de alertas</h1><p>Visualiza incidentes y avisos cercanos en tiempo real.</p></div>
-  <button class="mz-btn primary" data-my-location>Usar mi ubicación</button>
-</div>
-<section class="mz-card">
-  <div class="mz-card-head"><h2>Alertas en tu zona</h2><span id="mapCount">0 alertas</span></div>
-  <div class="mz-map-wrap" style="height:650px"><div id="mapaCompleto"></div></div>
-  <div class="mz-map-tools">
-    <button class="mz-filter active" data-map-filter="todas">Todas</button>
-    <button class="mz-filter" data-map-filter="robo">🔴 Robos</button>
-    <button class="mz-filter" data-map-filter="accidente">🟠 Accidentes</button>
-    <button class="mz-filter" data-map-filter="agua">🔵 Agua</button>
-    <button class="mz-filter" data-map-filter="luz">💡 Luz</button>
-    <button class="mz-filter" data-map-filter="persona">🟣 Personas</button>
-    <button class="mz-filter" data-map-filter="mascota">🐾 Mascotas</button>
-  </div>
-  <div id="mapStatus" class="mz-empty"></div>
-</section>
-</div>
-</main>
+<div class="mz-layout-2col">
+
+  <!-- SIDEBAR -->
+  <aside class="mz-sidebar">
+    <div class="mz-logo">
+      <div class="mz-logo-mark">MZ</div>
+      <div><div class="mz-logo-name">MiZona</div><div class="mz-logo-domain">mizona.pe</div></div>
+    </div>
+    <div class="mz-nav-sec">Principal</div>
+    <a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
+    <a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
+    <a class="mz-nav-item active" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
+    <a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
+    <a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
+    <div class="mz-nav-sec">Comunidad</div>
+    <a class="mz-nav-item" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
+    <a class="mz-nav-item" href="ride.html"><i class="ti ti-car"></i><span>MiZonaRide</span></a>
+    <div class="mz-nav-sec">Cuenta</div>
+    <a class="mz-nav-item" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
+    <a class="mz-nav-item" href="negocio.html"><i class="ti ti-building-store"></i><span>Mi negocio</span></a>
+    <div class="mz-sidebar-spacer"></div>
+    <a href="alertas.html#reportar" class="mz-sidebar-btn" style="text-decoration:none">
+      <i class="ti ti-plus"></i> Reportar alerta
+    </a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="mz-feed">
+    <div class="mz-topbar">
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;color:var(--txt)">Mapa de alertas</div>
+        <div style="font-size:10px;color:var(--txt3)">Incidentes y avisos en tiempo real</div>
+      </div>
+      <button onclick="usarUbicacion()" style="background:var(--az);color:#fff;border:none;border-radius:var(--rs);padding:8px 14px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">
+        <i class="ti ti-current-location" style="font-size:14px"></i> Usar mi ubicación
+      </button>
+      <div class="mz-dist-tag" id="dist-tag-mapa"><i class="ti ti-map-pin"></i><span id="dist-mapa">Cargando...</span></div>
+    </div>
+
+    <div class="mz-card" style="margin:12px;border-radius:var(--r);overflow:hidden">
+      <div class="mz-card-head">
+        <div class="mz-card-title"><i class="ti ti-map-pin"></i> Alertas en tu zona</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:9px;font-weight:700;color:var(--vd);display:flex;align-items:center;gap:3px">
+            <span style="width:6px;height:6px;background:var(--vd);border-radius:50%;animation:blink 1.5s ease-in-out infinite;display:inline-block"></span> En vivo
+          </span>
+          <span id="mapCount" style="font-size:10px;font-weight:700;color:var(--txt2)">0 alertas</span>
+        </div>
+      </div>
+
+      <div class="mz-map-filtros">
+        <button class="mz-map-filtro active" onclick="filtrar('todas',this)">Todas</button>
+        <button class="mz-map-filtro" onclick="filtrar('robo',this)">🔴 Robos</button>
+        <button class="mz-map-filtro" onclick="filtrar('accidente',this)">🟠 Accidentes</button>
+        <button class="mz-map-filtro" onclick="filtrar('agua',this)">💧 Agua/Luz</button>
+        <button class="mz-map-filtro" onclick="filtrar('mascota',this)">🐾 Mascotas</button>
+        <button class="mz-map-filtro" onclick="filtrar('persona',this)">👤 Personas</button>
+        <button class="mz-map-filtro" onclick="filtrar('incendio',this)">🔥 Incendios</button>
+      </div>
+
+      <div id="mapaCompleto"></div>
+
+      <div class="mz-map-leyenda">
+        <div class="mz-ley-item"><div class="mz-ley-dot" style="background:#E24B4A"></div>Robo/Delito</div>
+        <div class="mz-ley-item"><div class="mz-ley-dot" style="background:#f59e0b"></div>Accidente</div>
+        <div class="mz-ley-item"><div class="mz-ley-dot" style="background:#185FA5"></div>Agua/Luz</div>
+        <div class="mz-ley-item"><div class="mz-ley-dot" style="background:#d97706"></div>Mascota</div>
+        <div class="mz-ley-item"><div class="mz-ley-dot" style="background:#9b5cf6"></div>Persona</div>
+        <div class="mz-ley-item"><div class="mz-ley-dot" style="background:#1D9E75"></div>Verificada</div>
+        <span style="margin-left:auto;font-size:9px;color:var(--txt3)">© OpenStreetMap — Gratis</span>
+      </div>
+    </div>
+  </main>
 </div>
 
-<nav class="mz-mobile-bottom">
-  <a href="index.html">⌂<span>Inicio</span></a>
-  <a href="alertas.html">◔<span>Alertas</span></a>
-  <a class="plus" href="alertas.html#reportar">＋</a>
-  <a href="mapa.html">⌖<span>Mapa</span></a>
-  <a href="perfil.html">♙<span>Perfil</span></a>
+<!-- BOTTOM NAV MOBILE -->
+<nav class="mz-bottom-nav">
+  <div class="mz-bn-inner">
+    <div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
+    <div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
+    <div class="mz-bn-item active"><i class="ti ti-map"></i><span>Mapa</span></div>
+    <div class="mz-bn-item" onclick="location.href='servicios.html'"><i class="ti ti-tool"></i><span>Servicios</span></div>
+    <div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
+  </div>
 </nav>
-<script type="module" src="js/mapa-mizona.js"></script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script type="module">
+import { PUBLIC_ENV } from './js/env.public.js';
+const sb = supabase.createClient(PUBLIC_ENV.SUPABASE_URL, PUBLIC_ENV.SUPABASE_PUBLISHABLE_KEY);
+
+const colores = {robo:'#E24B4A',accidente:'#f59e0b',agua:'#185FA5',luz:'#185FA5',mascota:'#d97706',incendio:'#ef4444',persona:'#9b5cf6',otro:'#8b5cf6'};
+let mapaInst = null, todosMarkers = [], miPos = null;
+
+function crearIcono(tipo, verificada) {
+  const color = verificada ? '#1D9E75' : (colores[tipo] || '#8b5cf6');
+  return L.divIcon({
+    html:`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="38" viewBox="0 0 30 38"><path d="M15 0C6.716 0 0 6.716 0 15c0 9.375 15 23 15 23S30 24.375 30 15C30 6.716 23.284 0 15 0z" fill="${color}" opacity=".95"/><circle cx="15" cy="15" r="9" fill="white" opacity=".92"/>${verificada?'<circle cx="23" cy="6" r="5" fill="#1D9E75"/><text x="23" y="8.5" text-anchor="middle" font-size="7" fill="white">✓</text>':''}</svg>`,
+    iconSize:[30,38],iconAnchor:[15,38],popupAnchor:[0,-40],className:''
+  });
+}
+
+function initMapa() {
+  mapaInst = L.map('mapaCompleto',{zoomControl:true,scrollWheelZoom:true}).setView([-12.046,-77.043],13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mapaInst);
+  usarUbicacion();
+  cargarAlertas();
+}
+
+window.usarUbicacion = function() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(pos => {
+    const {latitude:lat, longitude:lng} = pos.coords;
+    miPos = [lat,lng];
+    mapaInst.setView([lat,lng],16);
+    if (window._miPosMarker) mapaInst.removeLayer(window._miPosMarker);
+    const ico = L.divIcon({
+      html:`<div style="width:16px;height:16px;background:#E24B4A;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 5px rgba(220,38,38,.25)"></div>`,
+      iconSize:[16,16],iconAnchor:[8,8],className:''
+    });
+    window._miPosMarker = L.marker([lat,lng],{icon:ico}).addTo(mapaInst).bindPopup('<b>📍 Tú estás aquí</b>');
+    // Actualizar distrito aproximado
+    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es`)
+      .then(r=>r.json())
+      .then(d=>{
+        const dist = d.address?.suburb || d.address?.district || d.address?.city_district || d.address?.city || 'Tu zona';
+        document.getElementById('dist-mapa').textContent = dist;
+      }).catch(()=>{});
+  }, ()=>{
+    document.getElementById('dist-mapa').textContent = 'Ubicación no disponible';
+  });
+};
+
+async function cargarAlertas() {
+  try {
+    const {data} = await sb.from('alertas').select('*').in('estado',['reportada','verificada','en_revision']).not('latitud','is',null).order('created_at',{ascending:false}).limit(100);
+    if (data?.length) {
+      cargarEnMapa(data.map(a=>({lat:parseFloat(a.latitud),lng:parseFloat(a.longitud),tipo:a.categoria,titulo:a.titulo,meta:`${a.zona_referencia||a.distrito||''} · ${timeAgo(a.created_at)}`,verificada:a.estado==='verificada',conf:a.total_confirmaciones||0,id:a.id})));
+      return;
+    }
+  } catch(e){}
+  // Demo si no hay datos reales
+  cargarEnMapa([
+    {lat:-12.046,lng:-77.043,tipo:'robo',titulo:'Robo de celular',meta:'Jr. Las Palmeras · Hace 12 min',verificada:false,conf:3},
+    {lat:-12.042,lng:-77.039,tipo:'agua',titulo:'Corte de agua — Sedapal',meta:'Av. Universitaria · Hoy',verificada:true,conf:0},
+    {lat:-12.05,lng:-77.047,tipo:'mascota',titulo:'Mascota perdida — Max',meta:'Parque · Hace 2h',verificada:false,conf:1},
+    {lat:-12.048,lng:-77.041,tipo:'robo',titulo:'Moto robada',meta:'Av. Naranjal · Hace 45 min',verificada:true,conf:6},
+    {lat:-12.044,lng:-77.045,tipo:'accidente',titulo:'Accidente de tránsito',meta:'Cruce · Hace 30 min',verificada:false,conf:2},
+  ]);
+}
+
+function cargarEnMapa(alertas) {
+  todosMarkers.forEach(m=>mapaInst.removeLayer(m)); todosMarkers=[];
+  alertas.forEach(a=>{
+    if(!a.lat||!a.lng) return;
+    const m = L.marker([a.lat,a.lng],{icon:crearIcono(a.tipo,a.verificada)}).addTo(mapaInst);
+    m.bindPopup(`<div style="min-width:200px;font-family:inherit">
+      <div style="font-size:8px;font-weight:700;background:${a.verificada?'#f0fdf4':'#fef2f2'};color:${a.verificada?'#14532d':'#991b1b'};border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:5px">${a.verificada?'✓ Verificada':'Sin verificar · '+a.conf+' confirmaron'}</div>
+      <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:3px">${a.titulo}</div>
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:8px">${a.meta}</div>
+      <button onclick="this.textContent='✓ Confirmado';this.style.background='#1D9E75'" style="width:100%;background:#185FA5;color:#fff;border:none;border-radius:6px;padding:6px;font-size:10px;font-weight:700;cursor:pointer;margin-bottom:5px">✓ También lo vi</button>
+      <button onclick="if(navigator.share){navigator.share({title:'MiZona',text:'${a.titulo}',url:location.href})}" style="width:100%;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:6px;padding:5px;font-size:10px;cursor:pointer">📱 Compartir</button>
+    </div>`);
+    m._tipo = a.tipo; todosMarkers.push(m);
+  });
+  document.getElementById('mapCount').textContent = `${alertas.length} alertas activas`;
+}
+
+window.filtrar = function(tipo, btn) {
+  document.querySelectorAll('.mz-map-filtro').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.color='';b.style.borderColor='';});
+  btn.classList.add('active');
+  todosMarkers.forEach(m=>{tipo==='todas'||m._tipo===tipo?mapaInst.addLayer(m):mapaInst.removeLayer(m);});
+  const vis = tipo==='todas'?todosMarkers.length:todosMarkers.filter(m=>m._tipo===tipo).length;
+  document.getElementById('mapCount').textContent = `${vis} alertas`;
+};
+
+function timeAgo(s){const d=(Date.now()-new Date(s))/60000;if(d<60)return`Hace ${Math.floor(d)} min`;if(d<1440)return`Hace ${Math.floor(d/60)} h`;return`Hace ${Math.floor(d/1440)} días`;}
+
+const st=document.createElement('style');
+st.textContent='@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}';
+document.head.appendChild(st);
+
+initMapa();
+</script>
 </body>
 </html>

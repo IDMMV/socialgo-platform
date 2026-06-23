@@ -1,320 +1,402 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Mi perfil · MiZona.pe</title>
-  <link rel="stylesheet" href="css/global.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>Mi perfil — MiZona.pe</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="css/mizona.css">
+<style>
+.perfil-portada{height:160px;background:linear-gradient(135deg,#185FA5,#1D9E75);position:relative;border-radius:var(--r) var(--r) 0 0;overflow:hidden}
+.perfil-portada img{width:100%;height:100%;object-fit:cover}
+.perfil-portada-btn{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:9px;font-weight:700;cursor:pointer;backdrop-filter:blur(4px)}
+.perfil-avatar-wrap{position:relative;margin-top:-40px;margin-left:20px;display:inline-block}
+.perfil-avatar{width:80px;height:80px;border-radius:50%;background:var(--az);border:4px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;overflow:hidden}
+.perfil-avatar img{width:100%;height:100%;object-fit:cover}
+.perfil-avatar-btn{position:absolute;bottom:2px;right:2px;width:24px;height:24px;border-radius:50%;background:var(--az);border:2px solid var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.perfil-avatar-btn i{font-size:12px;color:#fff}
+.perfil-info-row{padding:8px 20px 14px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.perfil-nombre{font-size:18px;font-weight:800;color:var(--txt)}
+.perfil-usuario{font-size:11px;color:var(--txt3);margin-top:2px;display:flex;align-items:center;gap:5px}
+.perfil-dist{font-size:10px;color:var(--az);font-weight:600;display:flex;align-items:center;gap:3px;margin-top:3px}
+.perfil-edit-btn{background:var(--bg);color:var(--txt2);border:1px solid var(--bd);border-radius:var(--rs);padding:7px 14px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s}
+.perfil-edit-btn:hover{border-color:var(--az);color:var(--az)}
+.perfil-stats{display:flex;gap:0;border-top:1px solid var(--bd2)}
+.perfil-stat{flex:1;padding:10px;text-align:center;border-right:1px solid var(--bd2)}
+.perfil-stat:last-child{border-right:none}
+.perfil-stat-val{font-size:18px;font-weight:800;color:var(--txt)}
+.perfil-stat-label{font-size:8px;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+
+/* FORM */
+.perfil-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.campo{display:flex;flex-direction:column;gap:4px}
+.campo.full{grid-column:1/-1}
+.campo label{font-size:10px;font-weight:600;color:var(--txt2)}
+.campo input,.campo select,.campo textarea{background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);padding:8px 11px;font-size:11px;color:var(--txt);width:100%;transition:border-color .15s}
+.campo input:focus,.campo select:focus,.campo textarea:focus{border-color:var(--az);background:var(--card);outline:none}
+.campo textarea{min-height:70px;resize:vertical}
+.campo small{font-size:9px;color:var(--txt3)}
+
+/* TOGGLE */
+.toggle-fila{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd2)}
+.toggle-fila:last-child{border-bottom:none}
+.toggle-fila label{font-size:10px;color:var(--txt2)}
+.toggle-switch{width:36px;height:20px;background:var(--bd);border-radius:20px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;border:none}
+.toggle-switch.on{background:var(--az)}
+.toggle-switch::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle-switch.on::after{transform:translateX(16px)}
+
+/* ACTIVIDAD TABS */
+.act-tabs{display:flex;border-bottom:1px solid var(--bd2);background:var(--card)}
+.act-tab{flex:1;padding:10px;font-size:10px;font-weight:700;color:var(--txt3);border:none;border-bottom:2px solid transparent;background:transparent;cursor:pointer;transition:all .15s}
+.act-tab.active{color:var(--az);border-bottom-color:var(--az);background:var(--az-bg)}
+.act-content{padding:14px;min-height:120px;display:flex;align-items:center;justify-content:center;color:var(--txt3);font-size:11px;flex-direction:column;gap:8px}
+
+/* LOGOUT BTN */
+.logout-btn{background:var(--rj-bg);color:var(--rj);border:1px solid var(--rj-bd);border-radius:var(--rs);padding:8px 16px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s}
+.logout-btn:hover{background:var(--rj);color:#fff}
+
+@media(max-width:640px){.perfil-form-grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-  <main class="compact-page">
-    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
-      <a class="brand" href="index.html" style="margin:0">
-        <span class="brand-mark">S</span>
-        <span data-brand-name>MiZona.pe</span>
-      </a>
-      <a class="secondary" href="index.html">← Volver</a>
-    </header>
 
-    <section class="page-card profile-edit-card">
-      <div class="profile-media-block">
-        <div class="profile-cover">
-          <img id="coverImage" alt="" hidden>
-          <button id="changeCover" class="cover-action" type="button">
-            🖼️ Cambiar portada
+<div id="mz-toast" class="mz-toast"></div>
+<input type="file" id="input-avatar" accept="image/*" hidden>
+<input type="file" id="input-portada" accept="image/*" hidden>
+
+<div class="mz-layout-2col">
+
+  <!-- SIDEBAR -->
+  <aside class="mz-sidebar">
+    <div class="mz-logo">
+      <div class="mz-logo-mark">MZ</div>
+      <div><div class="mz-logo-name">MiZona</div><div class="mz-logo-domain">mizona.pe</div></div>
+    </div>
+    <div class="mz-nav-sec">Principal</div>
+    <a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
+    <a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
+    <a class="mz-nav-item" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
+    <a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
+    <a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
+    <div class="mz-nav-sec">Comunidad</div>
+    <a class="mz-nav-item" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
+    <a class="mz-nav-item" href="ride.html"><i class="ti ti-car"></i><span>MiZonaRide</span></a>
+    <div class="mz-nav-sec">Cuenta</div>
+    <a class="mz-nav-item" href="mensajes.html"><i class="ti ti-message"></i><span>Mensajes</span></a>
+    <a class="mz-nav-item active" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
+    <a class="mz-nav-item" href="negocio.html"><i class="ti ti-building-store"></i><span>Mi negocio</span></a>
+    <div class="mz-sidebar-spacer"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="mz-feed">
+    <div class="mz-topbar">
+      <div style="flex:1;font-size:14px;font-weight:700;color:var(--txt)">Mi perfil</div>
+      <a href="index.html" style="font-size:10px;color:var(--txt3);display:flex;align-items:center;gap:4px;text-decoration:none"><i class="ti ti-arrow-left" style="font-size:14px"></i> Volver</a>
+    </div>
+
+    <div class="mz-feed-body">
+
+      <!-- CARD PERFIL -->
+      <div class="mz-card" id="perfil-card">
+        <!-- PORTADA -->
+        <div class="perfil-portada" id="portada-wrap">
+          <img id="portada-img" style="display:none">
+          <button class="perfil-portada-btn" onclick="document.getElementById('input-portada').click()">
+            <i class="ti ti-photo" style="font-size:11px"></i> Cambiar portada
           </button>
         </div>
 
-        <div class="profile-avatar-row">
-          <div id="avatarBox" class="profile-avatar-large">U</div>
-
-          <div class="profile-avatar-controls">
-            <button id="changeAvatar" class="primary avatar-upload-button" type="button">
-              📷 Cambiar foto de perfil
+        <!-- AVATAR + INFO -->
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px 0 0">
+          <div class="perfil-avatar-wrap">
+            <div class="perfil-avatar" id="avatar-box">
+              <img id="avatar-img" style="display:none">
+              <span id="avatar-iniciales">U</span>
+            </div>
+            <div class="perfil-avatar-btn" onclick="document.getElementById('input-avatar').click()">
+              <i class="ti ti-camera"></i>
+            </div>
+          </div>
+          <div style="padding:10px 0 8px;display:flex;gap:6px">
+            <button class="perfil-edit-btn" id="btn-editar" onclick="toggleEditar()">
+              <i class="ti ti-pencil" style="font-size:13px"></i> Editar perfil
             </button>
-            <small>
-              Esta imagen aparecerá en las burbujas, historias, publicaciones y clips.
-            </small>
+            <button class="logout-btn" onclick="cerrarSesion()">
+              <i class="ti ti-logout" style="font-size:13px"></i> Salir
+            </button>
           </div>
         </div>
 
-        <input id="avatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
-        <input id="coverInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
-      </div>
-
-      <h1>Mi perfil</h1>
-
-      <div id="loading" class="notice">Cargando perfil…</div>
-      <div id="message" class="notice" hidden></div>
-
-      <form id="profileForm" hidden>
-        <div class="profile-form-grid">
-          <label class="field">
-            Nombre visible
-            <input id="displayName" maxlength="80" required>
-          </label>
-
-          <label class="field">
-            Usuario
-            <input id="username" readonly>
-            <small>Tu usuario es único.</small>
-          </label>
-
-          <label class="field">
-            Correo de acceso
-            <input id="email" type="email" required>
-          </label>
-
-          <label class="field">
-            Número de contacto
-            <input id="phone" type="tel" inputmode="tel" maxlength="25" placeholder="+51 999 999 999">
-          </label>
-
-          <label class="field full">
-            Biografía
-            <textarea id="bio" maxlength="300" rows="4" placeholder="Cuéntanos algo sobre ti"></textarea>
-          </label>
+        <div class="perfil-info-row">
+          <div>
+            <div class="perfil-nombre" id="perfil-nombre">Cargando...</div>
+            <div class="perfil-usuario"><i class="ti ti-at" style="font-size:11px"></i><span id="perfil-username">@usuario</span></div>
+            <div class="perfil-dist"><i class="ti ti-map-pin" style="font-size:11px"></i><span id="perfil-dist">Tu zona</span></div>
+          </div>
+          <div id="perfil-bio" style="font-size:11px;color:var(--txt2);max-width:300px;line-height:1.5"></div>
         </div>
 
-        <div class="profile-privacy">
-          <label class="toggle-row">
-            <span>Permitir que me encuentren por correo</span>
-            <input id="findByEmail" type="checkbox">
-          </label>
-          <label class="toggle-row">
-            <span>Permitir que me encuentren por teléfono</span>
-            <input id="findByPhone" type="checkbox">
-          </label>
+        <!-- STATS -->
+        <div class="perfil-stats">
+          <div class="perfil-stat">
+            <div class="perfil-stat-val" id="stat-alertas">0</div>
+            <div class="perfil-stat-label">Alertas</div>
+          </div>
+          <div class="perfil-stat">
+            <div class="perfil-stat-val" id="stat-servicios">0</div>
+            <div class="perfil-stat-label">Servicios</div>
+          </div>
+          <div class="perfil-stat">
+            <div class="perfil-stat-val" id="stat-confirmaciones">0</div>
+            <div class="perfil-stat-label">Confirmaciones</div>
+          </div>
+          <div class="perfil-stat">
+            <div class="perfil-stat-val" id="stat-solicitudes">0</div>
+            <div class="perfil-stat-label">Solicitudes</div>
+          </div>
         </div>
+      </div>
 
-        <div class="profile-actions">
-          <button class="primary" id="saveButton" type="submit">Guardar cambios</button>
-          <a class="secondary" href="index.html">Cancelar y volver</a>
-          <button class="secondary" id="logoutButton" type="button">Cerrar sesión</button>
+      <!-- FORMULARIO EDITAR -->
+      <div class="mz-card" id="form-editar" style="display:none">
+        <div class="mz-card-head">
+          <div class="mz-card-title"><i class="ti ti-pencil"></i> Editar información</div>
         </div>
-      </form>
-    </section>
+        <div style="padding:14px">
+          <div class="perfil-form-grid">
+            <div class="campo">
+              <label>Nombre visible</label>
+              <input id="f-nombre" type="text" maxlength="80" placeholder="Tu nombre completo">
+            </div>
+            <div class="campo">
+              <label>Usuario</label>
+              <input id="f-username" type="text" readonly style="opacity:.6">
+              <small>El usuario no se puede cambiar</small>
+            </div>
+            <div class="campo">
+              <label>Correo de acceso</label>
+              <input id="f-email" type="email">
+            </div>
+            <div class="campo">
+              <label>Teléfono de contacto</label>
+              <input id="f-telefono" type="tel" placeholder="+51 999 999 999">
+            </div>
+            <div class="campo">
+              <label>Distrito</label>
+              <input id="f-distrito" type="text" placeholder="Ej: Los Olivos, Surco...">
+            </div>
+            <div class="campo">
+              <label>Zona o urbanización</label>
+              <input id="f-zona" type="text" placeholder="Ej: Urb. El Naranjal">
+            </div>
+            <div class="campo full">
+              <label>Biografía</label>
+              <textarea id="f-bio" maxlength="300" placeholder="Cuéntanos algo sobre ti..."></textarea>
+            </div>
+          </div>
 
-    <section class="page-card" style="margin-top:18px">
-      <h2>Tu actividad</h2>
-      <div class="profile-tabs">
-        <button class="active" data-tab="posts">Publicaciones</button>
-        <button data-tab="likes">Me gusta</button>
-        <button data-tab="saved">Guardados</button>
-        <button data-tab="shared">Compartidos</button>
+          <div style="margin-top:12px;background:var(--bg);border-radius:var(--rs);padding:10px 12px">
+            <div style="font-size:10px;font-weight:700;color:var(--txt2);margin-bottom:8px">Privacidad</div>
+            <div class="toggle-fila">
+              <label>Permitir que me encuentren por correo</label>
+              <button class="toggle-switch on" id="tog-email" onclick="this.classList.toggle('on')"></button>
+            </div>
+            <div class="toggle-fila">
+              <label>Permitir que me encuentren por teléfono</label>
+              <button class="toggle-switch" id="tog-tel" onclick="this.classList.toggle('on')"></button>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button onclick="guardarPerfil()" style="background:var(--az);color:#fff;border:none;border-radius:var(--rs);padding:9px 20px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">
+              <i class="ti ti-device-floppy" style="font-size:14px"></i> Guardar cambios
+            </button>
+            <button onclick="toggleEditar()" style="background:var(--bg);color:var(--txt2);border:1px solid var(--bd);border-radius:var(--rs);padding:9px 16px;font-size:11px;cursor:pointer">Cancelar</button>
+          </div>
+        </div>
       </div>
-      <div id="activityContent" class="activity-grid">
-        <p class="notice">Cargando actividad…</p>
+
+      <!-- ACTIVIDAD -->
+      <div class="mz-card">
+        <div class="act-tabs">
+          <button class="act-tab active" onclick="verActividad('alertas',this)"><i class="ti ti-bell" style="font-size:13px"></i> Alertas</button>
+          <button class="act-tab" onclick="verActividad('servicios',this)"><i class="ti ti-tool" style="font-size:13px"></i> Servicios</button>
+          <button class="act-tab" onclick="verActividad('solicitudes',this)"><i class="ti ti-clipboard-list" style="font-size:13px"></i> Solicitudes</button>
+          <button class="act-tab" onclick="verActividad('confirmaciones',this)"><i class="ti ti-check" style="font-size:13px"></i> Confirmaciones</button>
+        </div>
+        <div class="act-content" id="act-content">
+          <i class="ti ti-bell" style="font-size:30px;color:var(--bd)"></i>
+          <div>No hay alertas publicadas aún</div>
+          <a href="alertas.html#reportar" style="color:var(--az);font-size:10px;font-weight:700;text-decoration:none">Publicar primera alerta →</a>
+        </div>
       </div>
-    </section>
+
+    </div>
   </main>
+</div>
 
-  <script type="module">
-    import { applyBrand } from "./js/brand.js";
-    import { supabase, getMyProfile, getCurrentUser } from "./js/supabase.js";
-    import { uploadUserImage, removeStorageObject } from "./js/media.js";
+<!-- BOTTOM NAV -->
+<nav class="mz-bottom-nav">
+  <div class="mz-bn-inner">
+    <div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
+    <div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
+    <div class="mz-bn-item"><div class="mz-bn-center" onclick="location.href='index.html'"><i class="ti ti-plus"></i></div></div>
+    <div class="mz-bn-item" onclick="location.href='servicios.html'"><i class="ti ti-tool"></i><span>Servicios</span></div>
+    <div class="mz-bn-item active"><i class="ti ti-user"></i><span>Perfil</span></div>
+  </div>
+</nav>
 
-    applyBrand();
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script type="module">
+import { PUBLIC_ENV } from './js/env.public.js';
+const sb = supabase.createClient(PUBLIC_ENV.SUPABASE_URL, PUBLIC_ENV.SUPABASE_PUBLISHABLE_KEY);
 
-    const fields = {
-      loading: document.querySelector("#loading"),
-      message: document.querySelector("#message"),
-      form: document.querySelector("#profileForm"),
-      save: document.querySelector("#saveButton"),
-      displayName: document.querySelector("#displayName"),
-      username: document.querySelector("#username"),
-      email: document.querySelector("#email"),
-      phone: document.querySelector("#phone"),
-      bio: document.querySelector("#bio"),
-      findByEmail: document.querySelector("#findByEmail"),
-      findByPhone: document.querySelector("#findByPhone"),
-      avatarBox: document.querySelector("#avatarBox"),
-      coverImage: document.querySelector("#coverImage"),
-      activity: document.querySelector("#activityContent")
-    };
+let perfil = null, usuario = null;
 
-    let currentProfile = null;
-    const user = await getCurrentUser();
+function toast(msg) {
+  const t=document.getElementById('mz-toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
+}
 
-    if (!user) {
-      window.location.replace("login.html?next=perfil.html");
-    } else {
-      await loadProfile();
-      await loadActivity("posts");
+async function init() {
+  const {data:{session}} = await sb.auth.getSession();
+  if (!session?.user) { location.href='login.html?next=perfil.html'; return; }
+  usuario = session.user;
+  await cargarPerfil();
+}
+
+async function cargarPerfil() {
+  const {data} = await sb.from('perfiles').select('*').eq('id',usuario.id).single();
+  if (!data) return;
+  perfil = data;
+
+  const ini = (data.nombre_visible||data.username||'U').substring(0,2).toUpperCase();
+  document.getElementById('avatar-iniciales').textContent = ini;
+  document.getElementById('perfil-nombre').textContent = data.nombre_visible || data.username || 'Sin nombre';
+  document.getElementById('perfil-username').textContent = '@'+(data.username||'usuario');
+  document.getElementById('perfil-dist').textContent = data.distrito || 'Sin distrito';
+  document.getElementById('perfil-bio').textContent = data.biografia || '';
+
+  if (data.avatar_url) {
+    const img=document.getElementById('avatar-img');
+    img.src=data.avatar_url; img.style.display='block';
+    document.getElementById('avatar-iniciales').style.display='none';
+  }
+  if (data.portada_url) {
+    const img=document.getElementById('portada-img');
+    img.src=data.portada_url; img.style.display='block';
+  }
+
+  // Llenar formulario
+  document.getElementById('f-nombre').value = data.nombre_visible||'';
+  document.getElementById('f-username').value = data.username||'';
+  document.getElementById('f-email').value = usuario.email||'';
+  document.getElementById('f-telefono').value = data.telefono_contacto||'';
+  document.getElementById('f-distrito').value = data.distrito||'';
+  document.getElementById('f-zona').value = data.zona||'';
+  document.getElementById('f-bio').value = data.biografia||'';
+  if (data.permitir_busqueda_correo) document.getElementById('tog-email').classList.add('on');
+  if (data.permitir_busqueda_telefono) document.getElementById('tog-tel').classList.add('on');
+
+  // Stats
+  const [{count:ca},{count:cs},{count:cso}] = await Promise.all([
+    sb.from('alertas').select('*',{count:'exact',head:true}).eq('autor_id',usuario.id),
+    sb.from('servicios_mizona').select('*',{count:'exact',head:true}).eq('propietario_id',usuario.id),
+    sb.from('solicitudes_mizona').select('*',{count:'exact',head:true}).eq('usuario_id',usuario.id),
+  ]);
+  const {count:cc} = await sb.from('alerta_confirmaciones').select('*',{count:'exact',head:true}).eq('usuario_id',usuario.id).catch(()=>({count:0}));
+  document.getElementById('stat-alertas').textContent = ca||0;
+  document.getElementById('stat-servicios').textContent = cs||0;
+  document.getElementById('stat-solicitudes').textContent = cso||0;
+  document.getElementById('stat-confirmaciones').textContent = cc||0;
+}
+
+window.toggleEditar = function() {
+  const f=document.getElementById('form-editar');
+  f.style.display = f.style.display==='none'?'block':'none';
+  document.getElementById('btn-editar').innerHTML = f.style.display==='none'
+    ? '<i class="ti ti-pencil" style="font-size:13px"></i> Editar perfil'
+    : '<i class="ti ti-x" style="font-size:13px"></i> Cancelar';
+};
+
+window.guardarPerfil = async function() {
+  try {
+    const newEmail = document.getElementById('f-email').value.trim();
+    if (newEmail !== usuario.email) {
+      const {error} = await sb.auth.updateUser({email:newEmail});
+      if(error) throw error;
     }
+    const {error} = await sb.from('perfiles').update({
+      nombre_visible: document.getElementById('f-nombre').value.trim(),
+      telefono_contacto: document.getElementById('f-telefono').value.trim()||null,
+      distrito: document.getElementById('f-distrito').value.trim()||null,
+      zona: document.getElementById('f-zona').value.trim()||null,
+      biografia: document.getElementById('f-bio').value.trim()||null,
+      permitir_busqueda_correo: document.getElementById('tog-email').classList.contains('on'),
+      permitir_busqueda_telefono: document.getElementById('tog-tel').classList.contains('on'),
+    }).eq('id',usuario.id);
+    if(error) throw error;
+    toast('✅ Perfil actualizado correctamente');
+    await cargarPerfil();
+    toggleEditar();
+  } catch(e) { toast('Error: '+e.message); }
+};
 
-    function showMessage(text, isError = false) {
-      fields.message.hidden = false;
-      fields.message.textContent = text;
-      fields.message.style.borderColor = isError ? "var(--danger)" : "#22c55e";
+window.cerrarSesion = async function() {
+  await sb.auth.signOut({scope:'local'});
+  location.href='login.html';
+};
 
-      document.querySelector("#profileToast")?.remove();
-      const toast = document.createElement("div");
-      toast.id = "profileToast";
-      toast.className = `toast ${isError ? "error" : "success"}`;
-      toast.textContent = text;
-      document.body.appendChild(toast);
-      window.setTimeout(() => toast.remove(), 3500);
-    }
+window.verActividad = function(tipo, btn) {
+  document.querySelectorAll('.act-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const icons = {alertas:'ti-bell',servicios:'ti-tool',solicitudes:'ti-clipboard-list',confirmaciones:'ti-check'};
+  const labels = {alertas:'alertas publicadas',servicios:'servicios registrados',solicitudes:'solicitudes enviadas',confirmaciones:'alertas confirmadas'};
+  document.getElementById('act-content').innerHTML = `
+    <i class="ti ${icons[tipo]}" style="font-size:30px;color:var(--bd)"></i>
+    <div>No hay ${labels[tipo]} aún</div>`;
+};
 
-    function initials(value) {
-      return String(value || "U").split(/\s+/).slice(0,2).map(p => p[0]).join("").toUpperCase();
-    }
+// Subir imagen
+document.getElementById('input-avatar').addEventListener('change', async e => {
+  const file = e.target.files[0]; if(!file) return;
+  toast('Subiendo foto de perfil...');
+  try {
+    const ext=file.name.split('.').pop();
+    const path=`avatares/${usuario.id}/perfil.${ext}`;
+    const {error:ue} = await sb.storage.from('avatares').upload(path,file,{upsert:true});
+    if(ue) throw ue;
+    const {data:{publicUrl}} = sb.storage.from('avatares').getPublicUrl(path);
+    await sb.from('perfiles').update({avatar_url:publicUrl}).eq('id',usuario.id);
+    const img=document.getElementById('avatar-img'); img.src=publicUrl+'?v='+Date.now(); img.style.display='block';
+    document.getElementById('avatar-iniciales').style.display='none';
+    toast('✅ Foto de perfil actualizada');
+  } catch(err) { toast('Error al subir imagen: '+err.message); }
+});
 
-    async function loadProfile() {
-      currentProfile = await getMyProfile();
+document.getElementById('input-portada').addEventListener('change', async e => {
+  const file=e.target.files[0]; if(!file) return;
+  toast('Subiendo portada...');
+  try {
+    const ext=file.name.split('.').pop();
+    const path=`portadas/${usuario.id}/portada.${ext}`;
+    const {error:ue} = await sb.storage.from('portadas').upload(path,file,{upsert:true});
+    if(ue) throw ue;
+    const {data:{publicUrl}} = sb.storage.from('portadas').getPublicUrl(path);
+    await sb.from('perfiles').update({portada_url:publicUrl}).eq('id',usuario.id);
+    const img=document.getElementById('portada-img'); img.src=publicUrl+'?v='+Date.now(); img.style.display='block';
+    toast('✅ Portada actualizada');
+  } catch(err) { toast('Error: '+err.message); }
+});
 
-      if (!currentProfile) {
-        fields.loading.textContent = "No se pudo cargar el perfil.";
-        return;
-      }
+const st=document.createElement('style');
+st.textContent='.mz-toast.show{opacity:1}';
+document.head.appendChild(st);
 
-      fields.displayName.value = currentProfile.nombre_visible || "";
-      fields.username.value = currentProfile.username || "";
-      fields.email.value = user.email || "";
-      fields.phone.value = currentProfile.telefono_contacto || "";
-      fields.bio.value = currentProfile.biografia || "";
-      fields.findByEmail.checked = Boolean(currentProfile.permitir_busqueda_correo);
-      fields.findByPhone.checked = Boolean(currentProfile.permitir_busqueda_telefono);
-
-      if (currentProfile.avatar_url) {
-        fields.avatarBox.innerHTML = `<img src="${currentProfile.avatar_url}?v=${Date.now()}" alt="Foto de perfil">`;
-      } else {
-        fields.avatarBox.textContent = initials(currentProfile.nombre_visible);
-      }
-
-      if (currentProfile.portada_url) {
-        fields.coverImage.src = `${currentProfile.portada_url}?v=${Date.now()}`;
-        fields.coverImage.hidden = false;
-      }
-
-      fields.loading.hidden = true;
-      fields.form.hidden = false;
-    }
-
-    async function updateProfileImage(kind, file) {
-      if (!file) return;
-
-      const isAvatar = kind === "avatar";
-      const bucket = isAvatar ? "avatares" : "portadas";
-      const oldUrl = isAvatar ? currentProfile.avatar_url : currentProfile.portada_url;
-
-      try {
-        showMessage("Procesando imagen…");
-
-        const upload = await uploadUserImage({
-          file,
-          bucket,
-          folder: isAvatar ? "perfil" : "portada",
-          maxWidth: isAvatar ? 600 : 1800,
-          maxHeight: isAvatar ? 600 : 700,
-          quality: 0.84
-        });
-
-        const column = isAvatar ? "avatar_url" : "portada_url";
-        const { error } = await supabase.from("perfiles").update({
-          [column]: upload.url
-        }).eq("id", user.id);
-
-        if (error) throw error;
-
-        await removeStorageObject(bucket, oldUrl).catch(console.error);
-        currentProfile[column] = upload.url;
-        await loadProfile();
-        showMessage(isAvatar ? "Foto de perfil actualizada." : "Portada actualizada.");
-      } catch (error) {
-        showMessage(error.message, true);
-      }
-    }
-
-    document.querySelector("#changeAvatar").addEventListener("click", () => avatarInput.click());
-    document.querySelector("#changeCover").addEventListener("click", () => coverInput.click());
-    avatarInput.addEventListener("change", () => updateProfileImage("avatar", avatarInput.files?.[0]));
-    coverInput.addEventListener("change", () => updateProfileImage("cover", coverInput.files?.[0]));
-
-    fields.form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      fields.save.disabled = true;
-
-      try {
-        const newEmail = fields.email.value.trim().toLowerCase();
-        const oldEmail = String(user.email || "").toLowerCase();
-
-        if (newEmail !== oldEmail) {
-          const { error } = await supabase.auth.updateUser({ email: newEmail });
-          if (error) throw error;
-        }
-
-        const { error } = await supabase.from("perfiles").update({
-          nombre_visible: fields.displayName.value.trim(),
-          telefono_contacto: fields.phone.value.trim() || null,
-          biografia: fields.bio.value.trim() || null,
-          permitir_busqueda_correo: fields.findByEmail.checked,
-          permitir_busqueda_telefono: fields.findByPhone.checked
-        }).eq("id", user.id);
-
-        if (error) throw error;
-        showMessage(newEmail !== oldEmail
-          ? "Perfil guardado. Confirma el nuevo correo."
-          : "Perfil actualizado correctamente.");
-      } catch (error) {
-        showMessage(error.message, true);
-      } finally {
-        fields.save.disabled = false;
-      }
-    });
-
-    document.querySelector("#logoutButton").addEventListener("click", async () => {
-      await supabase.auth.signOut({ scope: "local" });
-      window.location.replace("login.html?logout=1");
-    });
-
-    document.querySelectorAll("[data-tab]").forEach(button => {
-      button.addEventListener("click", async () => {
-        document.querySelectorAll("[data-tab]").forEach(b => b.classList.remove("active"));
-        button.classList.add("active");
-        await loadActivity(button.dataset.tab);
-      });
-    });
-
-    async function loadActivity(tab) {
-      fields.activity.innerHTML = `<p class="notice">Cargando…</p>`;
-      let query;
-
-      if (tab === "posts") {
-        query = supabase.from("publicaciones").select("id,contenido,archivo_url,creado_en").eq("autor_id", user.id).order("creado_en", {ascending:false});
-      } else if (tab === "likes") {
-        query = supabase.from("me_gusta_publicaciones").select("creado_en,publicaciones(id,contenido,archivo_url,creado_en)").eq("usuario_id", user.id).order("creado_en", {ascending:false});
-      } else if (tab === "saved") {
-        query = supabase.from("publicaciones_guardadas").select("creado_en,publicaciones(id,contenido,archivo_url,creado_en)").eq("usuario_id", user.id).order("creado_en", {ascending:false});
-      } else {
-        query = supabase.from("publicaciones_compartidas").select("creado_en,publicaciones(id,contenido,archivo_url,creado_en)").eq("usuario_id", user.id).order("creado_en", {ascending:false});
-      }
-
-      const { data, error } = await query;
-      if (error) {
-        fields.activity.innerHTML = `<p class="notice">${error.message}</p>`;
-        return;
-      }
-
-      const posts = tab === "posts" ? data : data.map(item => item.publicaciones).filter(Boolean);
-
-      fields.activity.innerHTML = posts.length
-        ? posts.map(post => `
-          <article class="mini-post">
-            <small>${new Date(post.creado_en).toLocaleString("es-PE")}</small>
-            ${post.contenido ? `<p>${escapeHtml(post.contenido)}</p>` : ""}
-            ${post.archivo_url ? `<img class="post-image" src="${post.archivo_url}" alt="">` : ""}
-          </article>`).join("")
-        : `<p class="notice">No hay contenido en esta sección.</p>`;
-    }
-
-    function escapeHtml(value) {
-      return String(value || "")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;")
-        .replaceAll(">","&gt;").replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-  </script>
+init();
+</script>
 </body>
 </html>

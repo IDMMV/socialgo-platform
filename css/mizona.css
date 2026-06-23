@@ -222,3 +222,28 @@ input,textarea,select{font-family:inherit;outline:none}
   .mz-feed-body{padding:10px}
   .mz-svc-grid{grid-template-columns:1fr 1fr}
 }
+
+/* ===== CORRECCIONES LAYOUT FULL WIDTH ===== */
+body{margin:0;padding:0;overflow-x:hidden}
+.mz-layout,.mz-layout-2col{width:100%;max-width:100vw}
+
+/* Sidebar siempre visible en desktop */
+@media(min-width:641px){
+  .mz-layout{display:grid;grid-template-columns:210px 1fr 200px;min-height:100vh}
+  .mz-layout-2col{display:grid;grid-template-columns:210px 1fr;min-height:100vh}
+  .mz-sidebar{display:flex!important}
+  .mz-bottom-nav{display:none!important}
+}
+
+/* Toast corregido */
+.mz-toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:#1e293b;color:#fff;border-radius:20px;padding:10px 20px;
+  font-size:11px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s;
+  pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.3)
+}
+.mz-toast.show{opacity:1}
+
+/* Estados auth */
+.estado-guest .hide-guest{display:none!important}
+.estado-logged .hide-logged{display:none!important}

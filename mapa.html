@@ -23,6 +23,9 @@
 .mz-map-leyenda{padding:8px 12px;background:var(--bg);border-top:1px solid var(--bd);display:flex;gap:12px;flex-wrap:wrap;font-size:9px;color:var(--txt2)}
 .mz-ley-item{display:flex;align-items:center;gap:4px}
 .mz-ley-dot{width:10px;height:10px;border-radius:50%}
+.mz-live-toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(16px);z-index:5000;background:#0f172a;color:#fff;padding:10px 14px;border-radius:12px;font-size:12px;font-weight:700;box-shadow:0 12px 35px rgba(15,23,42,.28);opacity:0;pointer-events:none;transition:.2s;max-width:calc(100vw - 32px);text-align:center}
+.mz-live-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.mz-live-toast.error{background:#991b1b}
 
 @media (max-width: 768px){
   body{overflow-x:hidden}
@@ -141,6 +144,8 @@
   </main>
 </div>
 
+<div id="mzLiveToast" class="mz-live-toast" role="status" aria-live="polite"></div>
+
 <!-- BOTTOM NAV MOBILE -->
 <nav class="mz-bottom-nav">
   <div class="mz-bn-inner">
@@ -162,6 +167,11 @@ const colores = {robo:'#E24B4A',accidente:'#f59e0b',agua:'#185FA5',luz:'#185FA5'
 const RADIO_PREDETERMINADO = 1500;
 let radioZonaMetros = RADIO_PREDETERMINADO;
 let mapaInst = null, todosMarkers = [], miPos = null, alertasCache = [], filtroActual = 'todas';
+let confirmacionesPropias = new Set();
+let usuarioActualId = null;
+let realtimeCanal = null;
+let sincronizacionTimer = null;
+let toastTimer = null;
 
 function normalizarTipo(valor) {
   const t = String(valor || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
@@ -191,6 +201,37 @@ function escaparTexto(valor) {
   return String(valor ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+function mostrarAviso(mensaje, tipo='ok') {
+  const box = document.getElementById('mzLiveToast');
+  if (!box) return;
+  clearTimeout(toastTimer);
+  box.textContent = mensaje;
+  box.classList.toggle('error', tipo === 'error');
+  box.classList.add('show');
+  toastTimer = setTimeout(() => box.classList.remove('show'), 2800);
+}
+
+async function cargarConfirmacionesPropias() {
+  try {
+    const { data:authData } = await sb.auth.getUser();
+    const user = authData?.user;
+    if (!user) {
+      usuarioActualId = null;
+      confirmacionesPropias = new Set();
+      return;
+    }
+    usuarioActualId = String(user.id);
+    const { data, error } = await sb
+      .from('alerta_confirmaciones')
+      .select('alerta_id')
+      .eq('usuario_id', user.id);
+    if (error) throw error;
+    confirmacionesPropias = new Set((data || []).map(x => String(x.alerta_id)));
+  } catch (_) {
+    // La cuenta seguirá viendo los totales públicos aunque no pueda leer sus filas.
+  }
+}
+
 window.compartirAlertaMapa = async function(textoCodificado){
   const texto = decodeURIComponent(textoCodificado || '');
   const payload = { title:'MiZona', text:texto, url:location.href };
@@ -198,14 +239,14 @@ window.compartirAlertaMapa = async function(textoCodificado){
     if (navigator.share) await navigator.share(payload);
     else if (navigator.clipboard) {
       await navigator.clipboard.writeText(location.href);
-      alert('Enlace copiado');
+      mostrarAviso('Enlace copiado');
     }
   } catch(_) {}
 };
 
 window.confirmarAlertaMapa = async function(alertaId, button) {
   if (!alertaId) {
-    alert('Esta es una alerta de demostración.');
+    mostrarAviso('Esta es una alerta de demostración.', 'error');
     return;
   }
 
@@ -216,6 +257,12 @@ window.confirmarAlertaMapa = async function(alertaId, button) {
     return;
   }
 
+  const alerta = alertasCache.find(a => String(a.id) === String(alertaId));
+  if (alerta && String(alerta.autor_id || '') === String(user.id)) {
+    mostrarAviso('No puedes confirmar una alerta que tú mismo reportaste.', 'error');
+    return;
+  }
+
   button.disabled = true;
   button.textContent = 'Guardando...';
 
@@ -223,7 +270,7 @@ window.confirmarAlertaMapa = async function(alertaId, button) {
     const coords = await new Promise(resolve => {
       if (!navigator.geolocation) return resolve(null);
       navigator.geolocation.getCurrentPosition(
-        pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        pos => resolve({ lat:pos.coords.latitude, lng:pos.coords.longitude }),
         () => resolve(null),
         { enableHighAccuracy:false, timeout:5000, maximumAge:300000 }
       );
@@ -234,23 +281,28 @@ window.confirmarAlertaMapa = async function(alertaId, button) {
       p_latitud: coords?.lat ?? null,
       p_longitud: coords?.lng ?? null
     });
-
     if (error) throw error;
 
     const nuevoTotal = Number(data?.total || 0);
-    button.textContent = '✓ Confirmado';
+    confirmacionesPropias.add(String(alertaId));
+    alertasCache = alertasCache.map(a => String(a.id) === String(alertaId)
+      ? { ...a, conf:nuevoTotal, total_confirmaciones:nuevoTotal }
+      : a);
+
+    button.textContent = '✓ Ya confirmado';
     button.style.background = '#1D9E75';
+    button.disabled = true;
 
     const badge = document.getElementById(`badge-${alertaId}`);
     const info = document.getElementById(`confirmaciones-${alertaId}`);
     if (badge) badge.textContent = `Sin verificar · ${textoConfirmaciones(nuevoTotal)}`;
     if (info) info.textContent = `👥 ${textoConfirmaciones(nuevoTotal)}`;
 
-    alertasCache = alertasCache.map(a => String(a.id) === String(alertaId)
-      ? { ...a, conf: nuevoTotal, total_confirmaciones: nuevoTotal }
-      : a);
+    mostrarAviso(data?.mensaje || 'Confirmación registrada');
+    await sincronizarConteos(true);
   } catch (error) {
-    alert(error.message || 'No se pudo guardar la confirmación');
+    const mensaje = error?.message || 'No se pudo guardar la confirmación';
+    mostrarAviso(mensaje, 'error');
     button.disabled = false;
     button.textContent = '✓ También lo vi';
   }
@@ -264,11 +316,13 @@ function crearIcono(tipo, verificada) {
   });
 }
 
-function initMapa() {
+async function initMapa() {
   mapaInst = L.map('mapaCompleto',{zoomControl:true,scrollWheelZoom:true}).setView([-12.046,-77.043],13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mapaInst);
   usarUbicacion();
-  cargarAlertas();
+  await cargarConfirmacionesPropias();
+  await cargarAlertas();
+  iniciarSincronizacion();
 }
 
 function etiquetaRadio(metros) {
@@ -349,26 +403,99 @@ window.usarUbicacion = function() {
   });
 };
 
-async function cargarAlertas() {
+async function cargarAlertas({silencioso=false} = {}) {
   try {
-    const {data} = await sb.from('alertas').select('*').in('estado',['reportada','verificada','en_revision']).not('latitud','is',null).order('created_at',{ascending:false}).limit(100);
-    if (data?.length) {
-      alertasCache = data.map(a=>({lat:parseFloat(a.latitud),lng:parseFloat(a.longitud),tipo:normalizarTipo(a.categoria),titulo:a.titulo,meta:`${a.zona_referencia||a.distrito||''} · ${timeAgo(a.created_at)}`,verificada:a.estado==='verificada',conf:a.total_confirmaciones||0,id:a.id}));
+    const {data,error} = await sb
+      .from('alertas')
+      .select('id,categoria,titulo,distrito,zona_referencia,estado,latitud,longitud,created_at,total_confirmaciones,autor_id')
+      .in('estado',['reportada','verificada','en_revision'])
+      .not('latitud','is',null)
+      .order('created_at',{ascending:false})
+      .limit(100);
+
+    if (error) throw error;
+
+    alertasCache = (data || []).map(a => ({
+      lat:parseFloat(a.latitud),
+      lng:parseFloat(a.longitud),
+      tipo:normalizarTipo(a.categoria),
+      titulo:a.titulo,
+      meta:`${a.zona_referencia || a.distrito || ''} · ${timeAgo(a.created_at)}`,
+      verificada:a.estado === 'verificada',
+      conf:Number(a.total_confirmaciones || 0),
+      id:a.id,
+      autor_id:a.autor_id || null
+    }));
+    renderAlertas();
+  } catch (error) {
+    if (!silencioso) mostrarAviso(`No se pudieron cargar las alertas: ${error.message}`, 'error');
+    if (!alertasCache.length) {
+      alertasCache = [];
       renderAlertas();
-      return;
     }
-  } catch(e){}
-  // Demo si no hay datos reales
-  alertasCache = [
-    {lat:-12.046,lng:-77.043,tipo:'robo',titulo:'Robo de celular',meta:'Jr. Las Palmeras · Hace 12 min',verificada:false,conf:3},
-    {lat:-12.042,lng:-77.039,tipo:'agua',titulo:'Corte de agua — Sedapal',meta:'Av. Universitaria · Hoy',verificada:true,conf:0},
-    {lat:-12.05,lng:-77.047,tipo:'mascota',titulo:'Mascota perdida — Max',meta:'Parque · Hace 2h',verificada:false,conf:1},
-    {lat:-12.048,lng:-77.041,tipo:'robo',titulo:'Moto robada',meta:'Av. Naranjal · Hace 45 min',verificada:true,conf:6},
-    {lat:-12.044,lng:-77.045,tipo:'accidente',titulo:'Accidente de tránsito',meta:'Cruce · Hace 30 min',verificada:false,conf:2},
-  ];
-  renderAlertas();
+  }
 }
 
+async function sincronizarConteos(forzarRender=false) {
+  try {
+    const {data,error} = await sb
+      .from('alertas')
+      .select('id,total_confirmaciones,estado')
+      .in('estado',['reportada','verificada','en_revision']);
+    if (error) throw error;
+
+    let cambio = false;
+    const porId = new Map((data || []).map(x => [String(x.id), x]));
+    alertasCache = alertasCache.map(a => {
+      const nuevo = porId.get(String(a.id));
+      if (!nuevo) return a;
+      const total = Number(nuevo.total_confirmaciones || 0);
+      const verificada = nuevo.estado === 'verificada';
+      if (total !== Number(a.conf || 0) || verificada !== a.verificada) cambio = true;
+      return { ...a, conf:total, verificada };
+    });
+
+    if (cambio || forzarRender) renderAlertas();
+  } catch (_) {}
+}
+
+function aplicarCambioRealtime(registro) {
+  if (!registro?.id) return;
+  let encontrado = false;
+  alertasCache = alertasCache.map(a => {
+    if (String(a.id) !== String(registro.id)) return a;
+    encontrado = true;
+    return {
+      ...a,
+      conf:Number(registro.total_confirmaciones || 0),
+      verificada:registro.estado === 'verificada'
+    };
+  });
+  if (encontrado) renderAlertas();
+  else cargarAlertas({silencioso:true});
+}
+
+function iniciarSincronizacion() {
+  if (realtimeCanal) sb.removeChannel(realtimeCanal);
+  realtimeCanal = sb
+    .channel('mapa-alertas-tiempo-real')
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:'alertas'}, () => cargarAlertas({silencioso:true}))
+    .on('postgres_changes', {event:'UPDATE', schema:'public', table:'alertas'}, payload => aplicarCambioRealtime(payload.new))
+    .on('postgres_changes', {event:'DELETE', schema:'public', table:'alertas'}, () => cargarAlertas({silencioso:true}))
+    .subscribe();
+
+  clearInterval(sincronizacionTimer);
+  sincronizacionTimer = setInterval(() => {
+    if (!document.hidden) sincronizarConteos();
+  }, 12000);
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      cargarConfirmacionesPropias().then(() => sincronizarConteos(true));
+    }
+  });
+  window.addEventListener('online', () => sincronizarConteos(true));
+}
 
 function filtrarPorZona(alertas) {
   if (!miPos || !mapaInst) return alertas;
@@ -393,13 +520,17 @@ function cargarEnMapa(alertas) {
     const m = L.marker([a.lat,a.lng],{icon:crearIcono(a.tipo,a.verificada)}).addTo(mapaInst);
     const shareText = encodeURIComponent(String(a.titulo || 'Alerta MiZona'));
     const alertaId = a.id ? String(a.id) : '';
+    const yaConfirmada = alertaId && confirmacionesPropias.has(alertaId);
+    const esAutor = Boolean(usuarioActualId && a.autor_id && String(a.autor_id) === String(usuarioActualId));
     m.bindPopup(`<div style="min-width:240px;font-family:inherit">
       <div id="badge-${alertaId}" style="font-size:8px;font-weight:700;background:${a.verificada?'#f0fdf4':'#fef2f2'};color:${a.verificada?'#14532d':'#991b1b'};border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:5px">${a.verificada?'✓ Verificada':'Sin verificar · ' + textoConfirmaciones(a.conf)}</div>
       <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:3px">${escaparTexto(a.titulo)}</div>
       <div style="font-size:10px;color:#94a3b8;margin-bottom:4px">${escaparTexto(a.meta)}</div>
       ${Number.isFinite(a._dist) ? `<div style="font-size:9px;color:#7c3aed;font-weight:700;margin-bottom:6px">📍 A ${a._dist >= 1000 ? (a._dist/1000).toFixed(1)+' km' : Math.round(a._dist)+' m'} de tu ubicación</div>` : ''}
       <div id="confirmaciones-${alertaId}" style="font-size:10px;color:#475569;font-weight:700;margin-bottom:8px">👥 ${textoConfirmaciones(a.conf)}</div>
-      <button onclick="confirmarAlertaMapa('${alertaId}', this)" ${alertaId ? '' : 'disabled'} style="width:100%;background:${alertaId ? '#185FA5' : '#94a3b8'};color:#fff;border:none;border-radius:6px;padding:6px;font-size:10px;font-weight:700;cursor:${alertaId ? 'pointer' : 'not-allowed'};margin-bottom:5px">✓ También lo vi</button>
+      ${esAutor
+        ? `<div style="width:100%;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;border-radius:6px;padding:7px 8px;font-size:10px;font-weight:700;text-align:center;margin-bottom:5px">📝 Tú reportaste esta alerta</div>`
+        : `<button onclick="confirmarAlertaMapa('${alertaId}', this)" ${(alertaId && !yaConfirmada) ? '' : 'disabled'} style="width:100%;background:${yaConfirmada ? '#1D9E75' : (alertaId ? '#185FA5' : '#94a3b8')};color:#fff;border:none;border-radius:6px;padding:6px;font-size:10px;font-weight:700;cursor:${(alertaId && !yaConfirmada) ? 'pointer' : 'not-allowed'};margin-bottom:5px">${yaConfirmada ? '✓ Ya confirmado' : '✓ También lo vi'}</button>`}
       <button onclick="compartirAlertaMapa('${shareText}')" style="width:100%;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:6px;padding:5px;font-size:10px;cursor:pointer">📱 Compartir</button>
     </div>`);
     m._tipo = normalizarTipo(a.tipo); todosMarkers.push(m);
@@ -424,6 +555,11 @@ function timeAgo(s){const d=(Date.now()-new Date(s))/60000;if(d<60)return`Hace $
 const st=document.createElement('style');
 st.textContent='@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}';
 document.head.appendChild(st);
+
+window.addEventListener('beforeunload', () => {
+  clearInterval(sincronizacionTimer);
+  if (realtimeCanal) sb.removeChannel(realtimeCanal);
+});
 
 initMapa();
 </script>

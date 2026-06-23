@@ -116,3 +116,12 @@ MiZona/
 - Integración de inteligencia artificial del panel de negocio.
 
 Estas funciones deben conectarse a tablas y procesos seguros antes de mostrarse como servicios reales.
+
+
+## FASE 2 — DISEÑO UNIFICADO Y MENSAJERÍA
+
+Después de subir esta versión, ejecuta en Supabase el archivo:
+
+`sql/fase2_mensajeria_y_diseno.sql`
+
+Este archivo corrige la recursión de las políticas RLS del chat y habilita el nuevo listado de conversaciones. Consulta `INSTRUCCIONES_FASE2_MIZONA.md` para el orden completo.

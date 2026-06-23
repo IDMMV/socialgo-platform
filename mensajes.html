@@ -3,36 +3,46 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Mensajes · MiZona.pe</title>
+  <meta name="theme-color" content="#185FA5">
+  <title>Mensajes · MiZona</title>
   <link rel="stylesheet" href="css/global.css">
-<link rel="stylesheet" href="css/mizona-unified.css">
+  <link rel="stylesheet" href="css/mizona-unified.css">
+  <link rel="stylesheet" href="css/mizona-phase2.css">
 </head>
 <body>
-  <main class="page-shell">
-    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
-      <a class="brand" href="index.html">
-        <span class="brand-mark">MZ</span>
-        <span data-brand-name>MiZona.pe</span>
-      </a>
+  <main class="page-shell mz-chat-page">
+    <header class="mz-legacy-header">
+      <a class="brand" href="index.html"><span class="brand-mark">MZ</span><span data-brand-name>MiZona</span></a>
       <a class="secondary" href="index.html">← Volver</a>
     </header>
 
-    <section class="chat-layout">
-      <aside id="conversationsList" class="conversations-list">
-        <p class="notice">Cargando conversaciones…</p>
+    <section id="chatLayout" class="chat-layout" aria-label="Mensajería">
+      <aside class="conversations-list">
+        <div class="conversation-list-head">
+          <strong>Conversaciones</strong>
+          <small>Contacta con vecinos y proveedores de forma privada.</small>
+          <label class="conversation-search">
+            <i class="ti ti-search" aria-hidden="true"></i>
+            <input id="conversationSearch" type="search" placeholder="Buscar conversación" autocomplete="off">
+          </label>
+        </div>
+        <div id="conversationsItems">
+          <div class="chat-empty"><div><i class="ti ti-loader-2"></i><span>Cargando conversaciones…</span></div></div>
+        </div>
       </aside>
 
       <section class="chat-panel">
         <header id="chatHeader" class="chat-header">
-          <strong>Selecciona una conversación</strong>
+          <button id="chatBack" class="chat-back" type="button" aria-label="Volver a conversaciones"><i class="ti ti-arrow-left"></i></button>
+          <div class="chat-header-profile"><strong>Selecciona una conversación</strong><small>Elige un contacto para comenzar</small></div>
         </header>
 
         <div id="messagesList" class="messages-list">
-          <p class="notice">No hay conversación seleccionada.</p>
+          <div class="chat-empty"><div><i class="ti ti-messages"></i><strong>Tu mensajería de MiZona</strong><p>Selecciona una conversación o contacta a un proveedor.</p></div></div>
         </div>
 
         <form id="messageForm" class="message-form">
-          <input id="messageInput" maxlength="2000" placeholder="Escribe un mensaje" disabled>
+          <input id="messageInput" maxlength="2000" placeholder="Escribe un mensaje" autocomplete="off" disabled>
           <button id="sendButton" class="primary" type="submit" disabled>Enviar</button>
         </form>
       </section>
@@ -47,81 +57,199 @@
 
     const user = await getCurrentUser();
     if (!user) {
-      window.location.replace("login.html?next=mensajes.html");
+      const next = encodeURIComponent(location.pathname.split("/").pop() + location.search);
+      window.location.replace(`login.html?next=${next}`);
       throw new Error("Sesión no disponible");
     }
 
-    const conversationsList = document.querySelector("#conversationsList");
+    const params = new URLSearchParams(location.search);
+    const chatLayout = document.querySelector("#chatLayout");
+    const conversationsItems = document.querySelector("#conversationsItems");
+    const conversationSearch = document.querySelector("#conversationSearch");
     const messagesList = document.querySelector("#messagesList");
     const chatHeader = document.querySelector("#chatHeader");
+    const chatBack = document.querySelector("#chatBack");
     const form = document.querySelector("#messageForm");
     const input = document.querySelector("#messageInput");
     const sendButton = document.querySelector("#sendButton");
 
-    let activeConversationId = new URLSearchParams(location.search).get("c");
+    let activeConversationId = params.get("c");
+    let requestedContact = params.get("contacto") || params.get("contact");
     let realtimeChannel = null;
+    let conversations = [];
 
     function escapeHtml(value) {
       return String(value ?? "")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;")
-        .replaceAll(">","&gt;").replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+        .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;").replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    async function loadConversations() {
-      const { data, error } = await supabase
+    function isPolicyRecursion(error) {
+      return error?.code === "42P17" || /infinite recursion|recursi[oó]n infinita/i.test(error?.message || "");
+    }
+
+    function showConversationError(error) {
+      if (isPolicyRecursion(error)) {
+        conversationsItems.innerHTML = `
+          <div class="chat-setup-note">
+            <strong>Falta actualizar los permisos del chat.</strong><br>
+            Ejecuta en Supabase el archivo <b>sql/fase2_mensajeria_y_diseno.sql</b> y vuelve a cargar esta página.
+          </div>`;
+        return;
+      }
+      conversationsItems.innerHTML = `<div class="chat-error">No se pudieron cargar las conversaciones: ${escapeHtml(error?.message || "Error desconocido")}</div>`;
+    }
+
+    async function queryConversations() {
+      const rpcResult = await supabase.rpc("listar_conversaciones_mizona");
+      if (!rpcResult.error) return rpcResult;
+
+      if (rpcResult.error.code !== "PGRST202" && !/function .* does not exist/i.test(rpcResult.error.message || "")) {
+        return rpcResult;
+      }
+
+      return supabase
         .from("conversaciones_detalle")
         .select("*")
         .order("ultimo_mensaje_en", { ascending: false });
+    }
 
+    function renderConversations(filter = "") {
+      const term = filter.trim().toLocaleLowerCase("es");
+      const visible = conversations.filter(item => {
+        const text = `${item.otro_nombre || ""} ${item.otro_username || ""} ${item.ultimo_mensaje || ""}`.toLocaleLowerCase("es");
+        return !term || text.includes(term);
+      });
+
+      conversationsItems.innerHTML = visible.length
+        ? visible.map(item => `
+          <article class="conversation-item ${item.conversacion_id === activeConversationId ? "active" : ""}"
+                   data-conversation="${escapeHtml(item.conversacion_id)}" tabindex="0" role="button">
+            ${item.otro_avatar_url
+              ? `<img class="avatar" src="${escapeHtml(item.otro_avatar_url)}" alt="">`
+              : `<div class="avatar">${escapeHtml((item.otro_nombre || item.otro_username || "U").charAt(0).toUpperCase())}</div>`}
+            <div>
+              <strong>${escapeHtml(item.otro_nombre || item.otro_username || "Usuario")}</strong>
+              <small>@${escapeHtml(item.otro_username || "usuario")}</small>
+              <p>${escapeHtml((item.ultimo_mensaje || "Sin mensajes todavía").slice(0, 90))}</p>
+            </div>
+          </article>`).join("")
+        : `<div class="chat-empty"><div><i class="ti ti-message-circle-off"></i><strong>${term ? "No hay coincidencias" : "Aún no tienes conversaciones"}</strong><p>${term ? "Prueba con otro nombre." : "Busca un vecino o contacta a un proveedor para comenzar."}</p></div></div>`;
+
+      conversationsItems.querySelectorAll("[data-conversation]").forEach(item => {
+        const open = () => openConversation(item.dataset.conversation);
+        item.addEventListener("click", open);
+        item.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") { event.preventDefault(); open(); }
+        });
+      });
+    }
+
+    async function loadConversations({ autoOpen = true } = {}) {
+      const { data, error } = await queryConversations();
       if (error) {
-        conversationsList.innerHTML = `<p class="notice">${escapeHtml(error.message)}</p>`;
+        showConversationError(error);
+        return false;
+      }
+
+      conversations = data || [];
+      renderConversations(conversationSearch.value);
+
+      if (requestedContact) {
+        const contact = requestedContact;
+        requestedContact = null;
+        await resolveRequestedContact(contact);
+        return true;
+      }
+
+      if (activeConversationId && autoOpen) {
+        await openConversation(activeConversationId, false);
+      }
+      return true;
+    }
+
+    async function resolveRequestedContact(contactText) {
+      const contact = String(contactText || "").trim();
+      if (!contact) return;
+
+      conversationsItems.innerHTML = `<div class="chat-empty"><div><i class="ti ti-user-search"></i><span>Buscando a ${escapeHtml(contact)}…</span></div></div>`;
+
+      let result = await supabase
+        .from("perfiles_publicos")
+        .select("id,username,nombre_visible,avatar_url")
+        .ilike("username", contact)
+        .neq("id", user.id)
+        .limit(3);
+
+      if (!result.error && !result.data?.length) {
+        result = await supabase
+          .from("perfiles_publicos")
+          .select("id,username,nombre_visible,avatar_url")
+          .ilike("nombre_visible", contact)
+          .neq("id", user.id)
+          .limit(4);
+      }
+
+      if (!result.error && !result.data?.length) {
+        result = await supabase
+          .from("perfiles_publicos")
+          .select("id,username,nombre_visible,avatar_url")
+          .ilike("nombre_visible", `%${contact}%`)
+          .neq("id", user.id)
+          .limit(6);
+      }
+
+      if (result.error) {
+        showConversationError(result.error);
         return;
       }
 
-      conversationsList.innerHTML = data?.length
-        ? data.map(item => `
-          <article class="conversation-item ${item.conversacion_id === activeConversationId ? "active" : ""}"
-                   data-conversation="${item.conversacion_id}">
-            ${item.otro_avatar_url
-              ? `<img class="avatar" src="${escapeHtml(item.otro_avatar_url)}" alt="">`
-              : `<div class="avatar">${escapeHtml((item.otro_nombre || "U").charAt(0).toUpperCase())}</div>`}
-            <div>
-              <strong>${escapeHtml(item.otro_nombre || item.otro_username)}</strong>
-              <small>@${escapeHtml(item.otro_username)}</small>
-              <p>${escapeHtml((item.ultimo_mensaje || "Sin mensajes").slice(0,80))}</p>
-            </div>
-          </article>`).join("")
-        : `<p class="notice">Todavía no tienes conversaciones.</p>`;
-
-      document.querySelectorAll("[data-conversation]").forEach(item => {
-        item.addEventListener("click", () => openConversation(item.dataset.conversation));
-      });
-
-      if (activeConversationId) {
-        await openConversation(activeConversationId, false);
-      } else if (data?.length) {
-        await openConversation(data[0].conversacion_id, false);
+      const matches = result.data || [];
+      if (!matches.length) {
+        conversationsItems.innerHTML = `
+          <div class="chat-empty"><div><i class="ti ti-user-off"></i><strong>No se encontró a ${escapeHtml(contact)}</strong><p>Ese nombre puede ser de demostración o el usuario todavía no está registrado.</p><a class="secondary" href="servicios.html">Ver servicios disponibles</a></div></div>`;
+        return;
       }
+
+      if (matches.length > 1) {
+        conversationsItems.innerHTML = matches.map(profile => `
+          <article class="conversation-item" data-start-user="${escapeHtml(profile.id)}">
+            ${profile.avatar_url ? `<img class="avatar" src="${escapeHtml(profile.avatar_url)}" alt="">` : `<div class="avatar">${escapeHtml((profile.nombre_visible || "U")[0])}</div>`}
+            <div><strong>${escapeHtml(profile.nombre_visible || "Usuario")}</strong><small>@${escapeHtml(profile.username || "usuario")}</small><p>Toca para iniciar una conversación</p></div>
+          </article>`).join("");
+        conversationsItems.querySelectorAll("[data-start-user]").forEach(item => item.addEventListener("click", () => startConversation(item.dataset.startUser)));
+        return;
+      }
+
+      await startConversation(matches[0].id);
+    }
+
+    async function startConversation(otherUserId) {
+      const { data, error } = await supabase.rpc("crear_o_obtener_conversacion", { p_otro_usuario: otherUserId });
+      if (error) {
+        showConversationError(error);
+        return;
+      }
+      activeConversationId = data;
+      history.replaceState(null, "", `mensajes.html?c=${encodeURIComponent(data)}`);
+      await loadConversations({ autoOpen: false });
+      await openConversation(data, false);
     }
 
     async function openConversation(id, updateUrl = true) {
       activeConversationId = id;
-      if (updateUrl) history.replaceState(null, "", `mensajes.html?c=${id}`);
+      if (updateUrl) history.replaceState(null, "", `mensajes.html?c=${encodeURIComponent(id)}`);
 
-      document.querySelectorAll("[data-conversation]").forEach(item => {
-        item.classList.toggle("active", item.dataset.conversation === id);
-      });
-
+      renderConversations(conversationSearch.value);
+      chatLayout.classList.add("chat-open");
       input.disabled = false;
       sendButton.disabled = false;
 
-      const current = [...document.querySelectorAll("[data-conversation]")]
-        .find(item => item.dataset.conversation === id);
-
-      chatHeader.innerHTML = current
-        ? current.querySelector("div").innerHTML
-        : "<strong>Conversación</strong>";
+      const current = conversations.find(item => item.conversacion_id === id);
+      chatHeader.querySelector(".chat-header-profile").innerHTML = current
+        ? `<strong>${escapeHtml(current.otro_nombre || current.otro_username || "Conversación")}</strong><small>@${escapeHtml(current.otro_username || "usuario")}</small>`
+        : `<strong>Conversación</strong><small>Mensajes privados</small>`;
 
       await loadMessages();
       subscribeRealtime();
@@ -129,7 +257,7 @@
     }
 
     async function loadMessages() {
-      messagesList.innerHTML = `<p class="notice">Cargando mensajes…</p>`;
+      messagesList.innerHTML = `<div class="chat-empty"><div><i class="ti ti-loader-2"></i><span>Cargando mensajes…</span></div></div>`;
 
       const { data, error } = await supabase
         .from("mensajes")
@@ -139,15 +267,22 @@
         .limit(300);
 
       if (error) {
-        messagesList.innerHTML = `<p class="notice">${escapeHtml(error.message)}</p>`;
+        messagesList.innerHTML = isPolicyRecursion(error)
+          ? `<div class="chat-setup-note"><strong>Los permisos del chat aún no están actualizados.</strong><br>Ejecuta <b>sql/fase2_mensajeria_y_diseno.sql</b> en Supabase.</div>`
+          : `<div class="chat-error">${escapeHtml(error.message)}</div>`;
         return;
       }
 
       messagesList.innerHTML = data?.length
         ? data.map(renderMessage).join("")
-        : `<p class="notice">Aún no hay mensajes. Escribe el primero.</p>`;
+        : `<div class="chat-empty"><div><i class="ti ti-message-plus"></i><strong>Inicia la conversación</strong><p>Escribe el primer mensaje.</p></div></div>`;
 
-      await supabase.from("mensajes").update({ leido: true, leido_en: new Date().toISOString() }).eq("conversacion_id", activeConversationId).neq("remitente_id", user.id).eq("leido", false);
+      await supabase
+        .from("mensajes")
+        .update({ leido: true, leido_en: new Date().toISOString() })
+        .eq("conversacion_id", activeConversationId)
+        .neq("remitente_id", user.id)
+        .eq("leido", false);
 
       messagesList.scrollTop = messagesList.scrollHeight;
     }
@@ -158,26 +293,28 @@
         <div class="message-row ${mine ? "mine" : ""}">
           <div class="message-bubble">
             <span>${escapeHtml(message.contenido)}</span>
-            <small>${new Date(message.creado_en).toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"})}${mine ? `<span class="message-status">${message.leido ? "✓✓" : "✓"}</span>` : ""}</small>
+            <small>${new Date(message.creado_en).toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}${mine ? `<span class="message-status">${message.leido ? "✓✓" : "✓"}</span>` : ""}</small>
           </div>
         </div>`;
     }
 
     function subscribeRealtime() {
       if (realtimeChannel) supabase.removeChannel(realtimeChannel);
-
       realtimeChannel = supabase
-        .channel(`conversation-${activeConversationId}`)
+        .channel(`mizona-conversation-${activeConversationId}`)
         .on("postgres_changes", {
           event: "INSERT",
           schema: "public",
           table: "mensajes",
           filter: `conversacion_id=eq.${activeConversationId}`
-        }, payload => {
-          if (messagesList.querySelector(".notice")) messagesList.innerHTML = "";
+        }, async payload => {
+          if (messagesList.querySelector(".chat-empty")) messagesList.innerHTML = "";
           messagesList.insertAdjacentHTML("beforeend", renderMessage(payload.new));
           messagesList.scrollTop = messagesList.scrollHeight;
-          loadConversations();
+          if (payload.new.remitente_id !== user.id) {
+            await supabase.from("mensajes").update({ leido: true, leido_en: new Date().toISOString() }).eq("id", payload.new.id);
+          }
+          loadConversations({ autoOpen: false });
         })
         .subscribe();
     }
@@ -188,7 +325,6 @@
       if (!content || !activeConversationId) return;
 
       sendButton.disabled = true;
-
       const { error } = await supabase.from("mensajes").insert({
         conversacion_id: activeConversationId,
         remitente_id: user.id,
@@ -197,22 +333,24 @@
 
       if (error) {
         const detail = error.details || error.hint || error.message;
-        messagesList.insertAdjacentHTML(
-          "beforeend",
-          `<div class="chat-error">No se pudo enviar: ${escapeHtml(detail)}</div>`
-        );
+        messagesList.insertAdjacentHTML("beforeend", `<div class="chat-error">No se pudo enviar: ${escapeHtml(detail)}</div>`);
       } else {
         input.value = "";
         await loadMessages();
-        await loadConversations();
+        await loadConversations({ autoOpen: false });
       }
 
       sendButton.disabled = false;
       input.focus();
     });
 
+    conversationSearch.addEventListener("input", () => renderConversations(conversationSearch.value));
+    chatBack.addEventListener("click", () => chatLayout.classList.remove("chat-open"));
+    addEventListener("beforeunload", () => { if (realtimeChannel) supabase.removeChannel(realtimeChannel); });
+
     await loadConversations();
   </script>
-<script type="module" src="./js/mizona-core.js"></script>
+  <script type="module" src="./js/mizona-core.js"></script>
+  <script type="module" src="./js/mizona-shell-v2.js"></script>
 </body>
 </html>

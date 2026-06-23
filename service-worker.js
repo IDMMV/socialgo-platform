@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v2.0.0-estable";
+const CACHE_NAME = "mizona-v2.1.0-fase2";
 
 const CORE = [
   "./",
@@ -11,6 +11,14 @@ const CORE = [
   "./empleos.html",
   "./ride.html",
   "./perfil.html",
+  "./clips.html",
+  "./negocio.html",
+  "./admin.html",
+  "./usuario.html",
+  "./explorar.html",
+  "./amistades.html",
+  "./notificaciones.html",
+  "./mensajes.html",
   "./login.html",
   "./registro.html",
   "./recuperar.html",
@@ -23,7 +31,9 @@ const CORE = [
   "./css/mizona-dark.css",
   "./css/global.css",
   "./css/mizona-unified.css",
+  "./css/mizona-phase2.css",
   "./js/mizona-core.js",
+  "./js/mizona-shell-v2.js",
   "./js/mizona-ui-v2.js",
   "./js/brand.js",
   "./js/config.js",

@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="css/mizona.css">
 <link rel="stylesheet" href="css/mizona-unified.css">
+<link rel="stylesheet" href="css/mizona-phase2.css">
 </head>
 <body class="estado-guest">
 
@@ -225,10 +226,8 @@
           <div class="mz-card-title" style="font-size:12px"><i class="ti ti-tool"></i> Profesionales cerca de ti</div>
           <a href="servicios.html" style="font-size:10px;color:var(--az);font-weight:600">Ver todos</a>
         </div>
-        <div class="mz-svc-grid">
-          <div class="mz-svc-card"><div class="mz-svc-av" style="background:var(--az-bg);color:#1d4ed8">LQ</div><div class="mz-svc-name">Luis Quispe</div><div class="mz-svc-trade">Electricista</div><div class="mz-verificado">✓ Verificado</div><div class="mz-svc-stars">★ 4.8 · (47)</div><button class="mz-svc-btn" onclick="contactarSvc('Luis Quispe')">Contactar</button></div>
-          <div class="mz-svc-card"><div class="mz-svc-av" style="background:var(--vd-bg);color:#14532d">RG</div><div class="mz-svc-name">Rosa Gómez</div><div class="mz-svc-trade">Limpieza</div><div class="mz-verificado">✓ Verificado</div><div class="mz-svc-stars">★ 4.9 · (83)</div><button class="mz-svc-btn" onclick="contactarSvc('Rosa Gómez')">Contactar</button></div>
-          <div class="mz-svc-card"><div class="mz-svc-av" style="background:var(--am-bg);color:#713f12">JL</div><div class="mz-svc-name">Jhostan Lima</div><div class="mz-svc-trade">Gasfitero</div><div class="mz-verificado">✓ Verificado</div><div class="mz-svc-stars">★ 4.7 · (31)</div><button class="mz-svc-btn" onclick="contactarSvc('Jhostan Lima')">Contactar</button></div>
+        <div class="mz-svc-grid" id="inicio-servicios">
+          <div class="mz-svc-card"><div class="mz-svc-av">…</div><div class="mz-svc-name">Cargando</div><div class="mz-svc-trade">Servicios de tu zona</div></div>
           <div class="mz-svc-card" style="border:1px dashed var(--bd);background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer" onclick="location.href='servicios.html#registrar'"><i class="ti ti-plus" style="font-size:22px;color:var(--txt3);margin-bottom:6px"></i><div style="font-size:9px;color:var(--txt3);text-align:center">¿Ofreces un servicio? <strong style="color:var(--az)">Regístrate</strong></div></div>
         </div>
       </div>
@@ -430,6 +429,38 @@ window.filtrarMapa = function(tipo, btn) {
   todosMarkers.forEach(m => { tipo==='todas'||m._tipoAlerta===tipo ? mapaInst.addLayer(m) : mapaInst.removeLayer(m); });
 };
 
+function escInicio(value='') {
+  return String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
+}
+function inicialesInicio(value='') {
+  return String(value||'S').trim().split(/\s+/).slice(0,2).map(v=>v[0]||'').join('').toUpperCase() || 'S';
+}
+async function cargarServiciosInicio() {
+  const box=document.getElementById('inicio-servicios');
+  if(!box) return;
+  try {
+    const {data,error}=await sb.from('servicios_mizona')
+      .select('id,propietario_id,nombre,categoria,verificado,calificacion,total_resenas')
+      .eq('estado','activo')
+      .order('verificado',{ascending:false})
+      .order('calificacion',{ascending:false})
+      .limit(3);
+    if(error) throw error;
+    const cards=(data||[]).map(item=>`<div class="mz-svc-card">
+      <div class="mz-svc-av" style="background:var(--az-bg);color:#1d4ed8">${escInicio(inicialesInicio(item.nombre))}</div>
+      <div class="mz-svc-name">${escInicio(item.nombre)}</div>
+      <div class="mz-svc-trade">${escInicio(item.categoria||'Servicio')}</div>
+      <div class="mz-verificado">${item.verificado?'✓ Verificado':'Disponible'}</div>
+      <div class="mz-svc-stars">${Number(item.calificacion||0)>0?'★ '+Number(item.calificacion).toFixed(1)+' · ('+Number(item.total_resenas||0)+')':'Nuevo en MiZona'}</div>
+      <button class="mz-svc-btn" type="button" data-contact-owner="${escInicio(item.propietario_id)}" data-contact-name="${escInicio(item.nombre)}">Contactar</button>
+    </div>`).join('');
+    box.innerHTML=(cards||`<div class="mz-svc-card"><div class="mz-svc-av"><i class="ti ti-tool"></i></div><div class="mz-svc-name">Aún no hay servicios</div><div class="mz-svc-trade">Sé el primero en publicar</div></div>`)+`<div class="mz-svc-card" style="border:1px dashed var(--bd);background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer" onclick="location.href='servicios.html#registrar'"><i class="ti ti-plus" style="font-size:22px;color:var(--txt3);margin-bottom:6px"></i><div style="font-size:9px;color:var(--txt3);text-align:center">¿Ofreces un servicio? <strong style="color:var(--az)">Regístrate</strong></div></div>`;
+    box.querySelectorAll('[data-contact-owner]').forEach(button=>button.addEventListener('click',()=>contactarSvc(button.dataset.contactOwner,button.dataset.contactName)));
+  } catch(error) {
+    box.innerHTML=`<div class="mz-svc-card"><div class="mz-svc-av"><i class="ti ti-tool-off"></i></div><div class="mz-svc-name">Servicios no disponibles</div><div class="mz-svc-trade">${escInicio(error.message||'Intenta nuevamente')}</div><button class="mz-svc-btn" type="button" onclick="location.href='servicios.html'">Abrir servicios</button></div>`;
+  }
+}
+
 // ===== ACCIONES =====
 window.mostrarToast = function(msg) {
   const t=document.getElementById('mz-toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
@@ -439,7 +470,22 @@ window.cerrarModal = function(id) { const m=document.getElementById(id); if(m){m
 window.compartirWhatsApp = function(txt) { window.open('https://wa.me/?text='+encodeURIComponent(txt+'\n\nVía mizona.pe'),'_blank'); };
 window.abrirPublicar = function() { if(document.body.classList.contains('estado-guest')){location.href='login.html';return;} abrirModal('modal-alerta'); };
 window.confirmar = function(id, btn) { btn.disabled=true; btn.textContent='✓ Confirmado'; btn.style.background='var(--vd)'; btn.style.color='#fff'; mostrarToast('¡Gracias! Tu confirmación ayuda a verificar la alerta.'); };
-window.contactarSvc = function(nombre) { if(document.body.classList.contains('estado-guest')){mostrarToast('Inicia sesión para contactar a '+nombre);setTimeout(()=>location.href='login.html',1500);return;} location.href='mensajes.html?contacto='+encodeURIComponent(nombre); };
+window.contactarSvc = async function(usuarioId, nombre='este proveedor') {
+  if(document.body.classList.contains('estado-guest')){
+    mostrarToast('Inicia sesión para contactar a '+nombre);
+    setTimeout(()=>location.href='login.html?next='+encodeURIComponent('index.html'),1200);
+    return;
+  }
+  const { data:{ user } } = await sb.auth.getUser();
+  if(!usuarioId){ location.href='servicios.html'; return; }
+  if(user?.id===usuarioId){ mostrarToast('Este servicio te pertenece.'); return; }
+  const {data,error}=await sb.rpc('crear_o_obtener_conversacion',{p_otro_usuario:usuarioId});
+  if(error){
+    mostrarToast(/recursion/i.test(error.message||'') ? 'Actualiza la Fase 2 en Supabase para habilitar el chat.' : 'No se pudo abrir el chat: '+error.message);
+    return;
+  }
+  location.href='mensajes.html?c='+encodeURIComponent(data);
+};
 async function obtenerUsuarioYPerfil() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session?.user) return { user:null, profile:null };
@@ -530,6 +576,7 @@ document.head.appendChild(st);
 
 initAuth();
 initMapa();
+cargarServiciosInicio();
 </script>
 <script type="module" src="./js/mizona-core.js"></script>
 </body>

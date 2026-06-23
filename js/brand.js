@@ -15,8 +15,13 @@ let cachedBrand = { ...DEFAULT_BRAND };
 let loadPromise = null;
 
 function normaliseBrand(value = {}) {
+  const receivedName = String(value.name || value.nombre || DEFAULT_BRAND.name).trim();
+  const name = /^social\s*go(?:\.pe)?$/i.test(receivedName)
+    ? DEFAULT_BRAND.name
+    : (receivedName || DEFAULT_BRAND.name);
+
   return {
-    name: String(value.name || value.nombre || DEFAULT_BRAND.name).trim() || DEFAULT_BRAND.name,
+    name,
     domain: String(value.domain || DEFAULT_BRAND.domain).trim() || DEFAULT_BRAND.domain,
     slogan: String(value.slogan || value.eslogan || DEFAULT_BRAND.slogan).trim(),
     primary: value.primary || value.color_principal || DEFAULT_BRAND.primary,

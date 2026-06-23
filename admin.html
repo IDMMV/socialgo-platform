@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Administración · SocialGo</title>
+  <title>Administración · MiZona.pe</title>
   <link rel="stylesheet" href="css/global.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
     <header class="admin-toolbar">
       <a class="brand" href="index.html" style="margin:0">
         <span class="brand-mark">S</span>
-        <span data-brand-name>SocialGo</span>
+        <span data-brand-name>MiZona.pe</span>
       </a>
       <a class="secondary" href="index.html">← Volver al inicio</a>
     </header>
@@ -156,7 +156,7 @@
       await loadBrand();
 
       const current = getBrand();
-      brandName.value = current.name || "SocialGo";
+      brandName.value = current.name || "MiZona.pe";
       brandSlogan.value = current.slogan || "";
       brandPrimary.value = current.primary || "#7c3aed";
       brandSecondary.value = current.secondary || "#22b8f0";
@@ -277,7 +277,7 @@
 
         try {
           await saveBrand({
-            name: brandName.value.trim() || "SocialGo",
+            name: brandName.value.trim() || "MiZona.pe",
             slogan: brandSlogan.value.trim(),
             primary: brandPrimary.value,
             secondary: brandSecondary.value

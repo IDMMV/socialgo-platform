@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050b16">
+<title>Servicios | MiZona.pe</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/mizona-dark.css">
+
+</head>
+<body>
+<div class="mz-app">
+<aside class="mz-sidebar">
+  <a class="mz-brand" href="index.html">
+    <span class="mz-brand-badge">MZ</span>
+    <span><strong>MiZona<span>.pe</span></strong><small>Tu zona más segura.</small></span>
+  </a>
+  <nav class="mz-nav"><a class="" href="index.html"><span>⌂</span><span>Inicio</span></a><a class="" href="alertas.html"><span>◔</span><span>Alertas</span></a><a class="" href="mapa.html"><span>⌖</span><span>Mapa</span></a><a class="active" href="servicios.html"><span>▣</span><span>Servicios</span></a><a class="" href="solicitudes.html"><span>▤</span><span>Solicitudes</span></a><a class="" href="perfil.html"><span>♙</span><span>Perfil</span></a></nav>
+  <section class="mz-side-card"><strong>Comunidad verificada</strong><p>Vecinos, negocios e instituciones colaborando para una zona más segura.</p></section>
+  <section class="mz-side-card"><strong>Privacidad primero</strong><p>Las alertas muestran zonas aproximadas. Los datos sensibles se mantienen protegidos.</p></section>
+</aside>
+<main class="mz-main">
+<header class="mz-topbar">
+  <button class="mz-btn ghost mz-menu-btn" data-menu>☰</button>
+  <button class="mz-zone" data-change-zone>📍 <span data-zone>Ventanilla, Callao</span></button>
+  <label class="mz-search"><input type="search" placeholder="Buscar en MiZona..."></label>
+  <div class="mz-actions">
+    <a class="mz-btn danger" href="alertas.html#reportar">＋ <span class="text">Reportar alerta</span></a>
+    <a class="mz-btn ghost" href="notificaciones.html">🔔</a>
+    <a class="mz-btn ghost" href="perfil.html">Perfil</a>
+  </div>
+</header>
+<div class="mz-content">
+<div class="mz-page-title"><div><h1>Servicios</h1><p>Profesionales y negocios cercanos, organizados por especialidad.</p></div><button class="mz-btn primary">Publicar servicio</button></div>
+<section class="mz-card">
+  <div class="mz-card-pad">
+    <div class="mz-form">
+      <label class="mz-field"><span>Buscar</span><input placeholder="Electricista, gasfitero, limpieza..."></label>
+      <label class="mz-field"><span>Categoría</span><select><option>Todas</option><option>Electricidad</option><option>Gasfitería</option><option>Limpieza</option><option>Pintura</option></select></label>
+    </div>
+  </div>
+</section>
+<section class="mz-card" style="margin-top:14px">
+  <article class="mz-feed-card">
+    <div class="mz-feed-head"><div><span class="mz-tag verificada">Verificado por vecinos</span><h3>Luis Quispe Mamani</h3></div><strong>★ 4.9</strong></div>
+    <p>Electricista certificado · Instalaciones, reparaciones y emergencias.</p>
+    <div class="mz-feed-meta"><span>📍 A 1.2 km</span><span>Disponible hoy</span></div>
+    <div class="mz-feed-actions"><button class="mz-btn success sm">WhatsApp</button><button class="mz-btn primary sm">Contactar</button></div>
+  </article>
+  <article class="mz-feed-card">
+    <div class="mz-feed-head"><div><span class="mz-tag reportada">Alta urgencia</span><h3>Gasfitero urgente — tubería rota</h3></div><strong>S/80 – S/150</strong></div>
+    <p>Solicitud publicada por una vecina de tu zona.</p>
+    <div class="mz-feed-actions"><button class="mz-btn success sm">Enviar cotización</button></div>
+  </article>
+</section>
+</div>
+</main>
+</div>
+
+<nav class="mz-mobile-bottom">
+  <a href="index.html">⌂<span>Inicio</span></a>
+  <a href="alertas.html">◔<span>Alertas</span></a>
+  <a class="plus" href="alertas.html#reportar">＋</a>
+  <a href="mapa.html">⌖<span>Mapa</span></a>
+  <a href="perfil.html">♙<span>Perfil</span></a>
+</nav>
+<script type="module">import {initMiZonaUI} from "./js/mizona-ui-v2.js";initMiZonaUI();</script>
+</body>
+</html>

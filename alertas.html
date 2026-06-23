@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050b16">
+<title>Alertas | MiZona.pe</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/mizona-dark.css">
+
+</head>
+<body>
+<div class="mz-app">
+<aside class="mz-sidebar">
+  <a class="mz-brand" href="index.html">
+    <span class="mz-brand-badge">MZ</span>
+    <span><strong>MiZona<span>.pe</span></strong><small>Tu zona más segura.</small></span>
+  </a>
+  <nav class="mz-nav"><a class="" href="index.html"><span>⌂</span><span>Inicio</span></a><a class="active" href="alertas.html"><span>◔</span><span>Alertas</span></a><a class="" href="mapa.html"><span>⌖</span><span>Mapa</span></a><a class="" href="servicios.html"><span>▣</span><span>Servicios</span></a><a class="" href="solicitudes.html"><span>▤</span><span>Solicitudes</span></a><a class="" href="perfil.html"><span>♙</span><span>Perfil</span></a></nav>
+  <section class="mz-side-card"><strong>Comunidad verificada</strong><p>Vecinos, negocios e instituciones colaborando para una zona más segura.</p></section>
+  <section class="mz-side-card"><strong>Privacidad primero</strong><p>Las alertas muestran zonas aproximadas. Los datos sensibles se mantienen protegidos.</p></section>
+</aside>
+<main class="mz-main">
+<header class="mz-topbar">
+  <button class="mz-btn ghost mz-menu-btn" data-menu>☰</button>
+  <button class="mz-zone" data-change-zone>📍 <span data-zone>Ventanilla, Callao</span></button>
+  <label class="mz-search"><input type="search" placeholder="Buscar en MiZona..."></label>
+  <div class="mz-actions">
+    <a class="mz-btn danger" href="alertas.html#reportar">＋ <span class="text">Reportar alerta</span></a>
+    <a class="mz-btn ghost" href="notificaciones.html">🔔</a>
+    <a class="mz-btn ghost" href="perfil.html">Perfil</a>
+  </div>
+</header>
+<div class="mz-content">
+<div class="mz-page-title">
+  <div><h1>Alertas de tu zona</h1><p>Reporta hechos, confirma información y sigue actualizaciones.</p></div>
+  <a class="mz-btn danger" href="#reportar">Nueva alerta</a>
+</div>
+
+<div class="mz-page-grid">
+  <section class="mz-card">
+    <div class="mz-card-head"><h2>Alertas recientes</h2><span class="mz-tag reportada">Información ciudadana</span></div>
+    <div id="alertasLista"><div class="mz-loader">Cargando...</div></div>
+  </section>
+
+  <aside class="mz-card" id="reportar">
+    <div class="mz-card-head"><h2>Reportar alerta</h2></div>
+    <div class="mz-card-pad">
+      <form id="alertaForm" class="mz-form">
+        <label class="mz-field"><span>Categoría</span>
+          <select name="categoria" required>
+            <option value="robo">Robo o asalto</option>
+            <option value="accidente">Accidente</option>
+            <option value="agua">Corte o fuga de agua</option>
+            <option value="luz">Corte de luz</option>
+            <option value="persona">Persona desaparecida</option>
+            <option value="mascota">Mascota perdida</option>
+            <option value="incendio">Incendio</option>
+            <option value="otro">Otro</option>
+          </select>
+        </label>
+        <label class="mz-field"><span>Distrito</span><input name="distrito" value="Ventanilla" required></label>
+        <label class="mz-field full"><span>Título</span><input name="titulo" maxlength="120" required placeholder="Describe brevemente lo ocurrido"></label>
+        <label class="mz-field full"><span>Descripción</span><textarea name="descripcion" rows="5" maxlength="1200" required placeholder="Incluye hora, referencia y detalles útiles. No publiques acusaciones ni datos sensibles."></textarea></label>
+        <label class="mz-field full"><span>Zona o referencia</span><input name="zona_referencia" placeholder="Ej.: Av. Las Palmeras, cerca del mercado"></label>
+        <input name="latitud" type="hidden">
+        <input name="longitud" type="hidden">
+        <div class="mz-field full" style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="mz-btn ghost" data-use-location>📍 Usar ubicación aproximada</button>
+          <button type="submit" class="mz-btn danger">Enviar alerta</button>
+        </div>
+      </form>
+      <div id="alertaStatus" hidden></div>
+      <p style="color:var(--muted);font-size:12px;line-height:1.5;margin-top:14px">
+        MiZona informa sobre hechos reportados; no determina culpabilidad. Los casos sensibles pueden pasar a revisión.
+      </p>
+    </div>
+  </aside>
+</div>
+</div>
+</main>
+</div>
+
+<nav class="mz-mobile-bottom">
+  <a href="index.html">⌂<span>Inicio</span></a>
+  <a href="alertas.html">◔<span>Alertas</span></a>
+  <a class="plus" href="alertas.html#reportar">＋</a>
+  <a href="mapa.html">⌖<span>Mapa</span></a>
+  <a href="perfil.html">♙<span>Perfil</span></a>
+</nav>
+<script type="module" src="js/alertas-mizona.js"></script>
+</body>
+</html>

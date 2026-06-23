@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050b16">
+<title>Solicitudes | MiZona.pe</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/mizona-dark.css">
+
+</head>
+<body>
+<div class="mz-app">
+<aside class="mz-sidebar">
+  <a class="mz-brand" href="index.html">
+    <span class="mz-brand-badge">MZ</span>
+    <span><strong>MiZona<span>.pe</span></strong><small>Tu zona más segura.</small></span>
+  </a>
+  <nav class="mz-nav"><a class="" href="index.html"><span>⌂</span><span>Inicio</span></a><a class="" href="alertas.html"><span>◔</span><span>Alertas</span></a><a class="" href="mapa.html"><span>⌖</span><span>Mapa</span></a><a class="" href="servicios.html"><span>▣</span><span>Servicios</span></a><a class="active" href="solicitudes.html"><span>▤</span><span>Solicitudes</span></a><a class="" href="perfil.html"><span>♙</span><span>Perfil</span></a></nav>
+  <section class="mz-side-card"><strong>Comunidad verificada</strong><p>Vecinos, negocios e instituciones colaborando para una zona más segura.</p></section>
+  <section class="mz-side-card"><strong>Privacidad primero</strong><p>Las alertas muestran zonas aproximadas. Los datos sensibles se mantienen protegidos.</p></section>
+</aside>
+<main class="mz-main">
+<header class="mz-topbar">
+  <button class="mz-btn ghost mz-menu-btn" data-menu>☰</button>
+  <button class="mz-zone" data-change-zone>📍 <span data-zone>Ventanilla, Callao</span></button>
+  <label class="mz-search"><input type="search" placeholder="Buscar en MiZona..."></label>
+  <div class="mz-actions">
+    <a class="mz-btn danger" href="alertas.html#reportar">＋ <span class="text">Reportar alerta</span></a>
+    <a class="mz-btn ghost" href="notificaciones.html">🔔</a>
+    <a class="mz-btn ghost" href="perfil.html">Perfil</a>
+  </div>
+</header>
+<div class="mz-content">
+<div class="mz-page-title"><div><h1>Solicitudes</h1><p>Pide ayuda y recibe cotizaciones de profesionales cercanos.</p></div><button class="mz-btn primary">Nueva solicitud</button></div>
+<section class="mz-card"><div class="mz-card-pad">
+<form class="mz-form" onsubmit="event.preventDefault();alert('La conexión de solicitudes se activa en la próxima fase.');">
+<label class="mz-field"><span>Categoría</span><select><option>Electricidad</option><option>Gasfitería</option><option>Limpieza</option><option>Otros</option></select></label>
+<label class="mz-field"><span>Urgencia</span><select><option>Normal</option><option>Hoy</option><option>Urgente</option></select></label>
+<label class="mz-field full"><span>Título</span><input placeholder="¿Qué necesitas?"></label>
+<label class="mz-field full"><span>Descripción</span><textarea rows="5"></textarea></label>
+<label class="mz-field"><span>Presupuesto aproximado</span><input placeholder="S/"></label>
+<label class="mz-field"><span>Fecha necesaria</span><input type="date"></label>
+<div class="mz-field full"><button class="mz-btn primary">Publicar solicitud</button></div>
+</form></div></section>
+</div>
+</main>
+</div>
+
+<nav class="mz-mobile-bottom">
+  <a href="index.html">⌂<span>Inicio</span></a>
+  <a href="alertas.html">◔<span>Alertas</span></a>
+  <a class="plus" href="alertas.html#reportar">＋</a>
+  <a href="mapa.html">⌖<span>Mapa</span></a>
+  <a href="perfil.html">♙<span>Perfil</span></a>
+</nav>
+<script type="module">import {initMiZonaUI} from "./js/mizona-ui-v2.js";initMiZonaUI();</script>
+</body>
+</html>

@@ -1,8 +1,23 @@
-const CACHE_NAME = "socialgo-v0.8.5e";
+const CACHE_NAME = "mizona-v1.1.0-fase1b";
 
 const CORE = [
   "./",
   "./index.html",
+  "./js/dashboard-mizona.js",
+  "./js/mapa-mizona.js",
+  "./js/alertas-mizona.js",
+  "./js/mizona-ui-v2.js",
+  "./css/mizona-dark.css",
+  "./mapa.html",
+  "./assets/mizona-logo.svg",
+  "./assets/icon-512.png",
+  "./assets/icon-192.png",
+  "./js/mizona-ui.js",
+  "./css/mizona.css",
+  "./beneficios.html",
+  "./solicitudes.html",
+  "./servicios.html",
+  "./alertas.html",
   "./login.html",
   "./registro.html",
   "./clips.html",

@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="MiZona — Panel de tu negocio. Publica ofertas, gestiona solicitudes y llega a vecinos de tu zona.">
+<meta name="theme-color" content="#111827">
+<title>Mi Negocio — MiZona</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --az:#185FA5;--az-l:#378ADD;--az-bg:#EFF6FF;--az-bd:#bfdbfe;
+  --vd:#1D9E75;--vd-bg:#F0FDF4;--vd-bd:#86efac;
+  --rj:#E24B4A;--rj-bg:#FEF2F2;--rj-bd:#fecaca;
+  --am:#d97706;--am-bg:#FFFBEB;--am-bd:#fde68a;
+  --mo:#722ED1;--mo-bg:#F5F3FF;--mo-bd:#ddd6fe;
+  --nav:#111827;--nav2:#1e293b;
+  --bg:#f1f5f9;--card:#fff;
+  --txt:#1e293b;--txt2:#475569;--txt3:#94a3b8;
+  --bd:#e2e8f0;--bd2:#f1f5f9;
+  --r:12px;--rs:8px;
+  --sh:0 1px 3px rgba(0,0,0,.08);
+  --sh2:0 4px 12px rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;font-family:inherit}
+input,textarea,select{font-family:inherit;outline:none}
+
+/* ===== LAYOUT ===== */
+.layout{display:grid;grid-template-columns:200px 1fr;min-height:100vh;max-width:960px;margin:0 auto}
+
+/* ===== SIDEBAR ===== */
+.sidebar{background:var(--nav);position:sticky;top:0;height:100vh;display:flex;flex-direction:column;overflow-y:auto}
+.sb-logo{padding:16px 14px 12px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:9px}
+.sb-logo-mark{width:32px;height:32px;background:var(--az);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.sb-logo-name{font-size:15px;font-weight:700;color:#f1f5f9}
+.sb-logo-sub{font-size:8px;color:var(--az-l);font-weight:600;margin-top:1px}
+
+.sb-negocio{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-neg-name{font-size:11px;font-weight:700;color:#e2e8f0}
+.sb-neg-tipo{font-size:9px;color:#64748b;margin-top:2px;display:flex;align-items:center;gap:4px}
+.sb-neg-tipo i{font-size:10px}
+.sb-plan{display:inline-flex;align-items:center;gap:4px;font-size:8px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:5px}
+
+.sb-sec{font-size:8px;color:#334155;padding:10px 14px 3px;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 14px;cursor:pointer;border-left:2px solid transparent;transition:all .15s}
+.sb-item:hover{background:rgba(255,255,255,.04)}
+.sb-item.active{background:rgba(24,95,165,.2);border-left-color:var(--az-l)}
+.sb-item i{font-size:16px;color:#475569}
+.sb-item.active i{color:#60a5fa}
+.sb-item span{font-size:10px;color:#64748b}
+.sb-item.active span{color:#e2e8f0;font-weight:500}
+.sb-badge{background:var(--rj);color:#fff;font-size:7px;font-weight:700;padding:1px 5px;border-radius:20px;margin-left:auto}
+
+.sb-spacer{flex:1}
+.sb-upgrade{margin:10px 14px 14px;background:linear-gradient(135deg,var(--az),var(--vd));border-radius:var(--rs);padding:10px;cursor:pointer}
+.sb-upgrade-t{font-size:10px;font-weight:700;color:#fff}
+.sb-upgrade-s{font-size:8px;color:rgba(255,255,255,.7);margin-top:2px}
+.sb-upgrade-btn{background:rgba(255,255,255,.2);color:#fff;border-radius:5px;padding:4px 8px;font-size:8px;font-weight:700;margin-top:6px;display:inline-block;border:1px solid rgba(255,255,255,.3)}
+
+/* ===== MAIN ===== */
+.main{display:flex;flex-direction:column}
+.topbar{background:var(--card);border-bottom:1px solid var(--bd);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--sh)}
+.topbar-left h2{font-size:14px;font-weight:700;color:var(--txt)}
+.topbar-left p{font-size:10px;color:var(--txt3);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.topbar-btn{display:flex;align-items:center;gap:5px;padding:7px 12px;border-radius:var(--rs);font-size:10px;font-weight:700;transition:all .15s}
+.btn-primary{background:var(--az);color:#fff}
+.btn-primary:hover{background:var(--az-l)}
+.btn-outline{background:var(--bg);color:var(--txt2);border:1px solid var(--bd)}
+.btn-outline:hover{border-color:var(--az);color:var(--az)}
+
+/* ===== BODY ===== */
+.body{padding:16px;display:flex;flex-direction:column;gap:14px}
+
+/* ===== STATS ===== */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh)}
+.stat-label{font-size:10px;color:var(--txt3);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.stat-label i{font-size:13px}
+.stat-val{font-size:24px;font-weight:700;color:var(--txt);line-height:1}
+.stat-sub{font-size:9px;margin-top:4px;display:flex;align-items:center;gap:3px}
+.stat-up{color:var(--vd)}
+.stat-down{color:var(--rj)}
+.stat-neutral{color:var(--txt3)}
+
+/* ===== TABS ===== */
+.tabs-bar{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;display:flex;box-shadow:var(--sh)}
+.tab-btn{flex:1;padding:10px;font-size:10px;font-weight:700;color:var(--txt3);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px}
+.tab-btn i{font-size:14px}
+.tab-btn.active{color:var(--az);border-bottom-color:var(--az);background:var(--az-bg)}
+.tab-btn:hover:not(.active){color:var(--txt2);background:var(--bg)}
+
+/* ===== PANEL CONTENIDO ===== */
+.panel{display:none}
+.panel.active{display:flex;flex-direction:column;gap:12px}
+
+/* ===== FORM PUBLICAR OFERTA ===== */
+.form-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.form-card-head{padding:12px 16px;border-bottom:1px solid var(--bd2);display:flex;align-items:center;justify-content:space-between}
+.form-card-title{font-size:12px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:6px}
+.form-card-title i{font-size:15px;color:var(--az)}
+.form-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field-label{font-size:10px;font-weight:600;color:var(--txt2)}
+.field-input{background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);padding:8px 11px;font-size:11px;color:var(--txt);transition:border-color .15s}
+.field-input:focus{border-color:var(--az);background:var(--card)}
+.field-input.textarea{min-height:70px;resize:vertical}
+.field-hint{font-size:9px;color:var(--txt3)}
+
+/* TIPO OFERTA PILLS */
+.tipo-oferta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tipo-pill{padding:10px 8px;border-radius:var(--rs);border:1.5px solid var(--bd);background:var(--bg);cursor:pointer;text-align:center;transition:all .15s}
+.tipo-pill:hover{border-color:var(--az)}
+.tipo-pill.selected{border-color:var(--az);background:var(--az-bg)}
+.tipo-pill-icon{font-size:18px;margin-bottom:4px}
+.tipo-pill-label{font-size:9px;font-weight:700;color:var(--txt2)}
+.tipo-pill.selected .tipo-pill-label{color:var(--az)}
+
+/* ALCANCE PREVIEW */
+.alcance-box{background:linear-gradient(135deg,var(--az-bg),var(--vd-bg));border:1px solid var(--az-bd);border-radius:var(--rs);padding:10px 12px}
+.alcance-title{font-size:10px;font-weight:700;color:var(--az);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.alcance-title i{font-size:12px}
+.alcance-stats{display:flex;gap:16px}
+.alcance-stat-val{font-size:18px;font-weight:800;color:var(--txt)}
+.alcance-stat-label{font-size:8px;color:var(--txt3);margin-top:1px}
+.alcance-nota{font-size:9px;color:var(--txt2);margin-top:6px;display:flex;align-items:flex-start;gap:5px;line-height:1.4}
+.alcance-nota i{font-size:11px;flex-shrink:0;margin-top:1px;color:var(--az)}
+
+/* BOOST BOX */
+.boost-box{background:var(--am-bg);border:1px solid var(--am-bd);border-radius:var(--rs);padding:10px 12px;display:flex;align-items:center;gap:10px}
+.boost-box i{font-size:20px;color:var(--am);flex-shrink:0}
+.boost-text{flex:1}
+.boost-title{font-size:10px;font-weight:700;color:#713f12}
+.boost-desc{font-size:9px;color:#854d0e;margin-top:1px}
+.boost-btn{background:var(--am);color:#fff;border-radius:var(--rs);padding:6px 12px;font-size:9px;font-weight:700;flex-shrink:0}
+
+/* GENERADOR IA */
+.ia-box{background:var(--mo-bg);border:1px solid var(--mo-bd);border-radius:var(--rs);padding:10px 12px;display:flex;align-items:flex-start;gap:10px}
+.ia-box i{font-size:18px;color:var(--mo);flex-shrink:0;margin-top:2px}
+.ia-title{font-size:10px;font-weight:700;color:#4c1d95;margin-bottom:2px}
+.ia-desc{font-size:9px;color:#5b21b6;line-height:1.4}
+.ia-btn{background:var(--mo);color:#fff;border-radius:var(--rs);padding:5px 10px;font-size:9px;font-weight:700;margin-top:6px;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+.ia-resultado{background:var(--card);border-radius:var(--rs);padding:8px 10px;margin-top:7px;font-size:10px;color:var(--txt2);line-height:1.5;display:none;border:1px solid var(--mo-bd)}
+
+/* FORM FOOTER */
+.form-footer{padding:12px 16px;border-top:1px solid var(--bd2);display:flex;align-items:center;gap:8px;background:var(--bg)}
+.form-submit{background:var(--az);color:#fff;border-radius:var(--rs);padding:9px 20px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;transition:background .15s}
+.form-submit:hover{background:var(--az-l)}
+.form-submit i{font-size:14px}
+.form-cancel{background:var(--card);color:var(--txt2);border:1px solid var(--bd);border-radius:var(--rs);padding:9px 16px;font-size:11px;font-weight:600}
+
+/* ===== LISTA OFERTAS ===== */
+.oferta-row{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;display:flex;align-items:flex-start;gap:12px;box-shadow:var(--sh)}
+.or-icon{width:40px;height:40px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.or-body{flex:1;min-width:0}
+.or-title{font-size:12px;font-weight:700;color:var(--txt)}
+.or-desc{font-size:10px;color:var(--txt2);margin-top:2px}
+.or-meta{font-size:9px;color:var(--txt3);margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.or-meta i{font-size:10px}
+.or-stats{display:flex;gap:10px;margin-top:8px}
+.or-stat{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--txt2)}
+.or-stat i{font-size:13px}
+.or-stat.blue i{color:var(--az)}
+.or-stat.green i{color:var(--vd)}
+.or-stat.orange i{color:var(--am)}
+.or-actions{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.or-status{font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px}
+.status-activa{background:var(--vd-bg);color:#14532d;border:1px solid var(--vd-bd)}
+.status-vencida{background:var(--bg);color:var(--txt3);border:1px solid var(--bd)}
+.status-pausada{background:var(--am-bg);color:#713f12;border:1px solid var(--am-bd)}
+.or-btns{display:flex;gap:5px}
+.or-btn{padding:4px 10px;border-radius:20px;font-size:9px;font-weight:700;border:1px solid;cursor:pointer;transition:all .15s}
+.or-btn-edit{background:var(--az-bg);color:var(--az);border-color:var(--az-bd)}
+.or-btn-pause{background:var(--am-bg);color:#713f12;border-color:var(--am-bd)}
+.or-btn-del{background:var(--rj-bg);color:#991b1b;border-color:var(--rj-bd)}
+.or-btn-renew{background:var(--vd-bg);color:#14532d;border-color:var(--vd-bd)}
+
+/* COUNTDOWN */
+.countdown{font-size:9px;color:var(--rj);font-weight:700;display:flex;align-items:center;gap:3px}
+.countdown i{font-size:11px}
+
+/* ===== PANEL ESTADÍSTICAS ===== */
+.stats-detail{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chart-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:14px;box-shadow:var(--sh)}
+.chart-title{font-size:11px;font-weight:700;color:var(--txt);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.chart-title i{font-size:14px;color:var(--az)}
+.bar-chart{display:flex;flex-direction:column;gap:8px}
+.bar-row{display:flex;align-items:center;gap:8px}
+.bar-label{font-size:9px;color:var(--txt2);width:70px;flex-shrink:0;text-align:right}
+.bar-wrap{flex:1;height:14px;background:var(--bg);border-radius:7px;overflow:hidden}
+.bar-fill{height:100%;border-radius:7px;transition:width .6s ease}
+.bar-val{font-size:9px;font-weight:700;color:var(--txt);width:30px;text-align:right;flex-shrink:0}
+.pie-legend{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.pie-item{display:flex;align-items:center;gap:7px}
+.pie-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.pie-label{font-size:9px;color:var(--txt2);flex:1}
+.pie-val{font-size:9px;font-weight:700;color:var(--txt)}
+
+/* ===== PANEL SOLICITUDES ===== */
+.sol-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh)}
+.sol-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.sol-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.sol-name{font-size:11px;font-weight:700;color:var(--txt)}
+.sol-meta{font-size:9px;color:var(--txt3);margin-top:2px}
+.sol-presup{font-size:11px;font-weight:700;color:var(--vd);margin-left:auto;flex-shrink:0}
+.sol-desc{font-size:10px;color:var(--txt2);line-height:1.5;margin-bottom:8px}
+.sol-footer{display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--bd2)}
+.sol-btn-r{background:var(--vd);color:#fff;border-radius:var(--rs);padding:7px 14px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:4px}
+.sol-btn-r i{font-size:13px}
+.sol-btn-wa{background:#25D366;color:#fff;border-radius:var(--rs);padding:7px 12px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:4px}
+.sol-btn-wa i{font-size:13px}
+.sol-btn-pass{background:var(--bg);color:var(--txt3);border:1px solid var(--bd);border-radius:var(--rs);padding:7px 10px;font-size:10px;margin-left:auto}
+.sol-urgencia{font-size:8px;font-weight:700;padding:2px 8px;border-radius:20px}
+.urg-alta{background:var(--rj-bg);color:#991b1b;border:1px solid var(--rj-bd)}
+.urg-media{background:var(--am-bg);color:#713f12;border:1px solid var(--am-bd)}
+
+/* ===== CONFIGURACIÓN ===== */
+.config-section{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.config-section-head{padding:12px 16px;border-bottom:1px solid var(--bd2);display:flex;align-items:center;gap:7px}
+.config-section-title{font-size:11px;font-weight:700;color:var(--txt)}
+.config-section-title i{font-size:14px;color:var(--az)}
+.config-body{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd2)}
+/* MODALIDAD OFERTA */
+.modalidad-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mod-pill{padding:10px 8px;border-radius:var(--rs);border:1.5px solid var(--bd);background:var(--bg);cursor:pointer;text-align:center;transition:all .15s}
+.mod-pill:hover{border-color:var(--az);background:var(--az-bg)}
+.mod-pill.selected{border-color:var(--az);background:var(--az-bg)}
+.mod-pill-icon{font-size:20px;margin-bottom:4px}
+.mod-pill-label{font-size:9px;font-weight:700;color:var(--txt2)}
+.mod-pill-sub{font-size:8px;color:var(--txt3);margin-top:1px}
+.mod-pill.selected .mod-pill-label{color:var(--az)}
+.campo-modal{animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+
+/* TOGGLE */
+.toggle-label{font-size:10px;font-weight:600;color:var(--txt)}
+.toggle-sub{font-size:9px;color:var(--txt3);margin-top:1px}
+.toggle{width:36px;height:20px;background:var(--bd);border-radius:20px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--az)}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on::after{transform:translateX(16px)}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--nav2);color:#fff;border-radius:20px;padding:10px 20px;font-size:11px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* ===== MOBILE ===== */
+@media(max-width:700px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .stats-detail{grid-template-columns:1fr}
+  .form-row,.form-row-3{grid-template-columns:1fr}
+  .tipo-oferta-grid{grid-template-columns:repeat(2,1fr)}
+  .body{padding:10px}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">MZ</div>
+      <div>
+        <div class="sb-logo-name">MiZona</div>
+        <div class="sb-logo-sub">mizona.pe</div>
+      </div>
+    </div>
+
+    <div class="sb-negocio">
+      <div class="sb-neg-name" id="neg-nombre">Ferretería Don Carlos</div>
+      <div class="sb-neg-tipo"><i class="ti ti-building-store"></i> <span id="neg-tipo">Ferretería</span></div>
+      <div style="margin-top:5px">
+        <span class="sb-plan" style="background:var(--az-bg);color:var(--az);border:1px solid var(--az-bd)"><i class="ti ti-star" style="font-size:10px"></i> Plan Destacado</span>
+      </div>
+    </div>
+
+    <div class="sb-sec">Panel</div>
+    <div class="sb-item active" onclick="cambiarTab('dashboard',this)">
+      <i class="ti ti-layout-dashboard"></i><span>Resumen</span>
+    </div>
+    <div class="sb-item" onclick="cambiarTab('oferta',this)">
+      <i class="ti ti-tag"></i><span>Nueva oferta</span>
+    </div>
+    <div class="sb-item" onclick="cambiarTab('mis-ofertas',this)">
+      <i class="ti ti-list"></i><span>Mis ofertas</span>
+    </div>
+    <div class="sb-item" onclick="cambiarTab('solicitudes',this)">
+      <i class="ti ti-clipboard-list"></i><span>Solicitudes</span>
+      <span class="sb-badge" id="badge-sol">3</span>
+    </div>
+
+    <div class="sb-sec">Negocio</div>
+    <div class="sb-item" onclick="cambiarTab('stats',this)">
+      <i class="ti ti-chart-bar"></i><span>Estadísticas</span>
+    </div>
+    <div class="sb-item" onclick="cambiarTab('config',this)">
+      <i class="ti ti-settings"></i><span>Configuración</span>
+    </div>
+    <div class="sb-item" onclick="location.href='/index.html'">
+      <i class="ti ti-home"></i><span>Ver MiZona</span>
+    </div>
+
+    <div class="sb-spacer"></div>
+    <div class="sb-upgrade" onclick="mostrarToast('Próximamente: Plan Negocio Premium con más funciones')">
+      <div class="sb-upgrade-t">⚡ Subir a Premium</div>
+      <div class="sb-upgrade-s">Notificaciones push + catálogo</div>
+      <div class="sb-upgrade-btn">Ver planes →</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h2 id="page-title">Resumen de tu negocio</h2>
+        <p id="page-sub">Hoy, <span id="fecha-hoy"></span></p>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-btn btn-outline" onclick="location.href='/index.html'">
+          <i class="ti ti-eye" style="font-size:14px"></i> Ver en MiZona
+        </button>
+        <button class="topbar-btn btn-primary" onclick="cambiarTabBtn('oferta')">
+          <i class="ti ti-plus" style="font-size:14px"></i> Nueva oferta
+        </button>
+      </div>
+    </div>
+
+    <div class="body">
+
+      <!-- ===== PANEL DASHBOARD ===== -->
+      <div class="panel active" id="panel-dashboard">
+
+        <!-- STATS -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-eye" style="color:var(--az)"></i> Vistas hoy</div>
+            <div class="stat-val">247</div>
+            <div class="stat-sub stat-up"><i class="ti ti-trending-up" style="font-size:11px"></i> +34 vs ayer</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-pointer" style="color:var(--vd)"></i> Clics en ofertas</div>
+            <div class="stat-val">38</div>
+            <div class="stat-sub stat-up"><i class="ti ti-trending-up" style="font-size:11px"></i> +12 hoy</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-brand-whatsapp" style="color:#25D366"></i> WhatsApp recibidos</div>
+            <div class="stat-val">12</div>
+            <div class="stat-sub stat-neutral">Esta semana</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-star" style="color:var(--am)"></i> Calificación</div>
+            <div class="stat-val">4.8</div>
+            <div class="stat-sub stat-neutral">47 reseñas</div>
+          </div>
+        </div>
+
+        <!-- OFERTA ACTIVA -->
+        <div class="form-card">
+          <div class="form-card-head">
+            <div class="form-card-title"><i class="ti ti-tag"></i> Oferta activa ahora</div>
+            <button class="topbar-btn btn-outline" style="font-size:9px;padding:5px 10px" onclick="cambiarTabBtn('mis-ofertas')">Ver todas</button>
+          </div>
+          <div style="padding:12px 14px">
+            <div class="oferta-row" style="border:none;padding:0;box-shadow:none">
+              <div class="or-icon" style="background:var(--am-bg)">🔨</div>
+              <div class="or-body">
+                <div class="or-title">10% descuento en pinturas látex</div>
+                <div class="or-desc">Todas las marcas incluidas. Presenta MiZona en caja.</div>
+                <div class="or-meta">
+                  <span><i class="ti ti-clock"></i> Vence hoy 8:00 PM</span>
+                  <span><i class="ti ti-calendar"></i> Publicado hace 6h</span>
+                </div>
+                <div class="or-stats">
+                  <div class="or-stat blue"><i class="ti ti-eye"></i> 89 vistas</div>
+                  <div class="or-stat green"><i class="ti ti-pointer"></i> 23 clics</div>
+                  <div class="or-stat orange"><i class="ti ti-brand-whatsapp"></i> 7 WhatsApp</div>
+                </div>
+              </div>
+              <div class="or-actions">
+                <span class="or-status status-activa">Activa</span>
+                <div class="countdown"><i class="ti ti-clock"></i> Vence en 4h 20min</div>
+                <div class="or-btns">
+                  <button class="or-btn or-btn-renew" onclick="mostrarToast('Oferta renovada por 24 horas más')">Renovar</button>
+                  <button class="or-btn or-btn-pause" onclick="mostrarToast('Oferta pausada')">Pausar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOLICITUDES RECIENTES -->
+        <div class="form-card">
+          <div class="form-card-head">
+            <div class="form-card-title"><i class="ti ti-clipboard-list"></i> Solicitudes sin responder</div>
+            <span style="background:var(--rj-bg);color:#991b1b;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid var(--rj-bd)">3 nuevas</span>
+          </div>
+          <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+            <div class="sol-card" style="border:none;box-shadow:none;padding:0">
+              <div class="sol-top">
+                <div class="sol-av" style="background:var(--az-bg);color:var(--az)">AT</div>
+                <div style="flex:1">
+                  <div class="sol-name">Ana Torres</div>
+                  <div class="sol-meta">Hace 20 min · Tu zona</div>
+                </div>
+                <div class="sol-presup">S/.80–150</div>
+              </div>
+              <div class="sol-desc">Necesito pintura para sala y comedor, aprox 40m². ¿Tienen el color beige arena? También necesito rodillo y bandeja.</div>
+              <div class="sol-footer">
+                <button class="sol-btn-r" onclick="mostrarToast('Abriendo chat con Ana Torres...')"><i class="ti ti-send"></i> Responder</button>
+                <button class="sol-btn-wa" onclick="mostrarToast('Abriendo WhatsApp...')"><i class="ti ti-brand-whatsapp"></i> WhatsApp</button>
+                <button class="sol-btn-pass" onclick="mostrarToast('Solicitud marcada como vista')">Pasar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== PANEL NUEVA OFERTA ===== -->
+      <div class="panel" id="panel-oferta">
+        <div class="form-card">
+          <div class="form-card-head">
+            <div class="form-card-title"><i class="ti ti-tag"></i> Publicar nueva oferta</div>
+          </div>
+
+          <!-- TIPO DE OFERTA -->
+          <div class="form-body" style="padding-bottom:0">
+            <div class="field">
+              <label class="field-label">¿Qué tipo de oferta es?</label>
+              <div class="tipo-oferta-grid" id="tipo-grid">
+                <div class="tipo-pill selected" onclick="selTipo(this,'descuento')">
+                  <div class="tipo-pill-icon">🏷️</div>
+                  <div class="tipo-pill-label">Descuento %</div>
+                </div>
+                <div class="tipo-pill" onclick="selTipo(this,'precio')">
+                  <div class="tipo-pill-icon">💰</div>
+                  <div class="tipo-pill-label">Precio especial</div>
+                </div>
+                <div class="tipo-pill" onclick="selTipo(this,'combo')">
+                  <div class="tipo-pill-icon">📦</div>
+                  <div class="tipo-pill-label">Combo / 2x1</div>
+                </div>
+                <div class="tipo-pill" onclick="selTipo(this,'servicio')">
+                  <div class="tipo-pill-icon">🛠️</div>
+                  <div class="tipo-pill-label">Servicio gratis</div>
+                </div>
+                <div class="tipo-pill" onclick="selTipo(this,'evento')">
+                  <div class="tipo-pill-icon">📅</div>
+                  <div class="tipo-pill-label">Evento / Promo</div>
+                </div>
+                <div class="tipo-pill" onclick="selTipo(this,'otro')">
+                  <div class="tipo-pill-icon">✨</div>
+                  <div class="tipo-pill-label">Otro</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GENERADOR IA -->
+          <div class="form-body" style="padding-top:8px;padding-bottom:0">
+            <div class="ia-box">
+              <i class="ti ti-sparkles"></i>
+              <div style="flex:1">
+                <div class="ia-title">✨ Genera el texto con IA</div>
+                <div class="ia-desc">Describe tu oferta en pocas palabras y la IA genera el título y descripción atractivos automáticamente.</div>
+                <div style="display:flex;gap:7px;margin-top:7px">
+                  <input class="field-input" id="ia-input" placeholder="Ej: 10% en pinturas, 2x1 en tornillos..." style="flex:1;font-size:10px;padding:6px 9px">
+                  <button class="ia-btn" onclick="generarConIA()"><i class="ti ti-sparkles" style="font-size:12px"></i> Generar</button>
+                </div>
+                <div class="ia-resultado" id="ia-resultado"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-body">
+            <div class="field">
+              <label class="field-label">Título de la oferta *</label>
+              <input class="field-input" id="of-titulo" type="text" placeholder="Ej: 10% de descuento en todas las pinturas">
+              <span class="field-hint">Máximo 60 caracteres. Claro y directo.</span>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Descripción</label>
+              <textarea class="field-input textarea" id="of-desc" placeholder="Detalles de la oferta, condiciones, productos incluidos..."></textarea>
+            </div>
+
+            <!-- MODALIDAD DE OFERTA -->
+            <div class="field">
+              <label class="field-label">¿Cómo accede el vecino? *</label>
+              <div class="modalidad-grid" id="modalidad-grid">
+                <div class="mod-pill selected" onclick="selModalidad(this,'tienda')" data-tipo="tienda">
+                  <div class="mod-pill-icon">🏪</div>
+                  <div class="mod-pill-label">En tienda</div>
+                  <div class="mod-pill-sub">Va presencialmente</div>
+                </div>
+                <div class="mod-pill" onclick="selModalidad(this,'cupon')" data-tipo="cupon">
+                  <div class="mod-pill-icon">🎫</div>
+                  <div class="mod-pill-label">Cupón digital</div>
+                  <div class="mod-pill-sub">Muestra código</div>
+                </div>
+                <div class="mod-pill" onclick="selModalidad(this,'delivery')" data-tipo="delivery">
+                  <div class="mod-pill-icon">🛵</div>
+                  <div class="mod-pill-label">Delivery</div>
+                  <div class="mod-pill-sub">Lo llevan a casa</div>
+                </div>
+                <div class="mod-pill" onclick="selModalidad(this,'whatsapp')" data-tipo="whatsapp">
+                  <div class="mod-pill-icon">📱</div>
+                  <div class="mod-pill-label">Por WhatsApp</div>
+                  <div class="mod-pill-sub">Coordina por chat</div>
+                </div>
+                <div class="mod-pill" onclick="selModalidad(this,'online')" data-tipo="online">
+                  <div class="mod-pill-icon">🌐</div>
+                  <div class="mod-pill-label">Online / Web</div>
+                  <div class="mod-pill-sub">Pide por internet</div>
+                </div>
+                <div class="mod-pill" onclick="selModalidad(this,'mixto')" data-tipo="mixto">
+                  <div class="mod-pill-icon">✅</div>
+                  <div class="mod-pill-label">Ambas formas</div>
+                  <div class="mod-pill-sub">Tienda o delivery</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CAMPOS DINÁMICOS SEGÚN MODALIDAD -->
+            <!-- CUPÓN -->
+            <div id="campos-cupon" style="display:none" class="campo-modal">
+              <div class="form-row">
+                <div class="field">
+                  <label class="field-label">Código del cupón</label>
+                  <input class="field-input" id="of-cupon-code" type="text" placeholder="Ej: MIZONA10" style="font-family:monospace;font-weight:700;letter-spacing:2px;text-transform:uppercase">
+                  <span class="field-hint">El vecino muestra este código en caja o al pedir</span>
+                </div>
+                <div class="field">
+                  <label class="field-label">Máximo de usos</label>
+                  <input class="field-input" type="number" placeholder="Ej: 50 (vacío = ilimitado)">
+                </div>
+              </div>
+              <div class="info-box" style="background:var(--mo-bg);border:1px solid var(--mo-bd);border-radius:var(--rs);padding:8px 11px;font-size:9px;color:#4c1d95;display:flex;gap:6px;align-items:flex-start">
+                <i class="ti ti-info-circle" style="font-size:12px;flex-shrink:0;margin-top:1px"></i>
+                El vecino verá el cupón en la app y lo muestra en su celular. MiZona no verifica el uso — es por confianza con el negocio.
+              </div>
+            </div>
+
+            <!-- DELIVERY -->
+            <div id="campos-delivery" style="display:none" class="campo-modal">
+              <div class="form-row">
+                <div class="field">
+                  <label class="field-label">Zona de reparto</label>
+                  <input class="field-input" id="of-zona-delivery" type="text" placeholder="Ej: Toda la zona, radio 2km, solo Urb. Los Olivos">
+                </div>
+                <div class="field">
+                  <label class="field-label">Costo de delivery</label>
+                  <select class="field-input" id="of-costo-delivery">
+                    <option value="gratis">🎁 Delivery gratis</option>
+                    <option value="incluido">Incluido en el precio</option>
+                    <option value="cobro">Con costo adicional</option>
+                    <option value="consultar">Consultar al pedir</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row" id="row-costo-delivery" style="display:none">
+                <div class="field">
+                  <label class="field-label">¿Cuánto cuesta el delivery?</label>
+                  <input class="field-input" type="text" placeholder="Ej: S/.3 zona, S/.5 fuera">
+                </div>
+                <div class="field">
+                  <label class="field-label">Tiempo estimado</label>
+                  <input class="field-input" type="text" placeholder="Ej: 30–45 minutos">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label class="field-label">Pedido mínimo para delivery</label>
+                  <input class="field-input" type="text" placeholder="Ej: S/.30 mínimo (vacío = sin mínimo)">
+                </div>
+                <div class="field">
+                  <label class="field-label">¿Cómo pide el vecino?</label>
+                  <select class="field-input">
+                    <option>Por WhatsApp al negocio</option>
+                    <option>Llamar por teléfono</option>
+                    <option>Mensaje en MiZona</option>
+                  </select>
+                </div>
+              </div>
+              <div class="info-box" style="background:#F0FDF4;border:1px solid var(--vd-bd);border-radius:var(--rs);padding:8px 11px;font-size:9px;color:#14532d;display:flex;gap:6px;align-items:flex-start">
+                <i class="ti ti-check" style="font-size:12px;flex-shrink:0;margin-top:1px;color:var(--vd)"></i>
+                El vecino verá el badge 🛵 "Con delivery" en tu oferta. Aumenta considerablemente los clics.
+              </div>
+            </div>
+
+            <!-- WHATSAPP -->
+            <div id="campos-whatsapp" style="display:none" class="campo-modal">
+              <div class="form-row">
+                <div class="field">
+                  <label class="field-label">WhatsApp del negocio</label>
+                  <input class="field-input" type="tel" placeholder="+51 987 654 321" value="+51 987 654 321">
+                  <span class="field-hint">El vecino será redirigido directamente a este número</span>
+                </div>
+                <div class="field">
+                  <label class="field-label">Mensaje predefinido (opcional)</label>
+                  <input class="field-input" type="text" placeholder="Ej: Hola, vi su oferta en MiZona y quiero...">
+                </div>
+              </div>
+            </div>
+
+            <!-- PREVIEW BADGE -->
+            <div id="preview-modalidad" class="info-box" style="background:var(--az-bg);border:1px solid var(--az-bd);border-radius:var(--rs);padding:8px 11px;font-size:9px;color:var(--az);display:flex;gap:6px;align-items:center">
+              <i class="ti ti-eye" style="font-size:13px;flex-shrink:0"></i>
+              <span>Así verá el vecino tu oferta: <strong id="preview-badge">🏪 Disponible en tienda · Presenta MiZona en caja</strong></span>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label class="field-label">Descuento o precio</label>
+                <input class="field-input" id="of-precio" type="text" placeholder="Ej: 10% OFF o S/.15">
+              </div>
+              <div class="field">
+                <label class="field-label">Válido hasta</label>
+                <input class="field-input" id="of-vence" type="datetime-local">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label class="field-label">Condición</label>
+                <input class="field-input" type="text" placeholder="Ej: Mínimo S/.50, presenta MiZona">
+              </div>
+              <div class="field">
+                <label class="field-label">¿Se repite?</label>
+                <select class="field-input">
+                  <option value="">Solo esta vez</option>
+                  <option>Cada semana</option>
+                  <option>Cada mes</option>
+                  <option>Todos los fines de semana</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- ALCANCE ESTIMADO -->
+            <div class="alcance-box">
+              <div class="alcance-title"><i class="ti ti-radar"></i> Alcance estimado</div>
+              <div class="alcance-stats">
+                <div>
+                  <div class="alcance-stat-val">1,247</div>
+                  <div class="alcance-stat-label">Vecinos activos en tu zona</div>
+                </div>
+                <div>
+                  <div class="alcance-stat-val">~180</div>
+                  <div class="alcance-stat-label">Abrirán la oferta (estimado)</div>
+                </div>
+              </div>
+              <div class="alcance-nota">
+                <i class="ti ti-info-circle"></i>
+                Con tu plan actual apareces en el feed. Para enviar notificación push a todos los vecinos, activa un Boost.
+              </div>
+            </div>
+
+            <!-- BOOST -->
+            <div class="boost-box">
+              <i class="ti ti-rocket"></i>
+              <div class="boost-text">
+                <div class="boost-title">⚡ Boost tu oferta — S/.15</div>
+                <div class="boost-desc">Notificación push a 1,247 vecinos del distrito. Resultados en minutos.</div>
+              </div>
+              <button class="boost-btn" onclick="mostrarToast('Activando boost... se procesará al publicar la oferta')">Activar</button>
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <button class="form-submit" onclick="publicarOferta()">
+              <i class="ti ti-send"></i> Publicar oferta gratis
+            </button>
+            <button class="form-cancel" onclick="cambiarTabBtn('dashboard')">Cancelar</button>
+            <span style="margin-left:auto;font-size:9px;color:var(--txt3)">Aparece en Zona Ofertas al instante</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PANEL MIS OFERTAS ===== -->
+      <div class="panel" id="panel-mis-ofertas">
+        <div style="display:flex;flex-direction:column;gap:8px">
+
+          <div class="oferta-row">
+            <div class="or-icon" style="background:var(--am-bg)">🔨</div>
+            <div class="or-body">
+              <div class="or-title">10% descuento en pinturas látex</div>
+              <div class="or-desc">Todas las marcas. Muestra MiZona en caja.</div>
+              <div class="or-meta"><i class="ti ti-clock"></i> Vence hoy 8pm</div>
+              <div class="or-stats">
+                <div class="or-stat blue"><i class="ti ti-eye"></i> 89</div>
+                <div class="or-stat green"><i class="ti ti-pointer"></i> 23</div>
+                <div class="or-stat orange"><i class="ti ti-brand-whatsapp"></i> 7</div>
+              </div>
+            </div>
+            <div class="or-actions">
+              <span class="or-status status-activa">Activa</span>
+              <div class="or-btns">
+                <button class="or-btn or-btn-edit" onclick="mostrarToast('Editando oferta...')">Editar</button>
+                <button class="or-btn or-btn-pause" onclick="mostrarToast('Oferta pausada')">Pausar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="oferta-row">
+            <div class="or-icon" style="background:var(--vd-bg)">🔧</div>
+            <div class="or-body">
+              <div class="or-title">2x1 en tornillos y tuercas galvanizadas</div>
+              <div class="or-desc">Aplica en cajas de 100 unidades o más.</div>
+              <div class="or-meta"><i class="ti ti-calendar"></i> Venció ayer</div>
+              <div class="or-stats">
+                <div class="or-stat blue"><i class="ti ti-eye"></i> 134</div>
+                <div class="or-stat green"><i class="ti ti-pointer"></i> 41</div>
+                <div class="or-stat orange"><i class="ti ti-brand-whatsapp"></i> 15</div>
+              </div>
+            </div>
+            <div class="or-actions">
+              <span class="or-status status-vencida">Vencida</span>
+              <div class="or-btns">
+                <button class="or-btn or-btn-renew" onclick="mostrarToast('Oferta renovada por 7 días más')">Renovar</button>
+                <button class="or-btn or-btn-del" onclick="mostrarToast('Oferta eliminada')">Eliminar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="oferta-row">
+            <div class="or-icon" style="background:var(--az-bg)">⚡</div>
+            <div class="or-body">
+              <div class="or-title">Instalación eléctrica gratis en compras +S/.200</div>
+              <div class="or-desc">Incluye materiales. Coordinar con tienda.</div>
+              <div class="or-meta"><i class="ti ti-pause"></i> Pausada manualmente</div>
+              <div class="or-stats">
+                <div class="or-stat blue"><i class="ti ti-eye"></i> 67</div>
+                <div class="or-stat green"><i class="ti ti-pointer"></i> 19</div>
+                <div class="or-stat orange"><i class="ti ti-brand-whatsapp"></i> 8</div>
+              </div>
+            </div>
+            <div class="or-actions">
+              <span class="or-status status-pausada">Pausada</span>
+              <div class="or-btns">
+                <button class="or-btn or-btn-renew" onclick="mostrarToast('Oferta reactivada')">Reactivar</button>
+                <button class="or-btn or-btn-del" onclick="mostrarToast('Oferta eliminada')">Eliminar</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== PANEL SOLICITUDES ===== -->
+      <div class="panel" id="panel-solicitudes">
+        <div style="display:flex;flex-direction:column;gap:10px">
+
+          <div class="sol-card">
+            <div class="sol-top">
+              <div class="sol-av" style="background:var(--az-bg);color:var(--az)">AT</div>
+              <div style="flex:1">
+                <div class="sol-name">Ana Torres</div>
+                <div class="sol-meta">Hace 20 min · Tu zona · <span class="sol-urgencia urg-alta">🔴 Alta urgencia</span></div>
+              </div>
+              <div class="sol-presup">S/.80–150</div>
+            </div>
+            <div class="sol-desc">Necesito pintura para sala y comedor, aprox 40m². ¿Tienen beige arena? También rodillo y bandeja incluidos.</div>
+            <div class="sol-footer">
+              <button class="sol-btn-r" onclick="mostrarToast('Abriendo cotización para Ana Torres...')"><i class="ti ti-send"></i> Cotizar</button>
+              <button class="sol-btn-wa" onclick="mostrarToast('Abriendo WhatsApp...')"><i class="ti ti-brand-whatsapp"></i> WhatsApp</button>
+              <button class="sol-btn-pass">Pasar</button>
+            </div>
+          </div>
+
+          <div class="sol-card">
+            <div class="sol-top">
+              <div class="sol-av" style="background:var(--vd-bg);color:var(--vd)">MR</div>
+              <div style="flex:1">
+                <div class="sol-name">Miguel Ramos</div>
+                <div class="sol-meta">Hace 1h · Tu zona · <span class="sol-urgencia urg-media">🟡 Media urgencia</span></div>
+              </div>
+              <div class="sol-presup">S/.200–400</div>
+            </div>
+            <div class="sol-desc">Busco materiales para cerco perimétrico: postes, alambre de púas, cemento y clavos. ¿Tienen todo o solo partes?</div>
+            <div class="sol-footer">
+              <button class="sol-btn-r" onclick="mostrarToast('Abriendo cotización para Miguel Ramos...')"><i class="ti ti-send"></i> Cotizar</button>
+              <button class="sol-btn-wa" onclick="mostrarToast('Abriendo WhatsApp...')"><i class="ti ti-brand-whatsapp"></i> WhatsApp</button>
+              <button class="sol-btn-pass">Pasar</button>
+            </div>
+          </div>
+
+          <div class="sol-card">
+            <div class="sol-top">
+              <div class="sol-av" style="background:var(--am-bg);color:var(--am)">CL</div>
+              <div style="flex:1">
+                <div class="sol-name">Carmen López</div>
+                <div class="sol-meta">Hace 3h · Tu zona · <span class="sol-urgencia urg-media">🟡 Sin urgencia</span></div>
+              </div>
+              <div class="sol-presup">S/.50–80</div>
+            </div>
+            <div class="sol-desc">¿Tienen lijas de grano 80, 120 y 220? Necesito para lijar mueble de madera antes de pintar.</div>
+            <div class="sol-footer">
+              <button class="sol-btn-r" onclick="mostrarToast('Abriendo cotización para Carmen López...')"><i class="ti ti-send"></i> Cotizar</button>
+              <button class="sol-btn-wa" onclick="mostrarToast('Abriendo WhatsApp...')"><i class="ti ti-brand-whatsapp"></i> WhatsApp</button>
+              <button class="sol-btn-pass">Pasar</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== PANEL ESTADÍSTICAS ===== -->
+      <div class="panel" id="panel-stats">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-eye" style="color:var(--az)"></i> Vistas esta semana</div>
+            <div class="stat-val">1,284</div>
+            <div class="stat-sub stat-up"><i class="ti ti-trending-up" style="font-size:11px"></i> +18% vs semana pasada</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-pointer" style="color:var(--vd)"></i> Clics en ofertas</div>
+            <div class="stat-val">183</div>
+            <div class="stat-sub stat-up"><i class="ti ti-trending-up" style="font-size:11px"></i> Tasa 14.2%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-brand-whatsapp" style="color:#25D366"></i> WhatsApp recibidos</div>
+            <div class="stat-val">47</div>
+            <div class="stat-sub stat-up"><i class="ti ti-trending-up" style="font-size:11px"></i> +12 vs semana pasada</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-clipboard-list" style="color:var(--mo)"></i> Solicitudes recibidas</div>
+            <div class="stat-val">23</div>
+            <div class="stat-sub stat-up"><i class="ti ti-trending-up" style="font-size:11px"></i> 8 respondidas</div>
+          </div>
+        </div>
+
+        <div class="stats-detail">
+          <div class="chart-card">
+            <div class="chart-title"><i class="ti ti-chart-bar"></i> Vistas por día</div>
+            <div class="bar-chart">
+              <div class="bar-row">
+                <div class="bar-label">Lunes</div>
+                <div class="bar-wrap"><div class="bar-fill" style="width:60%;background:var(--az)"></div></div>
+                <div class="bar-val">152</div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">Martes</div>
+                <div class="bar-wrap"><div class="bar-fill" style="width:75%;background:var(--az)"></div></div>
+                <div class="bar-val">191</div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">Miércoles</div>
+                <div class="bar-wrap"><div class="bar-fill" style="width:45%;background:var(--az)"></div></div>
+                <div class="bar-val">114</div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">Jueves</div>
+                <div class="bar-wrap"><div class="bar-fill" style="width:90%;background:var(--az)"></div></div>
+                <div class="bar-val">229</div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">Viernes</div>
+                <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:var(--vd)"></div></div>
+                <div class="bar-val">247</div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">Sábado</div>
+                <div class="bar-wrap"><div class="bar-fill" style="width:80%;background:var(--az-l)"></div></div>
+                <div class="bar-val">203</div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">Domingo</div>
+                <div class="bar-wrap"><div class="bar-fill" style="width:55%;background:var(--az-l)"></div></div>
+                <div class="bar-val">148</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title"><i class="ti ti-chart-pie"></i> Cómo te encontraron</div>
+            <div class="pie-legend">
+              <div class="pie-item">
+                <div class="pie-dot" style="background:var(--az)"></div>
+                <div class="pie-label">Búsqueda en servicios</div>
+                <div class="pie-val">42%</div>
+              </div>
+              <div class="pie-item">
+                <div class="pie-dot" style="background:var(--vd)"></div>
+                <div class="pie-label">Zona Ofertas</div>
+                <div class="pie-val">31%</div>
+              </div>
+              <div class="pie-item">
+                <div class="pie-dot" style="background:var(--am)"></div>
+                <div class="pie-label">Feed principal</div>
+                <div class="pie-val">18%</div>
+              </div>
+              <div class="pie-item">
+                <div class="pie-dot" style="background:var(--mo)"></div>
+                <div class="pie-label">Solicitudes</div>
+                <div class="pie-val">9%</div>
+              </div>
+            </div>
+            <div style="margin-top:12px;background:var(--vd-bg);border:1px solid var(--vd-bd);border-radius:var(--rs);padding:8px 10px">
+              <div style="font-size:9px;font-weight:700;color:#14532d;margin-bottom:2px">💡 Insight de esta semana</div>
+              <div style="font-size:9px;color:var(--vd);line-height:1.4">Tu oferta de pinturas generó 3x más clics que tu perfil base. Publica ofertas semanales para mantener la visibilidad.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PANEL CONFIGURACIÓN ===== -->
+      <div class="panel" id="panel-config">
+
+        <div class="config-section">
+          <div class="config-section-head">
+            <div class="config-section-title"><i class="ti ti-building-store"></i> Datos del negocio</div>
+          </div>
+          <div class="config-body">
+            <div class="form-row">
+              <div class="field">
+                <label class="field-label">Nombre del negocio</label>
+                <input class="field-input" value="Ferretería Don Carlos">
+              </div>
+              <div class="field">
+                <label class="field-label">Categoría</label>
+                <select class="field-input">
+                  <option selected>Ferretería</option>
+                  <option>Farmacia</option>
+                  <option>Restaurante</option>
+                  <option>Bodega</option>
+                  <option>Otro</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label class="field-label">Dirección</label>
+                <input class="field-input" value="Av. Universitaria 450, Los Olivos">
+              </div>
+              <div class="field">
+                <label class="field-label">WhatsApp del negocio</label>
+                <input class="field-input" value="+51 987 654 321" type="tel">
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Horario de atención</label>
+              <input class="field-input" value="Lunes a Sábado: 8:00 AM – 7:00 PM">
+            </div>
+            <button class="form-submit" style="align-self:flex-start" onclick="mostrarToast('✅ Datos guardados correctamente')">
+              <i class="ti ti-device-floppy"></i> Guardar cambios
+            </button>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-head">
+            <div class="config-section-title"><i class="ti ti-bell"></i> Notificaciones</div>
+          </div>
+          <div class="config-body">
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Notificar cuando llegue una solicitud</div>
+                <div class="toggle-sub">Recibes push cuando un vecino pide algo de tu categoría</div>
+              </div>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Recordatorio antes que venza la oferta</div>
+                <div class="toggle-sub">Te avisamos 2 horas antes para renovar</div>
+              </div>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Resumen semanal de estadísticas</div>
+                <div class="toggle-sub">Reporte automático cada lunes por WhatsApp</div>
+              </div>
+              <div class="toggle" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Alertas de zona (como vecino)</div>
+                <div class="toggle-sub">También recibes alertas vecinales de tu zona</div>
+              </div>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-head">
+            <div class="config-section-title"><i class="ti ti-crown"></i> Plan actual</div>
+          </div>
+          <div class="config-body">
+            <div style="background:var(--az-bg);border:1px solid var(--az-bd);border-radius:var(--rs);padding:12px">
+              <div style="font-size:12px;font-weight:700;color:var(--az);margin-bottom:2px">Plan Destacado · S/.99/mes</div>
+              <div style="font-size:10px;color:var(--txt2);margin-bottom:8px">Vence el 21 de julio de 2026</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                <div style="font-size:9px;color:var(--txt2);display:flex;gap:5px;align-items:center"><i class="ti ti-check" style="font-size:11px;color:var(--vd)"></i>Aparecer en Zona Ofertas</div>
+                <div style="font-size:9px;color:var(--txt2);display:flex;gap:5px;align-items:center"><i class="ti ti-check" style="font-size:11px;color:var(--vd)"></i>Estadísticas detalladas</div>
+                <div style="font-size:9px;color:var(--txt2);display:flex;gap:5px;align-items:center"><i class="ti ti-check" style="font-size:11px;color:var(--vd)"></i>Solicitudes del distrito</div>
+                <div style="font-size:9px;color:var(--txt2);display:flex;gap:5px;align-items:center"><i class="ti ti-check" style="font-size:11px;color:var(--vd)"></i>2 boosts incluidos/mes</div>
+              </div>
+            </div>
+            <button class="form-submit" style="align-self:flex-start;background:linear-gradient(135deg,var(--az),var(--vd))" onclick="mostrarToast('Próximamente: Plan Premium con más funciones')">
+              <i class="ti ti-crown"></i> Subir a Premium — S/.249/mes
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+// ===== CONFIG =====
+const SUPABASE_URL = 'TU_SUPABASE_URL';
+const SUPABASE_ANON = 'TU_SUPABASE_ANON_KEY';
+
+// ===== MODALIDAD DE OFERTA =====
+const modalidadConfig = {
+  tienda:   { badge:'🏪 Disponible en tienda · Presenta MiZona en caja',    campos:[] },
+  cupon:    { badge:'🎫 Cupón digital · Muestra el código en pantalla',       campos:['cupon'] },
+  delivery: { badge:'🛵 Con delivery · Coordina por WhatsApp o teléfono',    campos:['delivery'] },
+  whatsapp: { badge:'📱 Pide por WhatsApp · Te contactan directamente',      campos:['whatsapp'] },
+  online:   { badge:'🌐 Disponible online · Ver enlace en la oferta',        campos:[] },
+  mixto:    { badge:'✅ En tienda y con delivery · Tú decides cómo pedir',   campos:['delivery'] },
+};
+
+function selModalidad(el, tipo){
+  document.querySelectorAll('.mod-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  // Ocultar todos los campos dinámicos
+  ['cupon','delivery','whatsapp'].forEach(c => {
+    const el2 = document.getElementById('campos-'+c);
+    if(el2) el2.style.display='none';
+  });
+  // Mostrar los que correspondan
+  const config = modalidadConfig[tipo] || modalidadConfig.tienda;
+  config.campos.forEach(c => {
+    const el2 = document.getElementById('campos-'+c);
+    if(el2) el2.style.display='flex'; // usa flex para form-row interno
+  });
+  // Si delivery, mostrar como block (no flex)
+  if(tipo==='delivery'||tipo==='mixto'){
+    const d=document.getElementById('campos-delivery');
+    if(d) d.style.display='block';
+  }
+  // Actualizar preview badge
+  const preview = document.getElementById('preview-badge');
+  if(preview) preview.textContent = config.badge;
+  // Mostrar/ocultar costo delivery según selección
+  if(tipo==='delivery'||tipo==='mixto'){
+    const sel = document.getElementById('of-costo-delivery');
+    if(sel) sel.addEventListener('change', toggleCostoDelivery);
+  }
+}
+
+function toggleCostoDelivery(){
+  const sel = document.getElementById('of-costo-delivery');
+  const row = document.getElementById('row-costo-delivery');
+  if(sel && row){
+    row.style.display = sel.value === 'cobro' ? 'grid' : 'none';
+  }
+}
+
+// ===== UTILIDADES =====
+function mostrarToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function cambiarTab(nombre, el){
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const panel=document.getElementById('panel-'+nombre);
+  if(panel) panel.classList.add('active');
+  const titles={
+    dashboard:'Resumen de tu negocio',
+    oferta:'Publicar nueva oferta',
+    'mis-ofertas':'Mis ofertas',
+    solicitudes:'Solicitudes recibidas',
+    stats:'Estadísticas',
+    config:'Configuración'
+  };
+  document.getElementById('page-title').textContent=titles[nombre]||nombre;
+}
+
+function cambiarTabBtn(nombre){
+  const items=document.querySelectorAll('.sb-item');
+  const tabMap={dashboard:0,oferta:1,'mis-ofertas':2,solicitudes:3,stats:4,config:5};
+  if(tabMap[nombre]!==undefined) cambiarTab(nombre, items[tabMap[nombre]]);
+}
+
+// ===== TIPO OFERTA =====
+function selTipo(el, tipo){
+  document.querySelectorAll('.tipo-pill').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ===== GENERADOR IA =====
+async function generarConIA(){
+  const input=document.getElementById('ia-input').value.trim();
+  if(!input){mostrarToast('Escribe algo primero');return;}
+  const btn=document.querySelector('.ia-btn');
+  btn.innerHTML='<i class="ti ti-loader-2" style="font-size:12px;animation:spin 1s linear infinite"></i> Generando...';
+  btn.disabled=true;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:300,
+        messages:[{role:'user',content:`Eres un experto en marketing para pequeños negocios peruanos. Genera un título (máximo 60 caracteres) y una descripción atractiva (máximo 120 caracteres) para esta oferta de un negocio local: "${input}". Responde SOLO con JSON: {"titulo":"...","descripcion":"..."}. Sin markdown ni explicaciones.`}]
+      })
+    });
+    const data=await res.json();
+    const texto=data.content?.[0]?.text||'{}';
+    const json=JSON.parse(texto.replace(/```json|```/g,'').trim());
+    if(json.titulo){
+      document.getElementById('of-titulo').value=json.titulo;
+      document.getElementById('of-desc').value=json.descripcion||'';
+      const resultado=document.getElementById('ia-resultado');
+      resultado.style.display='block';
+      resultado.innerHTML=`<strong style="color:var(--mo)">✨ Generado:</strong><br><b>${json.titulo}</b><br><span style="color:var(--txt3)">${json.descripcion}</span>`;
+      mostrarToast('✅ Texto generado. Puedes editarlo antes de publicar.');
+    }
+  }catch(e){
+    mostrarToast('Error al generar. Escribe el texto manualmente.');
+  }
+  btn.innerHTML='<i class="ti ti-sparkles" style="font-size:12px"></i> Generar';
+  btn.disabled=false;
+}
+
+// ===== PUBLICAR OFERTA =====
+async function publicarOferta(){
+  const titulo=document.getElementById('of-titulo').value.trim();
+  if(!titulo){mostrarToast('Escribe el título de la oferta');return;}
+  mostrarToast('✅ Oferta publicada. Ya aparece en Zona Ofertas.');
+  setTimeout(()=>cambiarTabBtn('mis-ofertas'),1500);
+}
+
+// ===== FECHA =====
+const dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const hoy=new Date();
+document.getElementById('fecha-hoy').textContent=`${dias[hoy.getDay()]} ${hoy.getDate()} de ${meses[hoy.getMonth()]} de ${hoy.getFullYear()}`;
+
+// Fecha mínima para vencimiento = ahora
+const ahora=new Date();
+ahora.setMinutes(ahora.getMinutes()-ahora.getTimezoneOffset());
+document.getElementById('of-vence').min=ahora.toISOString().slice(0,16);
+
+// CSS animación spinner
+const style=document.createElement('style');
+style.textContent='@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>

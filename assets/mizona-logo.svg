@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" role="img" aria-labelledby="t">
+<title id="t">MiZona.pe</title>
+<defs>
+  <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#185FA5"/>
+    <stop offset="1" stop-color="#1D9E75"/>
+  </linearGradient>
+</defs>
+<path fill="url(#g)" d="M32 2C15 2 4 14 4 30c0 21 28 32 28 32s28-11 28-32C60 14 49 2 32 2z"/>
+<circle cx="32" cy="29" r="13" fill="white"/>
+<path d="M22 34c3-8 17-8 20 0" fill="none" stroke="#185FA5" stroke-width="4" stroke-linecap="round"/>
+<circle cx="27" cy="25" r="3" fill="#185FA5"/><circle cx="37" cy="25" r="3" fill="#185FA5"/>
+<text x="72" y="39" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#0f172a">MiZona.pe</text>
+<text x="74" y="55" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#475569">Tu zona, tu gente, tus oportunidades.</text>
+</svg>

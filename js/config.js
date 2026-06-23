@@ -1,13 +1,16 @@
 export const APP_CONFIG = Object.freeze({
-  version: "0.1.0",
+  version: "1.0.0-fase1a",
   environment: "development",
   enablePWA: true,
   enableRegistration: true,
-  enableClips: true,
-  enableMessaging: true,
+  enableAlerts: true,
+  enableServices: true,
+  enableRequests: true,
+  enableBenefits: true,
+  enableClips: false,
+  enableMessaging: false,
   enableLiveStreams: false,
-  enableCreatorPayments: false,
-  maxImageMB: 5,
-  maxVideoMB: 25,
-  maxClipSeconds: 60
+  maxImageMB: 3,
+  maxVideoMB: 0,
+  maxClipSeconds: 0
 });

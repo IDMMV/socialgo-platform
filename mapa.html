@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050b16">
+<title>Mapa | MiZona.pe</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/mizona-dark.css">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+</head>
+<body>
+<div class="mz-app">
+<aside class="mz-sidebar">
+  <a class="mz-brand" href="index.html">
+    <span class="mz-brand-badge">MZ</span>
+    <span><strong>MiZona<span>.pe</span></strong><small>Tu zona más segura.</small></span>
+  </a>
+  <nav class="mz-nav"><a class="" href="index.html"><span>⌂</span><span>Inicio</span></a><a class="" href="alertas.html"><span>◔</span><span>Alertas</span></a><a class="active" href="mapa.html"><span>⌖</span><span>Mapa</span></a><a class="" href="servicios.html"><span>▣</span><span>Servicios</span></a><a class="" href="solicitudes.html"><span>▤</span><span>Solicitudes</span></a><a class="" href="perfil.html"><span>♙</span><span>Perfil</span></a></nav>
+  <section class="mz-side-card"><strong>Comunidad verificada</strong><p>Vecinos, negocios e instituciones colaborando para una zona más segura.</p></section>
+  <section class="mz-side-card"><strong>Privacidad primero</strong><p>Las alertas muestran zonas aproximadas. Los datos sensibles se mantienen protegidos.</p></section>
+</aside>
+<main class="mz-main">
+<header class="mz-topbar">
+  <button class="mz-btn ghost mz-menu-btn" data-menu>☰</button>
+  <button class="mz-zone" data-change-zone>📍 <span data-zone>Ventanilla, Callao</span></button>
+  <label class="mz-search"><input type="search" placeholder="Buscar en MiZona..."></label>
+  <div class="mz-actions">
+    <a class="mz-btn danger" href="alertas.html#reportar">＋ <span class="text">Reportar alerta</span></a>
+    <a class="mz-btn ghost" href="notificaciones.html">🔔</a>
+    <a class="mz-btn ghost" href="perfil.html">Perfil</a>
+  </div>
+</header>
+<div class="mz-content">
+<div class="mz-page-title">
+  <div><h1>Mapa de alertas</h1><p>Visualiza incidentes y avisos cercanos en tiempo real.</p></div>
+  <button class="mz-btn primary" data-my-location>Usar mi ubicación</button>
+</div>
+<section class="mz-card">
+  <div class="mz-card-head"><h2>Alertas en tu zona</h2><span id="mapCount">0 alertas</span></div>
+  <div class="mz-map-wrap" style="height:650px"><div id="mapaCompleto"></div></div>
+  <div class="mz-map-tools">
+    <button class="mz-filter active" data-map-filter="todas">Todas</button>
+    <button class="mz-filter" data-map-filter="robo">🔴 Robos</button>
+    <button class="mz-filter" data-map-filter="accidente">🟠 Accidentes</button>
+    <button class="mz-filter" data-map-filter="agua">🔵 Agua</button>
+    <button class="mz-filter" data-map-filter="luz">💡 Luz</button>
+    <button class="mz-filter" data-map-filter="persona">🟣 Personas</button>
+    <button class="mz-filter" data-map-filter="mascota">🐾 Mascotas</button>
+  </div>
+  <div id="mapStatus" class="mz-empty"></div>
+</section>
+</div>
+</main>
+</div>
+
+<nav class="mz-mobile-bottom">
+  <a href="index.html">⌂<span>Inicio</span></a>
+  <a href="alertas.html">◔<span>Alertas</span></a>
+  <a class="plus" href="alertas.html#reportar">＋</a>
+  <a href="mapa.html">⌖<span>Mapa</span></a>
+  <a href="perfil.html">♙<span>Perfil</span></a>
+</nav>
+<script type="module" src="js/mapa-mizona.js"></script>
+</body>
+</html>

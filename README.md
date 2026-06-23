@@ -1,60 +1,92 @@
-# SocialGo — Fase 1
+# MiZona.pe — Proyecto Completo
 
-Base inicial modular de la futura red social.
+**"Tu zona, tu gente, tus oportunidades."**
 
-## Incluye
+Dominio: mizona.pe | Stack: Vercel + GitHub + Supabase
 
-- Inicio adaptable a computadora y celular.
-- Registro e inicio de sesión en modo demostración.
-- Publicaciones de ejemplo.
-- Compartir mediante el menú nativo del teléfono para usuarios registrados.
-- Guardados y Me gusta de demostración.
-- Nombre, eslogan y colores editables desde `admin.html`.
-- PWA básica mediante `manifest.json` y `service-worker.js`.
-- Estructura inicial para Supabase.
-- SQL preliminar con RLS para perfiles y publicaciones.
-- Panel inicial de pendientes.
+---
 
-## Importante
+## Configuración inicial
 
-Esta versión es una demostración visual y estructural. Todavía no debe utilizarse con usuarios reales ni pagos.
+### 1. Configurar Supabase
+Edita `js/env.public.js` y reemplaza:
+```js
+SUPABASE_URL: "TU_SUPABASE_URL",
+SUPABASE_PUBLISHABLE_KEY: "TU_SUPABASE_ANON_KEY",
+```
 
-No incluye aún:
+Ejecuta los SQL en orden en Supabase SQL Editor:
+1. `sql/schema_mizona_fase1b.sql` — tablas principales
+2. `sql/schema_cupones_qr.sql` — sistema de cupones
 
-- Autenticación real de Supabase.
-- Chat en tiempo real.
-- Carga real de fotos o videos.
-- Roles administrativos completos.
-- MFA.
-- Cloudflare Turnstile.
-- Pagos.
-- Monetización.
-- Moderación automática.
-- Transmisiones en vivo.
+### 2. Subir a GitHub
+- Reemplaza todos los archivos en tu repo `socialgo-platform`
+- Vercel desplegará automáticamente
 
-## Cómo probar
+### 3. Configurar dominio en Vercel
+- Vercel → tu proyecto → Settings → Domains
+- Agrega `mizona.pe`
+- En NIC Perú → tu dominio → Gestionar DNS:
+  - Registro A: `@` → `76.76.21.21`
+  - CNAME: `www` → `cname.vercel-dns.com`
 
-1. Descomprime la carpeta.
-2. Abre el proyecto mediante un servidor local.
-3. Una opción sencilla es usar la extensión Live Server en Visual Studio Code.
-4. Abre `index.html`.
-5. Usa `registro.html` para crear un usuario de demostración.
-6. Abre `admin.html` para cambiar nombre, eslogan y colores.
+---
 
-## Próxima fase
+## Estructura del proyecto
 
-1. Crear proyecto Supabase de desarrollo.
-2. Configurar variables de entorno.
-3. Integrar Supabase Auth.
-4. Crear perfiles reales.
-5. Probar todas las políticas RLS.
-6. Crear roles administrativos.
-7. Añadir auditoría inmutable.
-8. Configurar Cloudflare y Turnstile.
+```
+mizona/
+├── index.html          ← Página principal con mapa
+├── alertas.html        ← Feed de alertas
+├── mapa.html           ← Mapa completo de alertas
+├── servicios.html      ← Directorio de técnicos
+├── solicitudes.html    ← Solicitudes de cotización
+├── ofertas.html        ← Zona Ofertas
+├── negocio.html        ← Panel del negocio (con QR)
+├── ride.html           ← MiZonaRide taxi comunitario
+├── empleos.html        ← Bolsa de trabajo
+├── perfil.html         ← Perfil del usuario
+├── mensajes.html       ← Mensajes
+├── admin.html          ← Panel administrador
+├── login.html          ← Inicio de sesión
+├── registro.html       ← Crear cuenta
+├── css/
+│   ├── mizona.css      ← CSS principal MiZona
+│   └── mizona-dark.css ← CSS tema oscuro
+├── js/
+│   ├── env.public.js   ← ⚠️ CONFIGURA AQUÍ tu Supabase
+│   ├── supabase.js     ← Cliente Supabase
+│   ├── auth.js         ← Autenticación
+│   ├── alertas-mizona.js
+│   ├── mapa-mizona.js
+│   └── dashboard-mizona.js
+└── sql/
+    ├── schema_mizona_fase1b.sql  ← Ejecutar primero
+    └── schema_cupones_qr.sql     ← Ejecutar segundo
+```
 
-## Seguridad
+---
 
-- No coloques `service_role` dentro de JavaScript público.
-- No subas contraseñas o claves privadas a GitHub.
-- Usa un proyecto Supabase separado para pruebas.
-- Revisa el archivo `sql/schema_fase1.sql` antes de ejecutarlo.
+## Módulos implementados
+
+- ✅ Alertas vecinales (ciudadanas y oficiales)
+- ✅ Mapa Leaflet en tiempo real (OpenStreetMap - gratis)
+- ✅ Sistema anti-fraude (puntos por reputación)
+- ✅ Botón de pánico con GPS
+- ✅ Directorio de servicios locales
+- ✅ Solicitudes de cotización privada
+- ✅ Panel de negocio completo
+- ✅ Sistema de cupones QR verificados
+- ✅ Zona Ofertas
+- ✅ MiZonaRide (taxi comunitario)
+- ✅ PWA instalable (Android)
+- ✅ Login/Registro con Supabase Auth
+
+## Por implementar (próximas fases)
+
+- [ ] Notificaciones push (Web Push API + VAPID)
+- [ ] Panel de municipalidad
+- [ ] Comunidades y grupos
+- [ ] Páginas de negocios completas
+- [ ] Integración Bomberos Perú automática
+- [ ] App Android nativa (React Native)

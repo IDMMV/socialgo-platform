@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MiZonaRide — MiZona.pe</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="css/mizona.css">
+</head>
+<body>
+<div class="mz-layout-2col">
+<aside class="mz-sidebar">
+  <div class="mz-logo"><div class="mz-logo-mark">MZ</div><div><div class="mz-logo-name">MiZonaRide</div><div class="mz-logo-domain">mizona.pe/ride</div></div></div>
+  <a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Volver a inicio</span></a>
+  <div class="mz-sidebar-spacer"></div>
+</aside>
+<main class="mz-feed">
+  <div class="mz-topbar">
+    <div style="font-size:13px;font-weight:700;color:#1e293b;flex:1">🚗 MiZonaRide</div>
+    <div class="mz-dist-tag"><i class="ti ti-map-pin"></i> Tu zona</div>
+  </div>
+  <div class="mz-feed-body">
+    <span class="mz-zona" style="background:#1e3a5f">MiZonaRide — Taxi comunitario</span>
+    <div id="mapa-ride" style="height:280px;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0"></div>
+    <div class="mz-card">
+      <div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-car"></i> ¿A dónde vas?</div></div>
+      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+        <div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:7px">
+          <div style="width:8px;height:8px;background:#E24B4A;border-radius:50%;flex-shrink:0"></div>
+          <span style="font-size:10px;color:#475569;flex:1">Tu ubicación actual</span>
+          <span style="font-size:9px;color:#185FA5;font-weight:600">Cambiar</span>
+        </div>
+        <div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:7px">
+          <div style="width:8px;height:8px;background:#185FA5;border-radius:50%;flex-shrink:0"></div>
+          <span style="font-size:10px;color:#94a3b8;flex:1">¿Cuál es tu destino?</span>
+          <span style="font-size:9px;color:#185FA5;font-weight:600">Buscar</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:10px;color:#64748b;flex-shrink:0">Tu precio:</span>
+          <input style="flex:1;background:#f1f5f9;border:1px solid #185FA5;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700;color:#185FA5;outline:none" placeholder="S/. 8.00" type="text">
+          <span style="font-size:8px;color:#94a3b8">Conductor puede contraofertar</span>
+        </div>
+        <button style="width:100%;background:linear-gradient(135deg,#185FA5,#1D9E75);color:#fff;border:none;border-radius:10px;padding:12px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px" onclick="alert('Buscando conductores en tu zona...')">
+          <i class="ti ti-car" style="font-size:16px"></i> Buscar conductor en mi zona
+        </button>
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 10px;font-size:9px;color:#1d4ed8">
+          <strong>4 conductores disponibles</strong> en tu zona · Sin comisión · Pago por Yape directo
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const m = L.map('mapa-ride',{zoomControl:true,scrollWheelZoom:false}).setView([-11.9525,-77.0662],14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(m);
+const conductores=[{lat:-11.948,lng:-77.064,nombre:'Carlos V.',precio:'S/.8'},{lat:-11.957,lng:-77.071,nombre:'Luis P.',precio:'S/.10'},{lat:-11.955,lng:-77.059,nombre:'Roberto M.',precio:'S/.7'}];
+conductores.forEach(c=>{
+  const ico=L.divIcon({html:`<div style="background:#185FA5;color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3)">🚗</div>`,iconSize:[32,32],iconAnchor:[16,16],className:''});
+  L.marker([c.lat,c.lng],{icon:ico}).addTo(m).bindPopup(`<b>${c.nombre}</b><br>Precio sugerido: ${c.precio}<br><button onclick="alert('Contactando a ${c.nombre}...')" style="margin-top:5px;background:#185FA5;color:#fff;border:none;border-radius:5px;padding:4px 10px;cursor:pointer;font-size:9px">Contactar</button>`);
+});
+if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>{m.setView([pos.coords.latitude,pos.coords.longitude],15);},{});}
+</script>
+</body>
+</html>

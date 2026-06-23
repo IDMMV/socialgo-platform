@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="MiZona — Panel de tu negocio. Publica ofertas, gestiona solicitudes y llega a vecinos de tu zona.">
-<meta name="theme-color" content="#111827">
+<meta name="theme-color" content="#185FA5">
 <title>Mi Negocio — MiZona</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -262,6 +262,7 @@ input,textarea,select{font-family:inherit;outline:none}
   .body{padding:10px}
 }
 </style>
+<link rel="stylesheet" href="css/mizona-unified.css">
 </head>
 <body>
 
@@ -777,7 +778,7 @@ input,textarea,select{font-family:inherit;outline:none}
             <div class="sol-footer">
               <button class="sol-btn-r" onclick="mostrarToast('Abriendo cotización para Ana Torres...')"><i class="ti ti-send"></i> Cotizar</button>
               <button class="sol-btn-wa" onclick="mostrarToast('Abriendo WhatsApp...')"><i class="ti ti-brand-whatsapp"></i> WhatsApp</button>
-              <button class="sol-btn-pass">Pasar</button>
+              <button class="sol-btn-pass" onclick="mostrarToast('Solicitud marcada como vista')">Pasar</button>
             </div>
           </div>
 
@@ -794,7 +795,7 @@ input,textarea,select{font-family:inherit;outline:none}
             <div class="sol-footer">
               <button class="sol-btn-r" onclick="mostrarToast('Abriendo cotización para Miguel Ramos...')"><i class="ti ti-send"></i> Cotizar</button>
               <button class="sol-btn-wa" onclick="mostrarToast('Abriendo WhatsApp...')"><i class="ti ti-brand-whatsapp"></i> WhatsApp</button>
-              <button class="sol-btn-pass">Pasar</button>
+              <button class="sol-btn-pass" onclick="mostrarToast('Solicitud marcada como vista')">Pasar</button>
             </div>
           </div>
 
@@ -811,7 +812,7 @@ input,textarea,select{font-family:inherit;outline:none}
             <div class="sol-footer">
               <button class="sol-btn-r" onclick="mostrarToast('Abriendo cotización para Carmen López...')"><i class="ti ti-send"></i> Cotizar</button>
               <button class="sol-btn-wa" onclick="mostrarToast('Abriendo WhatsApp...')"><i class="ti ti-brand-whatsapp"></i> WhatsApp</button>
-              <button class="sol-btn-pass">Pasar</button>
+              <button class="sol-btn-pass" onclick="mostrarToast('Solicitud marcada como vista')">Pasar</button>
             </div>
           </div>
 
@@ -1171,5 +1172,6 @@ const style=document.createElement('style');
 style.textContent='@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
 document.head.appendChild(style);
 </script>
+<script type="module" src="./js/mizona-core.js"></script>
 </body>
 </html>

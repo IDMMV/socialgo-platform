@@ -6,6 +6,7 @@
 <title>Zona Ofertas — MiZona.pe</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link rel="stylesheet" href="css/mizona.css">
+<link rel="stylesheet" href="css/mizona-unified.css">
 </head>
 <body>
 <div class="mz-layout-2col">
@@ -33,13 +34,13 @@
     </div>
     <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)">
       <div style="background:linear-gradient(135deg,#5B21B6,#722ED1);padding:14px;display:flex;align-items:center;justify-content:space-between">
-        <div><div style="font-size:9px;color:rgba(255,255,255,.8)">Yape — Exclusivo MiZona</div><div style="font-size:14px;font-weight:800;color:#fff">S/.5 Cashback</div></div>
+        <div><div style="font-size:9px;color:rgba(255,255,255,.8)">Oferta de demostración</div><div style="font-size:14px;font-weight:800;color:#fff">Beneficio próximo</div></div>
         <div style="font-size:20px;font-weight:800;color:#fff">💜</div>
       </div>
       <div style="padding:10px 12px">
-        <div style="font-size:10px;font-weight:700;color:#1e293b;margin-bottom:3px">Paga con Yape en tu zona</div>
-        <div style="font-size:9px;color:#475569">Recibe S/.5 de devolución en cualquier negocio de tu distrito. Solo vecinos MiZona.</div>
-        <button style="width:100%;background:#722ED1;color:#fff;border:none;border-radius:8px;padding:8px;font-size:10px;font-weight:700;margin-top:8px;cursor:pointer">Activar oferta Yape</button>
+        <div style="font-size:10px;font-weight:700;color:#1e293b;margin-bottom:3px">Promociones verificadas para vecinos</div>
+        <div style="font-size:9px;color:#475569">Las promociones reales deberán ser publicadas por negocios verificados y mostrar condiciones, vigencia y stock.</div>
+        <button type="button" style="width:100%;background:#722ED1;color:#fff;border:none;border-radius:8px;padding:10px;font-size:12px;font-weight:700;margin-top:8px;cursor:pointer" onclick="localStorage.setItem('mizona_interes_ofertas','1');window.mzToast('Listo. Te avisaremos cuando existan ofertas verificadas en tu zona.')">Avisarme cuando esté disponible</button>
       </div>
     </div>
     <div style="text-align:center;padding:20px;color:#94a3b8;font-size:11px">
@@ -60,5 +61,6 @@
     <div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
   </div>
 </nav>
+<script type="module" src="./js/mizona-core.js"></script>
 </body>
 </html>

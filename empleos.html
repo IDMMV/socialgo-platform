@@ -6,6 +6,7 @@
 <title>Empleos — MiZona.pe</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link rel="stylesheet" href="css/mizona.css">
+<link rel="stylesheet" href="css/mizona-unified.css">
 </head>
 <body>
 <div class="mz-layout-2col">
@@ -24,19 +25,29 @@
     <span class="mz-zona" style="background:#534AB7">Zona Empleos</span>
     <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:4px">
       <div style="padding:12px 14px;border-bottom:1px solid #f1f5f9">
-        <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:3px">Técnico Electricista</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:3px">Técnico Electricista</div><span class="mz-zona" style="background:#64748b;margin:0">Ejemplo</span></div>
         <div style="font-size:9px;color:#185FA5;font-weight:600;margin-bottom:4px">Empresa ABC · Tiempo completo</div>
         <div style="font-size:9px;color:#94a3b8;display:flex;gap:10px"><span><i class="ti ti-map-pin" style="font-size:10px"></i> Tu zona</span><span><i class="ti ti-currency-dollar" style="font-size:10px"></i> S/.1,500–2,000</span><span><i class="ti ti-clock" style="font-size:10px"></i> Lun–Vie</span></div>
       </div>
-      <div style="padding:8px 14px;display:flex;justify-content:flex-end"><button style="background:#185FA5;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:10px;font-weight:700;cursor:pointer">Postular</button></div>
+      <div style="padding:10px 14px;display:flex;justify-content:flex-end"><button class="mz-btn-submit" type="button" onclick="localStorage.setItem('mizona_interes_empleos','1');window.mzToast('Guardamos tu interés. Te avisaremos cuando se habiliten postulaciones reales.')"><i class="ti ti-bookmark"></i> Guardar interés</button></div>
     </div>
     <div style="text-align:center;padding:20px;color:#94a3b8;font-size:11px">
       <div style="font-size:30px;margin-bottom:8px">💼</div>
       <div style="font-weight:700;color:#475569;margin-bottom:4px">Próximamente más empleos</div>
-      <div>Esta sección se conectará con Supabase en la siguiente fase</div>
+      <div>Esta tarjeta es una demostración. Las ofertas reales se conectarán a Supabase en la fase de empleos.</div>
     </div>
   </div>
 </main>
 </div>
+<nav class="mz-bottom-nav">
+  <div class="mz-bn-inner">
+    <div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
+    <div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
+    <div class="mz-bn-item"><div class="mz-bn-center" onclick="location.href='index.html#publicar'"><i class="ti ti-plus"></i></div></div>
+    <div class="mz-bn-item" onclick="location.href='servicios.html'"><i class="ti ti-tool"></i><span>Servicios</span></div>
+    <div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
+  </div>
+</nav>
+<script type="module" src="./js/mizona-core.js"></script>
 </body>
 </html>

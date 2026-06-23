@@ -1,76 +1,90 @@
-const CACHE_NAME = "mizona-v1.1.0-fase1b";
+const CACHE_NAME = "mizona-v2.0.0-estable";
 
 const CORE = [
   "./",
   "./index.html",
-  "./js/dashboard-mizona.js",
-  "./js/mapa-mizona.js",
-  "./js/alertas-mizona.js",
-  "./js/mizona-ui-v2.js",
-  "./css/mizona-dark.css",
-  "./mapa.html",
-  "./assets/mizona-logo.svg",
-  "./assets/icon-512.png",
-  "./assets/icon-192.png",
-  "./js/mizona-ui.js",
-  "./css/mizona.css",
-  "./beneficios.html",
-  "./solicitudes.html",
-  "./servicios.html",
   "./alertas.html",
+  "./mapa.html",
+  "./servicios.html",
+  "./solicitudes.html",
+  "./ofertas.html",
+  "./empleos.html",
+  "./ride.html",
+  "./perfil.html",
   "./login.html",
   "./registro.html",
-  "./clips.html",
-  "./notificaciones.html",
-  "./usuario.html",
-  "./amistades.html",
   "./recuperar.html",
   "./restablecer.html",
-  "./auth-callback.html",
-  "./perfil.html",
+  "./manifest.json",
+  "./assets/mizona-logo.svg",
+  "./assets/icon-192.png",
+  "./assets/icon-512.png",
+  "./css/mizona.css",
+  "./css/mizona-dark.css",
   "./css/global.css",
-  "./js/app.js",
-  "./js/layout.js",
-  "./js/auth.js",
+  "./css/mizona-unified.css",
+  "./js/mizona-core.js",
+  "./js/mizona-ui-v2.js",
   "./js/brand.js",
   "./js/config.js",
   "./js/env.public.js",
-  "./js/session.js",
   "./js/supabase.js",
-  "./js/publicaciones.js",
-  "./js/media.js",
-  "./js/clips.js",
-  "./js/clip-editor.js",
-  "./js/resumable-upload.js"
+  "./js/alertas-mizona.js",
+  "./js/mapa-mizona.js",
+  "./js/servicios-mizona.js",
+  "./js/solicitudes-mizona.js"
 ];
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE))
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await Promise.allSettled(CORE.map(async (url) => {
+      const response = await fetch(url, { cache: "reload" });
+      if (response.ok) await cache.put(url, response);
+    }));
+  })());
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-      ))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)));
+    await self.clients.claim();
+  })());
 });
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
+  const request = event.request;
+  if (request.method !== "GET") return;
 
-  event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-        return response;
-      })
-      .catch(() => caches.match(event.request))
-  );
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  if (request.mode === "navigate") {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(request);
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, fresh.clone());
+        return fresh;
+      } catch {
+        return (await caches.match(request)) || (await caches.match("./index.html"));
+      }
+    })());
+    return;
+  }
+
+  event.respondWith((async () => {
+    const cached = await caches.match(request);
+    const network = fetch(request).then(async (response) => {
+      if (response.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, response.clone());
+      }
+      return response;
+    }).catch(() => null);
+
+    return cached || (await network) || new Response("Recurso no disponible", { status: 503 });
+  })());
 });

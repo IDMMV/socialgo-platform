@@ -1,92 +1,118 @@
-# MiZona.pe — Proyecto Completo
+# MiZona.pe
 
-**"Tu zona, tu gente, tus oportunidades."**
+**Tu zona, tu gente, tus oportunidades.**
 
-Dominio: mizona.pe | Stack: Vercel + GitHub + Supabase
+Proyecto web estático conectado a Supabase y desplegable desde GitHub hacia Vercel.
 
----
+## Versión incluida
 
-## Configuración inicial
+Esta carpeta corresponde a la **Fase 1 de estabilización y unificación visual**.
 
-### 1. Configurar Supabase
-Edita `js/env.public.js` y reemplaza:
-```js
-SUPABASE_URL: "TU_SUPABASE_URL",
-SUPABASE_PUBLISHABLE_KEY: "TU_SUPABASE_ANON_KEY",
+Se corrigieron:
+
+- Identidad de marca y funciones de `brand.js`.
+- Apariencia compartida entre páginas claras, oscuras y heredadas.
+- Instalación y actualización del service worker.
+- Publicación real de alertas y solicitudes desde la página principal.
+- Directorio real de servicios conectado a `servicios_mizona`.
+- Solicitudes reales conectadas a `solicitudes_mizona`.
+- Botones sin acción detectados en clips, empleos, ofertas y negocio.
+- Navegación móvil en páginas que quedaban sin menú.
+
+Consulta `CAMBIOS_FASE1.md` para conocer los detalles y las pruebas recomendadas.
+
+## Configuración de Supabase
+
+La configuración pública está en:
+
+```text
+js/env.public.js
 ```
 
-Ejecuta los SQL en orden en Supabase SQL Editor:
-1. `sql/schema_mizona_fase1b.sql` — tablas principales
-2. `sql/schema_cupones_qr.sql` — sistema de cupones
+La clave pública de Supabase puede estar en el navegador. Nunca coloques allí una clave `service_role`, una contraseña ni una clave privada de inteligencia artificial.
 
-### 2. Subir a GitHub
-- Reemplaza todos los archivos en tu repo `socialgo-platform`
-- Vercel desplegará automáticamente
+### Base de datos ya existente
 
-### 3. Configurar dominio en Vercel
-- Vercel → tu proyecto → Settings → Domains
-- Agrega `mizona.pe`
-- En NIC Perú → tu dominio → Gestionar DNS:
-  - Registro A: `@` → `76.76.21.21`
-  - CNAME: `www` → `cname.vercel-dns.com`
+Esta actualización no agrega tablas nuevas. Utiliza las tablas y funciones existentes del proyecto, especialmente:
 
----
+- `perfiles`
+- `alertas`
+- `alerta_confirmaciones`
+- `servicios_mizona`
+- `solicitudes_mizona`
+- `configuracion_plataforma`
+- `seguidores`
+- `conversaciones`, `conversacion_participantes` y `mensajes`
 
-## Estructura del proyecto
+Si esas tablas ya funcionan en tu web, **no vuelvas a ejecutar todos los SQL**.
 
-```
-mizona/
-├── index.html          ← Página principal con mapa
-├── alertas.html        ← Feed de alertas
-├── mapa.html           ← Mapa completo de alertas
-├── servicios.html      ← Directorio de técnicos
-├── solicitudes.html    ← Solicitudes de cotización
-├── ofertas.html        ← Zona Ofertas
-├── negocio.html        ← Panel del negocio (con QR)
-├── ride.html           ← MiZonaRide taxi comunitario
-├── empleos.html        ← Bolsa de trabajo
-├── perfil.html         ← Perfil del usuario
-├── mensajes.html       ← Mensajes
-├── admin.html          ← Panel administrador
-├── login.html          ← Inicio de sesión
-├── registro.html       ← Crear cuenta
+Para una instalación nueva, revisa los scripts de la carpeta `sql` en el orden de sus fases. El archivo `sql/schema_mizona_fase1b.sql` contiene las tablas de alertas, servicios y solicitudes usadas por las páginas nuevas.
+
+## Publicación en GitHub
+
+1. Conserva una copia de seguridad del repositorio actual.
+2. Reemplaza los archivos del repositorio por los de esta carpeta.
+3. Confirma que también subiste los archivos nuevos:
+   - `css/mizona-unified.css`
+   - `js/mizona-core.js`
+   - `js/servicios-mizona.js`
+   - `js/solicitudes-mizona.js`
+4. Haz commit y push.
+5. Espera el despliegue de Vercel.
+6. En el celular, actualiza la página. Si siguiera apareciendo la versión anterior, elimina los datos del sitio o desinstala y vuelve a instalar la PWA para limpiar la caché antigua.
+
+## Estructura principal
+
+```text
+MiZona/
+├── index.html
+├── alertas.html
+├── mapa.html
+├── servicios.html
+├── solicitudes.html
+├── ofertas.html
+├── empleos.html
+├── ride.html
+├── perfil.html
+├── negocio.html
+├── mensajes.html
+├── clips.html
+├── admin.html
 ├── css/
-│   ├── mizona.css      ← CSS principal MiZona
-│   └── mizona-dark.css ← CSS tema oscuro
+│   ├── mizona.css
+│   ├── mizona-dark.css
+│   ├── global.css
+│   └── mizona-unified.css
 ├── js/
-│   ├── env.public.js   ← ⚠️ CONFIGURA AQUÍ tu Supabase
-│   ├── supabase.js     ← Cliente Supabase
-│   ├── auth.js         ← Autenticación
+│   ├── mizona-core.js
+│   ├── brand.js
+│   ├── supabase.js
+│   ├── servicios-mizona.js
+│   ├── solicitudes-mizona.js
 │   ├── alertas-mizona.js
-│   ├── mapa-mizona.js
-│   └── dashboard-mizona.js
+│   └── mapa-mizona.js
 └── sql/
-    ├── schema_mizona_fase1b.sql  ← Ejecutar primero
-    └── schema_cupones_qr.sql     ← Ejecutar segundo
 ```
 
----
+## Estado funcional
 
-## Módulos implementados
+### Conectado a Supabase
 
-- ✅ Alertas vecinales (ciudadanas y oficiales)
-- ✅ Mapa Leaflet en tiempo real (OpenStreetMap - gratis)
-- ✅ Sistema anti-fraude (puntos por reputación)
-- ✅ Botón de pánico con GPS
-- ✅ Directorio de servicios locales
-- ✅ Solicitudes de cotización privada
-- ✅ Panel de negocio completo
-- ✅ Sistema de cupones QR verificados
-- ✅ Zona Ofertas
-- ✅ MiZonaRide (taxi comunitario)
-- ✅ PWA instalable (Android)
-- ✅ Login/Registro con Supabase Auth
+- Autenticación y recuperación de contraseña.
+- Alertas y confirmaciones.
+- Mapa de alertas.
+- Perfil, avatar y portada.
+- Servicios locales.
+- Solicitudes de trabajo o cotización.
+- Amistades, seguidores, mensajes y notificaciones, siempre que se hayan ejecutado sus esquemas correspondientes.
+- Clips, siempre que el almacenamiento y los esquemas de clips estén configurados.
 
-## Por implementar (próximas fases)
+### Todavía demostrativo o parcial
 
-- [ ] Notificaciones push (Web Push API + VAPID)
-- [ ] Panel de municipalidad
-- [ ] Comunidades y grupos
-- [ ] Páginas de negocios completas
-- [ ] Integración Bomberos Perú automática
-- [ ] App Android nativa (React Native)
+- Empleos reales y postulaciones.
+- Activación de ofertas comerciales reales.
+- MiZonaRide y contratación de conductores.
+- Operaciones completas del panel de negocio.
+- Integración de inteligencia artificial del panel de negocio.
+
+Estas funciones deben conectarse a tablas y procesos seguros antes de mostrarse como servicios reales.

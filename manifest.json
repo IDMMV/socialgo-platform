@@ -1,12 +1,12 @@
 {
   "name": "MiZona.pe",
   "short_name": "MiZona",
-  "description": "Tu zona más segura y tu comunidad más conectada.",
+  "description": "Tu zona, tu gente, tus oportunidades.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#050b16",
-  "theme_color": "#050b16",
+  "background_color": "#F1F5F9",
+  "theme_color": "#185FA5",
   "icons": [
     {
       "src": "assets/icon-192.png",

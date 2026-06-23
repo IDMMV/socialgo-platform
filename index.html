@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
+<meta name="theme-color" content="#185FA5">
 <meta name="description" content="MiZona — Tu zona, tu gente, tus oportunidades. Alertas vecinales, servicios locales y solicitudes en tu distrito.">
 <title>Inicio — MiZona.pe</title>
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="css/mizona.css">
+<link rel="stylesheet" href="css/mizona-unified.css">
 </head>
 <body class="estado-guest">
 
@@ -141,7 +142,7 @@
       <div class="mz-panic" onclick="activarPanico()">
         <div class="mz-panic-pulse">🆘</div>
         <div class="mz-panic-text"><h3>Botón de emergencia</h3><p>Alerta a vecinos en radio de 500m · GPS activo</p></div>
-        <button class="mz-panic-btn">ACTIVAR</button>
+        <button class="mz-panic-btn" type="button" onclick="event.stopPropagation();activarPanico()">ACTIVAR</button>
       </div>
 
       <!-- ALERTA OFICIAL -->
@@ -255,7 +256,7 @@
         <div class="mz-post-body">Vecinos, mañana la Municipalidad hará limpieza en el Parque El Naranjal desde las 8am. ¡Gracias a todos los que se animaron! 🌳</div>
         <div class="mz-post-footer">
           <button class="mz-post-action" onclick="this.style.color='var(--az)'"><i class="ti ti-thumb-up"></i> 24</button>
-          <button class="mz-post-action"><i class="ti ti-message"></i> 8</button>
+          <button class="mz-post-action" onclick="mostrarToast('Los comentarios de esta publicación de demostración se activarán al cargar publicaciones reales.')"><i class="ti ti-message"></i> 8</button>
           <button class="mz-post-action" onclick="compartirWhatsApp('Vi esto en MiZona: Limpieza en Parque El Naranjal mañana 8am. mizona.pe')"><i class="ti ti-share"></i> Compartir</button>
         </div>
       </div>
@@ -439,8 +440,80 @@ window.compartirWhatsApp = function(txt) { window.open('https://wa.me/?text='+en
 window.abrirPublicar = function() { if(document.body.classList.contains('estado-guest')){location.href='login.html';return;} abrirModal('modal-alerta'); };
 window.confirmar = function(id, btn) { btn.disabled=true; btn.textContent='✓ Confirmado'; btn.style.background='var(--vd)'; btn.style.color='#fff'; mostrarToast('¡Gracias! Tu confirmación ayuda a verificar la alerta.'); };
 window.contactarSvc = function(nombre) { if(document.body.classList.contains('estado-guest')){mostrarToast('Inicia sesión para contactar a '+nombre);setTimeout(()=>location.href='login.html',1500);return;} location.href='mensajes.html?contacto='+encodeURIComponent(nombre); };
-window.publicarAlerta = function() { const t=document.getElementById('al-titulo').value.trim(); if(!t){mostrarToast('Escribe un título para la alerta');return;} cerrarModal('modal-alerta'); mostrarToast('✅ Alerta publicada. Aparece como "Reportada" hasta confirmación.'); };
-window.publicarSolicitud = function() { const t=document.getElementById('sol-titulo').value.trim(); if(!t){mostrarToast('Escribe qué necesitas');return;} cerrarModal('modal-solicitud'); mostrarToast('✅ Solicitud publicada. Los técnicos de tu zona la verán.'); };
+async function obtenerUsuarioYPerfil() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session?.user) return { user:null, profile:null };
+  const { data: profile } = await sb.from('perfiles').select('distrito,zona').eq('id',session.user.id).maybeSingle();
+  return { user:session.user, profile:profile || null };
+}
+function extraerPresupuesto(texto='') {
+  const nums = String(texto).match(/\d+(?:[.,]\d+)?/g)?.map(v=>Number(v.replace(',','.'))) || [];
+  return { desde: nums[0] ?? null, hasta: nums[1] ?? nums[0] ?? null };
+}
+async function ubicacionAproximada() {
+  return new Promise(resolve => {
+    if (!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      p=>resolve({latitud:Number(p.coords.latitude.toFixed(6)),longitud:Number(p.coords.longitude.toFixed(6))}),
+      ()=>resolve(null),
+      {enableHighAccuracy:false,timeout:5000,maximumAge:300000}
+    );
+  });
+}
+window.publicarAlerta = async function() {
+  const titulo=document.getElementById('al-titulo').value.trim();
+  const descripcion=document.getElementById('al-desc').value.trim();
+  if(titulo.length<5){mostrarToast('Escribe un título más claro para la alerta');return;}
+  if(descripcion.length<10){mostrarToast('Agrega una descripción de al menos 10 caracteres');return;}
+  const {user,profile}=await obtenerUsuarioYPerfil();
+  if(!user){location.href='login.html?next=index.html';return;}
+  const ubicacion=await ubicacionAproximada();
+  const payload={
+    autor_id:user.id,
+    tipo_fuente:'ciudadana',
+    categoria:document.getElementById('al-cat').value,
+    titulo,
+    descripcion,
+    distrito:profile?.distrito || localStorage.getItem('mizona_zona') || 'Mi zona',
+    zona_referencia:document.getElementById('al-zona').value.trim() || profile?.zona || null,
+    latitud:ubicacion?.latitud ?? null,
+    longitud:ubicacion?.longitud ?? null,
+    estado:'reportada'
+  };
+  const {error}=await sb.from('alertas').insert(payload);
+  if(error){mostrarToast('No se pudo publicar: '+error.message);return;}
+  cerrarModal('modal-alerta');
+  ['al-titulo','al-desc','al-zona'].forEach(id=>document.getElementById(id).value='');
+  mostrarToast('✅ Alerta publicada correctamente.');
+  cargarAlertasSupabase();
+};
+window.publicarSolicitud = async function() {
+  const titulo=document.getElementById('sol-titulo').value.trim();
+  const descripcion=document.getElementById('sol-desc').value.trim();
+  if(titulo.length<5){mostrarToast('Escribe con más detalle qué necesitas');return;}
+  if(descripcion.length<10){mostrarToast('Agrega una descripción de al menos 10 caracteres');return;}
+  const {user,profile}=await obtenerUsuarioYPerfil();
+  if(!user){location.href='login.html?next=index.html';return;}
+  const pres=extraerPresupuesto(document.getElementById('sol-pres').value);
+  const urgTexto=document.getElementById('sol-urg').value;
+  const urgencia=urgTexto==='Hoy mismo'?'hoy':urgTexto==='Sin urgencia'?'normal':'urgente';
+  const payload={
+    usuario_id:user.id,
+    categoria:document.getElementById('sol-cat').value,
+    titulo,
+    descripcion,
+    distrito:profile?.distrito || localStorage.getItem('mizona_zona') || 'Mi zona',
+    presupuesto_desde:pres.desde,
+    presupuesto_hasta:pres.hasta,
+    urgencia,
+    estado:'abierta'
+  };
+  const {error}=await sb.from('solicitudes_mizona').insert(payload);
+  if(error){mostrarToast('No se pudo publicar: '+error.message);return;}
+  cerrarModal('modal-solicitud');
+  ['sol-titulo','sol-desc','sol-pres'].forEach(id=>document.getElementById(id).value='');
+  mostrarToast('✅ Solicitud publicada correctamente.');
+};
 window.activarPanico = function() {
   if(!navigator.geolocation){mostrarToast('Activa el GPS primero');return;}
   if(!confirm('⚠️ ¿Confirmas que hay una emergencia real? Esto alertará a vecinos en 500m.')) return;
@@ -458,5 +531,6 @@ document.head.appendChild(st);
 initAuth();
 initMapa();
 </script>
+<script type="module" src="./js/mizona-core.js"></script>
 </body>
 </html>

@@ -1,0 +1,192 @@
+/* ============================================================
+   MiZona.pe — capa visual unificada v1.0
+   Unifica páginas nuevas, heredadas y formularios de acceso.
+   ============================================================ */
+:root{
+  --mz-blue:#185FA5;
+  --mz-blue-soft:#EFF6FF;
+  --mz-green:#1D9E75;
+  --mz-red:#E24B4A;
+  --mz-bg:#F1F5F9;
+  --mz-card:#FFFFFF;
+  --mz-text:#1E293B;
+  --mz-muted:#64748B;
+  --mz-border:#E2E8F0;
+  --mz-radius:14px;
+  --mz-shadow:0 8px 28px rgba(15,23,42,.08);
+  --primary:var(--mz-blue);
+  --primary-2:var(--mz-green);
+  --danger:var(--mz-red);
+}
+html{color-scheme:light}
+body:not(.clips-page){background:var(--mz-bg);color:var(--mz-text)}
+body{font-size:14px;line-height:1.45}
+button,a,input,select,textarea{transition:border-color .18s,box-shadow .18s,background-color .18s,transform .18s}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid rgba(24,95,165,.22);outline-offset:2px
+}
+
+/* Marca */
+.brand-mark,.mz-logo-mark,.mz-brand-badge{
+  background:linear-gradient(135deg,var(--mz-blue),var(--mz-green))!important;
+  color:#fff!important;border-radius:10px!important;box-shadow:0 6px 18px rgba(24,95,165,.2)
+}
+.brand-mark{font-size:11px;letter-spacing:.02em}
+
+/* Páginas basadas en mizona.css */
+.mz-layout{grid-template-columns:230px minmax(0,1fr) 240px;max-width:1320px}
+.mz-layout-2col{grid-template-columns:230px minmax(0,1fr);max-width:1180px}
+.mz-sidebar{box-shadow:8px 0 24px rgba(15,23,42,.08)}
+.mz-logo{padding:18px 16px 15px}
+.mz-logo-name{font-size:18px}
+.mz-logo-domain,.mz-nav-sec{font-size:10px}
+.mz-nav-item{padding:10px 16px}
+.mz-nav-item span{font-size:13px}
+.mz-user-name{font-size:12px}.mz-user-dist{font-size:11px}
+.mz-sidebar-btn{font-size:12px;padding:11px}
+.mz-topbar{min-height:58px;padding:10px 18px}
+.mz-search,.mz-dist-tag{font-size:12px}
+.mz-feed-body{padding:18px;gap:14px}
+.mz-card-title{font-size:14px}.mz-card-link{font-size:12px}
+.mz-zona{font-size:10px;padding:3px 9px}
+.mz-svc-name{font-size:12px}.mz-svc-trade,.mz-svc-stars,.mz-verificado{font-size:10px}
+.mz-svc-btn,.mz-ac-btn,.mz-sol-btn{font-size:11px;min-height:32px}
+.mz-ac-title,.mz-sol-title{font-size:13px}.mz-ac-meta,.mz-sol-meta{font-size:11px}
+.mz-page-title h1{font-size:26px;letter-spacing:-.02em}
+.mz-page-title p{font-size:14px}
+.mz-card,.mz-sol,.mz-alerta-ciudadana{box-shadow:var(--mz-shadow)}
+
+/* Convierte las tres páginas oscuras antiguas al estilo claro MiZona */
+body:not(.clips-page){
+  --bg:var(--mz-bg);--panel:#fff;--panel-2:#F8FAFC;--panel-3:#EFF6FF;
+  --line:var(--mz-border);--text:var(--mz-text);--muted:var(--mz-muted);
+  --blue:var(--mz-blue);--blue-2:#2478BC;--red:var(--mz-red);--green:var(--mz-green);
+  --surface:#fff;--surface-2:#F8FAFC;--border:var(--mz-border)
+}
+.mz-app{background:var(--mz-bg)}
+.mz-app>.mz-sidebar{background:#111827;border-right:0;color:#fff}
+.mz-app .mz-brand strong,.mz-app .mz-brand{color:#fff}
+.mz-app .mz-brand small{color:#94A3B8}
+.mz-app .mz-nav a{color:#94A3B8}
+.mz-app .mz-nav a:hover,.mz-app .mz-nav a.active{background:rgba(24,95,165,.28);color:#fff}
+.mz-app .mz-side-card{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)}
+.mz-app .mz-side-card p{color:#94A3B8}
+.mz-app .mz-main{background:var(--mz-bg)}
+.mz-app .mz-topbar{height:64px;background:rgba(255,255,255,.96);border-color:var(--mz-border);box-shadow:0 1px 5px rgba(15,23,42,.06)}
+.mz-app .mz-zone,.mz-app .mz-search input,.mz-app .mz-btn.ghost{background:#F8FAFC;color:var(--mz-text);border-color:var(--mz-border)}
+.mz-app .mz-card{background:#fff;border-color:var(--mz-border);box-shadow:var(--mz-shadow)}
+.mz-app .mz-card-head{border-color:var(--mz-border)}
+.mz-app .mz-field label,.mz-app .mz-field span{color:var(--mz-muted)}
+.mz-app .mz-field input,.mz-app .mz-field select,.mz-app .mz-field textarea{background:#fff;color:var(--mz-text);border-color:#CBD5E1}
+.mz-app .mz-feed-card{border-color:var(--mz-border)}
+.mz-app .mz-feed-card p{color:var(--mz-muted)}
+.mz-app .mz-filter{background:#fff;color:var(--mz-text);border-color:var(--mz-border)}
+.mz-app .mz-filter.active{background:var(--mz-blue);color:#fff}
+.mz-app .mz-toast{background:#0F172A;color:#fff}
+.mz-app .mz-mobile-bottom{background:#fff;border-color:var(--mz-border);box-shadow:0 -8px 24px rgba(15,23,42,.08)}
+.mz-app .mz-mobile-bottom a{color:var(--mz-muted)}
+.mz-app .mz-mobile-bottom a.active{color:var(--mz-blue)}
+.mz-app .mz-mobile-bottom .plus{box-shadow:0 0 0 4px #fff}
+
+/* Páginas heredadas de SocialGo: nueva paleta clara */
+body:not(.clips-page) .page-shell{width:min(1180px,100%);padding:24px}
+body:not(.clips-page) .page-card,
+body:not(.clips-page) .auth-card,
+body:not(.clips-page) .admin-card,
+body:not(.clips-page) .panel,
+body:not(.clips-page) .composer,
+body:not(.clips-page) .post{
+  background:#fff;color:var(--mz-text);border:1px solid var(--mz-border);box-shadow:var(--mz-shadow)
+}
+body:not(.clips-page) .auth-card{width:min(480px,100%);padding:30px;border-radius:20px}
+body:not(.clips-page) .auth-card .brand{justify-content:center;margin-bottom:24px;color:var(--mz-text)}
+body:not(.clips-page) .auth-card h1{text-align:center;font-size:27px;letter-spacing:-.025em}
+body:not(.clips-page) .auth-card p{text-align:center;color:var(--mz-muted)}
+body:not(.clips-page) .auth-card label,
+body:not(.clips-page) .field{color:var(--mz-muted)}
+body:not(.clips-page) input,
+body:not(.clips-page) select,
+body:not(.clips-page) textarea{
+  background:#fff!important;color:var(--mz-text)!important;border-color:#CBD5E1!important
+}
+body:not(.clips-page) input::placeholder,body:not(.clips-page) textarea::placeholder{color:#94A3B8}
+body:not(.clips-page) .primary{background:linear-gradient(90deg,var(--mz-blue),#2478BC);color:#fff}
+body:not(.clips-page) .secondary{background:#fff;color:var(--mz-text);border-color:#CBD5E1}
+body:not(.clips-page) .secondary:hover{background:#F8FAFC;border-color:var(--mz-blue)}
+body:not(.clips-page) .notice{background:#F8FAFC;color:var(--mz-muted);border-color:var(--mz-border)}
+body:not(.clips-page) .brand{color:var(--mz-text)}
+body:not(.clips-page) .admin-toolbar{background:#fff;border:1px solid var(--mz-border);border-radius:16px;padding:12px 16px;box-shadow:var(--mz-shadow)}
+body:not(.clips-page) .admin-table{color:var(--mz-text)}
+body:not(.clips-page) .admin-table th{background:#F8FAFC;color:var(--mz-muted)}
+body:not(.clips-page) .admin-table td,body:not(.clips-page) .admin-table th{border-color:var(--mz-border)}
+body:not(.clips-page) .notification-item,
+body:not(.clips-page) .conversation-item,
+body:not(.clips-page) .user-result,
+body:not(.clips-page) .friend-card{background:#fff;border-color:var(--mz-border);color:var(--mz-text)}
+body:not(.clips-page) small,body:not(.clips-page) .muted{color:var(--mz-muted)}
+
+/* Formularios y diálogos nuevos */
+.mz-dialog{width:min(620px,calc(100% - 24px));border:0;border-radius:18px;padding:0;background:#fff;color:var(--mz-text);box-shadow:0 30px 90px rgba(15,23,42,.28)}
+.mz-dialog::backdrop{background:rgba(15,23,42,.58);backdrop-filter:blur(3px)}
+.mz-dialog-head{display:flex;align-items:center;justify-content:space-between;padding:17px 20px;border-bottom:1px solid var(--mz-border)}
+.mz-dialog-head h2{margin:0;font-size:20px}.mz-dialog-close{border:0;background:#F1F5F9;width:36px;height:36px;border-radius:50%;color:var(--mz-text)}
+.mz-dialog-body{padding:20px}.mz-dialog-actions{display:flex;justify-content:flex-end;gap:10px;padding:16px 20px;border-top:1px solid var(--mz-border)}
+.mz-empty-state{padding:34px 20px;text-align:center;color:var(--mz-muted)}
+.mz-empty-state i{display:block;font-size:36px;color:#94A3B8;margin-bottom:8px}
+.mz-global-toast{position:fixed;right:18px;bottom:18px;z-index:1000;max-width:min(380px,calc(100% - 36px));padding:12px 16px;border-radius:12px;background:#0F172A;color:#fff;box-shadow:0 18px 50px rgba(15,23,42,.28);opacity:0;transform:translateY(12px);pointer-events:none}
+.mz-global-toast.show{opacity:1;transform:translateY(0)}.mz-global-toast[data-type="error"]{background:#991B1B}
+
+/* Clips conserva fondo oscuro por tratarse de video, pero usa marca MiZona */
+.clips-page{--primary:#185FA5;--primary-2:#1D9E75}
+.clips-page .clips-header{border-bottom-color:rgba(255,255,255,.1)}
+
+@media(max-width:880px){
+  .mz-layout,.mz-layout-2col{display:block;max-width:none}
+  .mz-layout>.mz-sidebar,.mz-layout-2col>.mz-sidebar{display:none}
+  .mz-feed{border:0;min-height:100vh}
+  .mz-topbar{top:0}
+  .mz-feed-body{padding:14px 12px 86px}
+  .mz-svc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mz-app .mz-sidebar{box-shadow:20px 0 50px rgba(15,23,42,.28)}
+}
+@media(max-width:620px){
+  body{font-size:14px}
+  .mz-page-title{align-items:flex-start;flex-direction:column}
+  .mz-page-title .mz-btn{width:100%}
+  .mz-svc-grid{grid-template-columns:1fr}
+  .mz-topbar{padding:8px 10px}.mz-dist-tag{max-width:145px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body:not(.clips-page) .page-shell{padding:12px}
+  body:not(.clips-page) .page-card{padding:16px;border-radius:15px}
+  body:not(.clips-page) .auth-page{padding:14px}
+  body:not(.clips-page) .auth-card{padding:22px 18px}
+  .mz-dialog-actions{flex-direction:column-reverse}.mz-dialog-actions>*{width:100%}
+}
+
+/* Panel Mi Negocio: misma escala y ancho que el resto de MiZona */
+.layout{grid-template-columns:230px minmax(0,1fr)!important;max-width:1180px!important}
+.sb-logo{padding:18px 16px 15px!important}.sb-logo-mark{background:linear-gradient(135deg,var(--mz-blue),var(--mz-green))!important}
+.sb-logo-name{font-size:17px!important}.sb-logo-sub,.sb-sec{font-size:10px!important}
+.sb-item{padding:10px 16px!important}.sb-item span{font-size:12px!important}
+.body{padding:18px!important;gap:16px!important}.topbar{min-height:60px;padding:10px 18px!important}
+.stat-label,.tab-btn,.field-label,.or-desc,.or-meta,.sol-desc{font-size:11px!important}
+.form-card-title,.or-title,.sol-name{font-size:13px!important}
+.field-input{font-size:13px!important;min-height:40px!important}
+.topbar-btn,.form-submit,.form-cancel{font-size:12px!important;min-height:38px!important}
+
+/* Ajustes comunes de lectura para páginas heredadas */
+body:not(.clips-page) .page-card h1{font-size:28px;letter-spacing:-.025em;margin-top:0}
+body:not(.clips-page) .page-card h2{font-size:20px;color:var(--mz-text)}
+body:not(.clips-page) .page-card p{color:var(--mz-muted)}
+body:not(.clips-page) .status-badge{background:var(--mz-blue-soft);color:var(--mz-blue);border-color:#BFDBFE}
+body:not(.clips-page) .messages-shell,
+body:not(.clips-page) .chat-shell,
+body:not(.clips-page) .conversation-list,
+body:not(.clips-page) .messages-panel{background:#fff!important;border-color:var(--mz-border)!important;color:var(--mz-text)!important}
+body:not(.clips-page) .message-bubble{background:#F1F5F9!important;color:var(--mz-text)!important}
+body:not(.clips-page) .message-row.mine .message-bubble{background:var(--mz-blue)!important;color:#fff!important}
+body:not(.clips-page) .notification-item.unread{background:#EFF6FF!important;border-color:#BFDBFE!important}
+
+@media(max-width:880px){
+  .layout{display:block!important}.layout>.sidebar{display:none!important}.body{padding:14px 12px 86px!important}
+  .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}

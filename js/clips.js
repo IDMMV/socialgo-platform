@@ -81,6 +81,7 @@ let isProcessing = false;
 let textPosition = { x: 50, y: 48 };
 let draggingText = false;
 let dragOffset = { x: 0, y: 0 };
+let clipFeedMode = "all";
 
 async function requireUser(message) {
   const user = await getCurrentUser();
@@ -503,12 +504,34 @@ async function loadClips() {
     return;
   }
 
-  if (!data?.length) {
-    feed.innerHTML = `<section class="clip-empty"><section class="page-card"><h1>Todavía no hay clips</h1><p>Presiona Crear para publicar el primero.</p></section></section>`;
+  let visibleClips = data || [];
+  if (clipFeedMode === "following") {
+    const user = await getCurrentUser();
+    if (!user) {
+      feed.innerHTML = `<section class="clip-empty"><section class="page-card"><h1>Inicia sesión</h1><p>Necesitas una cuenta para ver los clips de las personas que sigues.</p><a class="primary" href="login.html?next=clips.html">Iniciar sesión</a></section></section>`;
+      return;
+    }
+    const { data: followed, error: followedError } = await supabase
+      .from("seguidores")
+      .select("seguido_id")
+      .eq("seguidor_id", user.id);
+    if (followedError) {
+      feed.innerHTML = `<section class="clip-empty"><div class="notice">${escapeHtml(followedError.message)}</div></section>`;
+      return;
+    }
+    const followedIds = new Set((followed || []).map(item => item.seguido_id));
+    visibleClips = visibleClips.filter(clip => followedIds.has(clip.autor_id));
+  }
+
+  if (!visibleClips.length) {
+    const message = clipFeedMode === "following"
+      ? "Aún no hay clips de las personas que sigues."
+      : "Todavía no hay clips. Presiona Crear para publicar el primero.";
+    feed.innerHTML = `<section class="clip-empty"><section class="page-card"><h1>Sin clips por ahora</h1><p>${message}</p></section></section>`;
     return;
   }
 
-  feed.innerHTML = data.map(renderClip).join("");
+  feed.innerHTML = visibleClips.map(renderClip).join("");
   bindClipActions();
   startVideoObserver();
 }
@@ -752,6 +775,14 @@ commentForm.addEventListener("submit", async event => {
 
 document.querySelector("#closeClipComments")?.addEventListener("click", () => {
   commentsDialog.close();
+});
+
+document.querySelectorAll("[data-feed-mode]").forEach(button => {
+  button.addEventListener("click", async () => {
+    clipFeedMode = button.dataset.feedMode;
+    document.querySelectorAll("[data-feed-mode]").forEach(item => item.classList.toggle("active", item === button));
+    await loadClips();
+  });
 });
 
 await loadClips();

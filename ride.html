@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="css/mizona.css">
+<link rel="stylesheet" href="css/mizona-unified.css">
 </head>
 <body>
 <div class="mz-layout-2col">
@@ -63,5 +64,15 @@ conductores.forEach(c=>{
 });
 if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>{m.setView([pos.coords.latitude,pos.coords.longitude],15);},{});}
 </script>
+<nav class="mz-bottom-nav">
+  <div class="mz-bn-inner">
+    <div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
+    <div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
+    <div class="mz-bn-item"><div class="mz-bn-center" onclick="location.href='index.html#publicar'"><i class="ti ti-plus"></i></div></div>
+    <div class="mz-bn-item" onclick="location.href='servicios.html'"><i class="ti ti-tool"></i><span>Servicios</span></div>
+    <div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
+  </div>
+</nav>
+<script type="module" src="./js/mizona-core.js"></script>
 </body>
 </html>

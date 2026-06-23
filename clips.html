@@ -3,19 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#030712">
-  <title>Clips · SocialGo</title>
+  <meta name="theme-color" content="#185FA5">
+  <title>Clips · MiZona</title>
   <link rel="stylesheet" href="css/global.css">
+<link rel="stylesheet" href="css/mizona-unified.css">
 </head>
 <body class="clips-page">
   <header class="clips-header">
     <a class="clips-logo" href="index.html">
-      <span class="brand-mark">S</span>
-      <strong data-brand-name>SocialGo</strong>
+      <span class="brand-mark">MZ</span>
+      <strong data-brand-name>MiZona</strong>
     </a>
     <nav class="clips-tabs">
-      <button class="active" type="button">Para ti</button>
-      <button type="button">Siguiendo</button>
+      <button class="active" type="button" data-feed-mode="all">Para ti</button>
+      <button type="button" data-feed-mode="following">Siguiendo</button>
     </nav>
     <a class="clips-search" href="explorar.html" aria-label="Buscar">⌕</a>
   </header>
@@ -208,5 +209,6 @@
   </nav>
 
   <script type="module" src="js/clips.js"></script>
+<script type="module" src="./js/mizona-core.js"></script>
 </body>
 </html>

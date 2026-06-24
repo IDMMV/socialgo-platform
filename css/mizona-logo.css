@@ -1,0 +1,53 @@
+/* ============================================================
+   MiZona.pe — identidad visual oficial
+   ============================================================ */
+.mz3-brand{min-height:72px;padding:10px 14px!important}
+.mz3-brand-logo{display:block;width:198px;max-width:100%;height:auto;object-fit:contain;object-position:left center}
+
+.mz-logo,.mz-brand,.sb-logo{
+  min-height:68px!important;
+  display:flex!important;
+  align-items:center!important;
+  padding:10px 14px!important;
+  box-sizing:border-box!important;
+}
+.mz-logo-img,.mz-sidebar-logo,.sb-logo-img{
+  display:block!important;
+  width:195px!important;
+  max-width:100%!important;
+  height:auto!important;
+  object-fit:contain!important;
+  object-position:left center!important;
+}
+
+/* Logos sobre fondos claros, como acceso, registro y cabeceras auxiliares */
+.brand.mz-official-brand{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  width:max-content!important;
+  max-width:100%!important;
+  min-height:auto!important;
+  text-decoration:none!important;
+}
+.mz-brand-horizontal{
+  display:block!important;
+  width:210px!important;
+  max-width:100%!important;
+  height:auto!important;
+  object-fit:contain!important;
+}
+.mz-icon-logo{width:38px;height:38px;display:block;object-fit:contain}
+
+/* Evita que reglas antiguas vuelvan a mostrar MZ/textos encima del logo */
+.mz-logo-mark,.mz-logo-name,.mz-logo-domain,
+.mz-brand-badge,.sb-logo-mark,.sb-logo-name,.sb-logo-sub,
+.mz3-brand-mark,.mz3-brand-text{display:none!important}
+
+@media(max-width:900px){
+  .mz3-brand-logo,.mz-logo-img,.mz-sidebar-logo,.sb-logo-img{width:182px!important}
+}
+
+.clips-logo-img{display:block;width:150px;height:auto;object-fit:contain}
+.mz-preview-logo{display:block;width:190px;height:auto;object-fit:contain}
+@media(max-width:600px){.clips-logo-img{width:112px}}

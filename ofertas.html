@@ -1,69 +1,70 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>Zona Ofertas — MiZona.pe</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
-<link rel="stylesheet" href="css/mizona.css">
-<link rel="stylesheet" href="css/mizona-unified.css">
-<link rel="stylesheet" href="css/mizona-phase2.css">
-<link rel="stylesheet" href="css/mizona-master-shell.css">
-</head>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet"/>
+<link href="css/mizona.css" rel="stylesheet"/>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
+<link href="css/mizona-phase2.css" rel="stylesheet"/>
+<link href="css/mizona-master-shell.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
 <body>
 <div class="mz-layout-2col">
 <aside class="mz-sidebar">
-  <div class="mz-logo"><div class="mz-logo-mark">MZ</div><div><div class="mz-logo-name">MiZona</div><div class="mz-logo-domain">mizona.pe</div></div></div>
-  <div class="mz-nav-sec">Principal</div>
-  <a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
-  <a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
-  <a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
-  <a class="mz-nav-item active" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
-  <div class="mz-sidebar-spacer"></div>
-  <a href="negocio.html" class="mz-sidebar-btn" style="text-decoration:none">🏪 Panel de mi negocio</a>
+<div class="mz-logo"><img alt="MiZona.pe" class="mz-logo-img" src="assets/mizona-logo-blanco.svg"/></div>
+<div class="mz-nav-sec">Principal</div>
+<a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
+<a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
+<a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
+<a class="mz-nav-item active" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
+<div class="mz-sidebar-spacer"></div>
+<a class="mz-sidebar-btn" href="negocio.html" style="text-decoration:none">🏪 Panel de mi negocio</a>
 </aside>
 <main class="mz-feed">
-  <div class="mz-topbar">
-    <div class="mz-search"><i class="ti ti-search"></i><span>Buscar ofertas...</span></div>
-    <div class="mz-dist-tag"><i class="ti ti-map-pin"></i> Tu zona</div>
-  </div>
-  <div class="mz-feed-body">
-    <span class="mz-zona am">Zona Ofertas</span>
-    <div style="background:linear-gradient(135deg,#1e3a5f,#0f2a47);border-radius:12px;padding:14px;margin-bottom:4px">
-      <div style="font-size:8px;font-weight:800;background:#185FA5;color:#fff;border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:5px">🎁 OFERTAS PARA VECINOS DE TU ZONA</div>
-      <div style="font-size:14px;font-weight:700;color:#f1f5f9;margin-bottom:3px">Beneficios exclusivos</div>
-      <div style="font-size:9px;color:#93c5fd">Solo para usuarios MiZona de tu distrito</div>
-    </div>
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)">
-      <div style="background:linear-gradient(135deg,#5B21B6,#722ED1);padding:14px;display:flex;align-items:center;justify-content:space-between">
-        <div><div style="font-size:9px;color:rgba(255,255,255,.8)">Oferta de demostración</div><div style="font-size:14px;font-weight:800;color:#fff">Beneficio próximo</div></div>
-        <div style="font-size:20px;font-weight:800;color:#fff">💜</div>
-      </div>
-      <div style="padding:10px 12px">
-        <div style="font-size:10px;font-weight:700;color:#1e293b;margin-bottom:3px">Promociones verificadas para vecinos</div>
-        <div style="font-size:9px;color:#475569">Las promociones reales deberán ser publicadas por negocios verificados y mostrar condiciones, vigencia y stock.</div>
-        <button type="button" style="width:100%;background:#722ED1;color:#fff;border:none;border-radius:8px;padding:10px;font-size:12px;font-weight:700;margin-top:8px;cursor:pointer" onclick="localStorage.setItem('mizona_interes_ofertas','1');window.mzToast('Listo. Te avisaremos cuando existan ofertas verificadas en tu zona.')">Avisarme cuando esté disponible</button>
-      </div>
-    </div>
-    <div style="text-align:center;padding:20px;color:#94a3b8;font-size:11px">
-      <div style="font-size:30px;margin-bottom:8px">🏪</div>
-      <div style="font-weight:700;color:#475569;margin-bottom:4px">¿Tienes un negocio?</div>
-      <div style="margin-bottom:12px">Publica tus ofertas gratis y llega a los vecinos de tu zona</div>
-      <a href="negocio.html" style="background:#185FA5;color:#fff;border-radius:8px;padding:9px 20px;font-size:11px;font-weight:700;display:inline-block">Ir a mi panel de negocio →</a>
-    </div>
-  </div>
+<div class="mz-topbar">
+<div class="mz-search"><i class="ti ti-search"></i><span>Buscar ofertas...</span></div>
+<div class="mz-dist-tag"><i class="ti ti-map-pin"></i> Tu zona</div>
+</div>
+<div class="mz-feed-body">
+<span class="mz-zona am">Zona Ofertas</span>
+<div style="background:linear-gradient(135deg,#1e3a5f,#0f2a47);border-radius:12px;padding:14px;margin-bottom:4px">
+<div style="font-size:8px;font-weight:800;background:#185FA5;color:#fff;border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:5px">🎁 OFERTAS PARA VECINOS DE TU ZONA</div>
+<div style="font-size:14px;font-weight:700;color:#f1f5f9;margin-bottom:3px">Beneficios exclusivos</div>
+<div style="font-size:9px;color:#93c5fd">Solo para usuarios MiZona de tu distrito</div>
+</div>
+<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)">
+<div style="background:linear-gradient(135deg,#5B21B6,#722ED1);padding:14px;display:flex;align-items:center;justify-content:space-between">
+<div><div style="font-size:9px;color:rgba(255,255,255,.8)">Oferta de demostración</div><div style="font-size:14px;font-weight:800;color:#fff">Beneficio próximo</div></div>
+<div style="font-size:20px;font-weight:800;color:#fff">💜</div>
+</div>
+<div style="padding:10px 12px">
+<div style="font-size:10px;font-weight:700;color:#1e293b;margin-bottom:3px">Promociones verificadas para vecinos</div>
+<div style="font-size:9px;color:#475569">Las promociones reales deberán ser publicadas por negocios verificados y mostrar condiciones, vigencia y stock.</div>
+<button onclick="localStorage.setItem('mizona_interes_ofertas','1');window.mzToast('Listo. Te avisaremos cuando existan ofertas verificadas en tu zona.')" style="width:100%;background:#722ED1;color:#fff;border:none;border-radius:8px;padding:10px;font-size:12px;font-weight:700;margin-top:8px;cursor:pointer" type="button">Avisarme cuando esté disponible</button>
+</div>
+</div>
+<div style="text-align:center;padding:20px;color:#94a3b8;font-size:11px">
+<div style="font-size:30px;margin-bottom:8px">🏪</div>
+<div style="font-weight:700;color:#475569;margin-bottom:4px">¿Tienes un negocio?</div>
+<div style="margin-bottom:12px">Publica tus ofertas gratis y llega a los vecinos de tu zona</div>
+<a href="negocio.html" style="background:#185FA5;color:#fff;border-radius:8px;padding:9px 20px;font-size:11px;font-weight:700;display:inline-block">Ir a mi panel de negocio →</a>
+</div>
+</div>
 </main>
 </div>
 <nav class="mz-bottom-nav">
-  <div class="mz-bn-inner">
-    <div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
-    <div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
-    <div class="mz-bn-item"><div class="mz-bn-center" onclick="location.href='index.html#publicar'"><i class="ti ti-plus"></i></div></div>
-    <div class="mz-bn-item active" onclick="location.href='ofertas.html'"><i class="ti ti-tag"></i><span>Ofertas</span></div>
-    <div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
-  </div>
+<div class="mz-bn-inner">
+<div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
+<div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
+<div class="mz-bn-item"><div class="mz-bn-center" onclick="location.href='index.html#publicar'"><i class="ti ti-plus"></i></div></div>
+<div class="mz-bn-item active" onclick="location.href='ofertas.html'"><i class="ti ti-tag"></i><span>Ofertas</span></div>
+<div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
+</div>
 </nav>
-<script type="module" src="./js/mizona-core.js"></script>
-<script type="module" src="./js/mizona-master-shell.js"></script>
+<script src="./js/mizona-core.js" type="module"></script>
+<script src="./js/mizona-master-shell.js" type="module"></script>
 </body>
 </html>

@@ -1,37 +1,32 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Perfil · MiZona</title>
-  <link rel="stylesheet" href="css/global.css">
-<link rel="stylesheet" href="css/mizona-unified.css">
-<link rel="stylesheet" href="css/mizona-phase2.css">
-<link rel="stylesheet" href="css/mizona-master-shell.css">
-</head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Perfil · MiZona</title>
+<link href="css/global.css" rel="stylesheet"/>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
+<link href="css/mizona-phase2.css" rel="stylesheet"/>
+<link href="css/mizona-master-shell.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
 <body>
-  <main class="page-shell">
-    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
-      <a class="brand" href="index.html">
-        <span class="brand-mark">MZ</span>
-        <span data-brand-name>MiZona</span>
-      </a>
-      <a class="secondary" href="explorar.html">← Explorar</a>
-    </header>
-
-    <section class="page-card" id="profileBox">
-      <p class="notice">Cargando perfil…</p>
-    </section>
-
-    <section class="page-card" style="margin-top:18px">
-      <h2>Publicaciones</h2>
-      <div id="userPosts" class="activity-grid">
-        <p class="notice">Cargando publicaciones…</p>
-      </div>
-    </section>
-  </main>
-
-  <script type="module">
+<main class="page-shell">
+<header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
+<a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a>
+<a class="secondary" href="explorar.html">← Explorar</a>
+</header>
+<section class="page-card" id="profileBox">
+<p class="notice">Cargando perfil…</p>
+</section>
+<section class="page-card" style="margin-top:18px">
+<h2>Publicaciones</h2>
+<div class="activity-grid" id="userPosts">
+<p class="notice">Cargando publicaciones…</p>
+</div>
+</section>
+</main>
+<script type="module">
     import { applyBrand } from "./js/brand.js";
     import { supabase, getCurrentUser } from "./js/supabase.js";
 
@@ -138,7 +133,7 @@
       }
     }
   </script>
-<script type="module" src="./js/mizona-core.js"></script>
-<script type="module" src="./js/mizona-master-shell.js"></script>
+<script src="./js/mizona-core.js" type="module"></script>
+<script src="./js/mizona-master-shell.js" type="module"></script>
 </body>
 </html>

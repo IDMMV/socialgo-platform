@@ -1,40 +1,35 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Explorar personas · MiZona.pe</title>
-  <link rel="stylesheet" href="css/global.css">
-<link rel="stylesheet" href="css/mizona-unified.css">
-<link rel="stylesheet" href="css/mizona-phase2.css">
-<link rel="stylesheet" href="css/mizona-master-shell.css">
-</head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Explorar personas · MiZona.pe</title>
+<link href="css/global.css" rel="stylesheet"/>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
+<link href="css/mizona-phase2.css" rel="stylesheet"/>
+<link href="css/mizona-master-shell.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
 <body>
-  <main class="page-shell">
-    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
-      <a class="brand" href="index.html">
-        <span class="brand-mark">MZ</span>
-        <span data-brand-name>MiZona.pe</span>
-      </a>
-      <a class="secondary" href="index.html">← Volver</a>
-    </header>
-
-    <section class="page-card">
-      <h1>Explorar personas</h1>
-      <form id="searchForm" class="comment-form">
-        <input id="searchInput" maxlength="50" placeholder="Buscar por nombre o usuario">
-        <button class="primary" type="submit">Buscar</button>
-      </form>
-    </section>
-
-    <section class="page-card" style="margin-top:18px">
-      <div id="peopleList" class="people-grid">
-        <p class="notice">Cargando usuarios…</p>
-      </div>
-    </section>
-  </main>
-
-  <script type="module">
+<main class="page-shell">
+<header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
+<a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a>
+<a class="secondary" href="index.html">← Volver</a>
+</header>
+<section class="page-card">
+<h1>Explorar personas</h1>
+<form class="comment-form" id="searchForm">
+<input id="searchInput" maxlength="50" placeholder="Buscar por nombre o usuario"/>
+<button class="primary" type="submit">Buscar</button>
+</form>
+</section>
+<section class="page-card" style="margin-top:18px">
+<div class="people-grid" id="peopleList">
+<p class="notice">Cargando usuarios…</p>
+</div>
+</section>
+</main>
+<script type="module">
     import { applyBrand } from "./js/brand.js";
     import { supabase, getCurrentUser } from "./js/supabase.js";
 
@@ -148,7 +143,7 @@
 
     await loadPeople();
   </script>
-<script type="module" src="./js/mizona-core.js"></script>
-<script type="module" src="./js/mizona-master-shell.js"></script>
+<script src="./js/mizona-core.js" type="module"></script>
+<script src="./js/mizona-master-shell.js" type="module"></script>
 </body>
 </html>

@@ -1,15 +1,16 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#185FA5">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#185FA5" name="theme-color"/>
 <title>Notificaciones — MiZona.pe</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
-<link rel="stylesheet" href="css/mizona.css">
-<link rel="stylesheet" href="css/mizona-unified.css">
-<link rel="stylesheet" href="css/mizona-phase2.css">
+<link href="manifest.json" rel="manifest"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet"/>
+<link href="css/mizona.css" rel="stylesheet"/>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
+<link href="css/mizona-phase2.css" rel="stylesheet"/>
 <style>
 .push-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:14px;padding:14px}
 .push-card{background:#fff;border:1px solid var(--bd);border-radius:16px;overflow:hidden;box-shadow:0 8px 28px rgba(15,23,42,.04)}
@@ -30,111 +31,104 @@
 .device-item,.inbox-item{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #eef2f7}.device-item:last-child,.inbox-item:last-child{border-bottom:none}.device-icon,.inbox-icon{width:38px;height:38px;border-radius:12px;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto}.device-main,.inbox-main{min-width:0;flex:1}.device-main strong,.inbox-main strong{display:block;font-size:11px;color:#1e293b}.device-main small,.inbox-main small{display:block;font-size:9px;color:#94a3b8;margin-top:2px;line-height:1.4}.device-badge{font-size:8px;font-weight:800;padding:4px 7px;border-radius:999px;background:#dcfce7;color:#166534}.device-badge.off{background:#f1f5f9;color:#64748b}.inbox-item.unread{background:#faf8ff;margin:0 -10px;padding:12px 10px;border-radius:12px}.inbox-item button{border:none;background:transparent;color:#7c3aed;cursor:pointer;font-size:16px}.empty-state{padding:24px;text-align:center;color:#94a3b8;font-size:10px}.section-tabs{display:flex;gap:6px;padding:10px 16px;border-bottom:1px solid #eef2f7;overflow-x:auto}.section-tab{border:none;background:#f1f5f9;color:#64748b;border-radius:999px;padding:7px 11px;font-size:9px;font-weight:800;cursor:pointer;white-space:nowrap}.section-tab.active{background:#7c3aed;color:#fff}.ios-help{display:none;margin-top:12px;padding:12px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:10px;line-height:1.5}
 @media(max-width:900px){.push-grid{grid-template-columns:1fr;padding:10px;padding-bottom:90px}.pref-grid{grid-template-columns:1fr}.mz-topbar{position:sticky;top:0;z-index:50}.push-card{border-radius:14px}}
 </style>
-<link rel="stylesheet" href="css/mizona-master-shell.css">
-</head>
+<link href="css/mizona-master-shell.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
 <body>
 <div class="mz-layout-2col">
-  <aside class="mz-sidebar">
-    <div class="mz-logo"><div class="mz-logo-mark">MZ</div><div><div class="mz-logo-name">MiZona</div><div class="mz-logo-domain">mizona.pe</div></div></div>
-    <div class="mz-nav-sec">Principal</div>
-    <a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
-    <a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell-ringing"></i><span>Alertas</span></a>
-    <a class="mz-nav-item" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
-    <a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
-    <a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
-    <div class="mz-nav-sec">Comunidad</div>
-    <a class="mz-nav-item" href="mensajes.html"><i class="ti ti-messages"></i><span>Mensajes</span></a>
-    <a class="mz-nav-item" href="amistades.html"><i class="ti ti-users"></i><span>Amigos</span></a>
-    <a class="mz-nav-item active" href="notificaciones.html"><i class="ti ti-bell"></i><span>Notificaciones</span></a>
-    <div class="mz-nav-sec">Cuenta</div>
-    <a class="mz-nav-item" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
-    <div class="mz-sidebar-spacer"></div>
-  </aside>
-
-  <main class="mz-feed">
-    <div class="mz-topbar">
-      <div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--txt)">Centro de notificaciones</div><div style="font-size:10px;color:var(--txt3)">Alertas, mensajes y avisos importantes en tus dispositivos</div></div>
-      <button id="markAllRead" class="push-btn secondary"><i class="ti ti-checks"></i> Marcar todo como leído</button>
-    </div>
-
-    <div class="push-grid">
-      <section>
-        <article class="push-card">
-          <div class="push-head"><h2>Notificaciones en este dispositivo</h2><span id="pushBadge" class="device-badge off">Comprobando</span></div>
-          <div class="push-body">
-            <div class="push-status">
-              <div class="push-status-icon"><i class="ti ti-bell-ringing"></i></div>
-              <div><div id="pushStatusTitle" class="push-status-title">Comprobando compatibilidad…</div><div id="pushStatusText" class="push-status-text">MiZona verificará el navegador y el permiso de este dispositivo.</div></div>
-            </div>
-            <div class="push-actions">
-              <button id="enablePush" class="push-btn primary"><i class="ti ti-bell-plus"></i> Activar en este dispositivo</button>
-              <button id="disablePush" class="push-btn danger" hidden><i class="ti ti-bell-off"></i> Desactivar aquí</button>
-              <button id="refreshLocation" class="push-btn secondary"><i class="ti ti-current-location"></i> Actualizar mi zona</button>
-              <button id="testPush" class="push-btn secondary" hidden><i class="ti ti-send"></i> Enviar prueba</button>
-            </div>
-            <div id="configWarning" class="push-config-warning" hidden></div>
-            <div id="iosHelp" class="ios-help"><strong>iPhone/iPad:</strong> abre el menú Compartir, selecciona <em>Agregar a pantalla de inicio</em>, abre MiZona desde su icono y vuelve a activar las notificaciones.</div>
-          </div>
-        </article>
-
-        <article class="push-card" style="margin-top:14px">
-          <div class="push-head"><h2>Qué deseas recibir</h2><button id="savePreferences" class="push-btn primary"><i class="ti ti-device-floppy"></i> Guardar</button></div>
-          <div class="push-body">
-            <div class="toggle-row"><div class="toggle-copy"><strong>Alertas cercanas</strong><small>Robos, accidentes, incendios y avisos en el radio elegido.</small></div><label class="switch"><input id="prefAlertas" type="checkbox"><span class="slider"></span></label></div>
-            <div id="alertPreferences">
-              <div class="category-box">
-                <label><input type="checkbox" name="category" value="robo"> Robos</label>
-                <label><input type="checkbox" name="category" value="accidente"> Accidentes</label>
-                <label><input type="checkbox" name="category" value="agua"> Agua</label>
-                <label><input type="checkbox" name="category" value="luz"> Luz</label>
-                <label><input type="checkbox" name="category" value="mascota"> Mascotas</label>
-                <label><input type="checkbox" name="category" value="persona"> Personas</label>
-                <label><input type="checkbox" name="category" value="incendio"> Incendios</label>
-              </div>
-              <div class="pref-grid" style="margin-top:12px">
-                <div class="pref-field"><label for="prefRadius">Radio de alertas</label><select id="prefRadius"><option value="500">500 m</option><option value="1000">1 km</option><option value="1500">1.5 km</option><option value="2000">2 km</option><option value="5000">5 km</option><option value="10000">10 km</option><option value="20000">20 km</option></select></div>
-                <div class="pref-field"><label for="prefFrequency">Frecuencia</label><select id="prefFrequency"><option value="inmediato">Inmediatamente</option><option value="solo_emergencias">Solo emergencias</option><option value="desactivado">Desactivado</option></select></div>
-              </div>
-            </div>
-            <div class="toggle-row"><div class="toggle-copy"><strong>Confirmaciones de mis alertas</strong><small>Cuando otro vecino confirme un evento que reportaste.</small></div><label class="switch"><input id="prefConfirmations" type="checkbox"><span class="slider"></span></label></div>
-            <div class="toggle-row"><div class="toggle-copy"><strong>Mensajes privados</strong><small>Avisos inmediatos cuando alguien te escriba.</small></div><label class="switch"><input id="prefMessages" type="checkbox"><span class="slider"></span></label></div>
-            <div class="toggle-row"><div class="toggle-copy"><strong>Amistades</strong><small>Solicitudes nuevas y respuestas.</small></div><label class="switch"><input id="prefFriends" type="checkbox"><span class="slider"></span></label></div>
-            <div class="toggle-row"><div class="toggle-copy"><strong>Mi negocio</strong><small>Aprobaciones, rechazos y consultas empresariales.</small></div><label class="switch"><input id="prefBusiness" type="checkbox"><span class="slider"></span></label></div>
-            <div class="toggle-row"><div class="toggle-copy"><strong>Ofertas cercanas</strong><small>Promociones relevantes; desactivadas inicialmente para evitar saturación.</small></div><label class="switch"><input id="prefOffers" type="checkbox"><span class="slider"></span></label></div>
-            <div class="pref-grid" style="margin-top:13px">
-              <div class="pref-field"><label for="quietStart">No molestar desde</label><input id="quietStart" type="time"></div>
-              <div class="pref-field"><label for="quietEnd">No molestar hasta</label><input id="quietEnd" type="time"></div>
-            </div>
-            <div class="toggle-row"><div class="toggle-copy"><strong>Permitir emergencias en horario silencioso</strong><small>Solo incidentes clasificados como críticos.</small></div><label class="switch"><input id="prefEmergencyQuiet" type="checkbox"><span class="slider"></span></label></div>
-          </div>
-        </article>
-      </section>
-
-      <aside>
-        <article class="push-card">
-          <div class="push-head"><h2>Dispositivos registrados</h2><button id="reloadDevices" class="push-btn secondary" title="Actualizar"><i class="ti ti-refresh"></i></button></div>
-          <div id="deviceList" class="push-body"><div class="empty-state">Cargando dispositivos…</div></div>
-        </article>
-
-        <article class="push-card" style="margin-top:14px">
-          <div class="push-head"><h2>Avisos recientes</h2><span id="unreadCount" class="device-badge off">0 nuevos</span></div>
-          <div class="section-tabs"><button class="section-tab active" data-tab="push">MiZona</button><button class="section-tab" data-tab="social">Actividad social</button></div>
-          <div id="pushInbox" class="push-body"><div class="empty-state">Cargando avisos…</div></div>
-          <div id="socialInbox" class="push-body" hidden><div class="empty-state">Cargando actividad…</div></div>
-        </article>
-      </aside>
-    </div>
-  </main>
+<aside class="mz-sidebar">
+<div class="mz-logo"><img alt="MiZona.pe" class="mz-logo-img" src="assets/mizona-logo-blanco.svg"/></div>
+<div class="mz-nav-sec">Principal</div>
+<a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
+<a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell-ringing"></i><span>Alertas</span></a>
+<a class="mz-nav-item" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
+<a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
+<a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
+<div class="mz-nav-sec">Comunidad</div>
+<a class="mz-nav-item" href="mensajes.html"><i class="ti ti-messages"></i><span>Mensajes</span></a>
+<a class="mz-nav-item" href="amistades.html"><i class="ti ti-users"></i><span>Amigos</span></a>
+<a class="mz-nav-item active" href="notificaciones.html"><i class="ti ti-bell"></i><span>Notificaciones</span></a>
+<div class="mz-nav-sec">Cuenta</div>
+<a class="mz-nav-item" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
+<div class="mz-sidebar-spacer"></div>
+</aside>
+<main class="mz-feed">
+<div class="mz-topbar">
+<div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--txt)">Centro de notificaciones</div><div style="font-size:10px;color:var(--txt3)">Alertas, mensajes y avisos importantes en tus dispositivos</div></div>
+<button class="push-btn secondary" id="markAllRead"><i class="ti ti-checks"></i> Marcar todo como leído</button>
 </div>
-
+<div class="push-grid">
+<section>
+<article class="push-card">
+<div class="push-head"><h2>Notificaciones en este dispositivo</h2><span class="device-badge off" id="pushBadge">Comprobando</span></div>
+<div class="push-body">
+<div class="push-status">
+<div class="push-status-icon"><i class="ti ti-bell-ringing"></i></div>
+<div><div class="push-status-title" id="pushStatusTitle">Comprobando compatibilidad…</div><div class="push-status-text" id="pushStatusText">MiZona verificará el navegador y el permiso de este dispositivo.</div></div>
+</div>
+<div class="push-actions">
+<button class="push-btn primary" id="enablePush"><i class="ti ti-bell-plus"></i> Activar en este dispositivo</button>
+<button class="push-btn danger" hidden="" id="disablePush"><i class="ti ti-bell-off"></i> Desactivar aquí</button>
+<button class="push-btn secondary" id="refreshLocation"><i class="ti ti-current-location"></i> Actualizar mi zona</button>
+<button class="push-btn secondary" hidden="" id="testPush"><i class="ti ti-send"></i> Enviar prueba</button>
+</div>
+<div class="push-config-warning" hidden="" id="configWarning"></div>
+<div class="ios-help" id="iosHelp"><strong>iPhone/iPad:</strong> abre el menú Compartir, selecciona <em>Agregar a pantalla de inicio</em>, abre MiZona desde su icono y vuelve a activar las notificaciones.</div>
+</div>
+</article>
+<article class="push-card" style="margin-top:14px">
+<div class="push-head"><h2>Qué deseas recibir</h2><button class="push-btn primary" id="savePreferences"><i class="ti ti-device-floppy"></i> Guardar</button></div>
+<div class="push-body">
+<div class="toggle-row"><div class="toggle-copy"><strong>Alertas cercanas</strong><small>Robos, accidentes, incendios y avisos en el radio elegido.</small></div><label class="switch"><input id="prefAlertas" type="checkbox"/><span class="slider"></span></label></div>
+<div id="alertPreferences">
+<div class="category-box">
+<label><input name="category" type="checkbox" value="robo"/> Robos</label>
+<label><input name="category" type="checkbox" value="accidente"/> Accidentes</label>
+<label><input name="category" type="checkbox" value="agua"/> Agua</label>
+<label><input name="category" type="checkbox" value="luz"/> Luz</label>
+<label><input name="category" type="checkbox" value="mascota"/> Mascotas</label>
+<label><input name="category" type="checkbox" value="persona"/> Personas</label>
+<label><input name="category" type="checkbox" value="incendio"/> Incendios</label>
+</div>
+<div class="pref-grid" style="margin-top:12px">
+<div class="pref-field"><label for="prefRadius">Radio de alertas</label><select id="prefRadius"><option value="500">500 m</option><option value="1000">1 km</option><option value="1500">1.5 km</option><option value="2000">2 km</option><option value="5000">5 km</option><option value="10000">10 km</option><option value="20000">20 km</option></select></div>
+<div class="pref-field"><label for="prefFrequency">Frecuencia</label><select id="prefFrequency"><option value="inmediato">Inmediatamente</option><option value="solo_emergencias">Solo emergencias</option><option value="desactivado">Desactivado</option></select></div>
+</div>
+</div>
+<div class="toggle-row"><div class="toggle-copy"><strong>Confirmaciones de mis alertas</strong><small>Cuando otro vecino confirme un evento que reportaste.</small></div><label class="switch"><input id="prefConfirmations" type="checkbox"/><span class="slider"></span></label></div>
+<div class="toggle-row"><div class="toggle-copy"><strong>Mensajes privados</strong><small>Avisos inmediatos cuando alguien te escriba.</small></div><label class="switch"><input id="prefMessages" type="checkbox"/><span class="slider"></span></label></div>
+<div class="toggle-row"><div class="toggle-copy"><strong>Amistades</strong><small>Solicitudes nuevas y respuestas.</small></div><label class="switch"><input id="prefFriends" type="checkbox"/><span class="slider"></span></label></div>
+<div class="toggle-row"><div class="toggle-copy"><strong>Mi negocio</strong><small>Aprobaciones, rechazos y consultas empresariales.</small></div><label class="switch"><input id="prefBusiness" type="checkbox"/><span class="slider"></span></label></div>
+<div class="toggle-row"><div class="toggle-copy"><strong>Ofertas cercanas</strong><small>Promociones relevantes; desactivadas inicialmente para evitar saturación.</small></div><label class="switch"><input id="prefOffers" type="checkbox"/><span class="slider"></span></label></div>
+<div class="pref-grid" style="margin-top:13px">
+<div class="pref-field"><label for="quietStart">No molestar desde</label><input id="quietStart" type="time"/></div>
+<div class="pref-field"><label for="quietEnd">No molestar hasta</label><input id="quietEnd" type="time"/></div>
+</div>
+<div class="toggle-row"><div class="toggle-copy"><strong>Permitir emergencias en horario silencioso</strong><small>Solo incidentes clasificados como críticos.</small></div><label class="switch"><input id="prefEmergencyQuiet" type="checkbox"/><span class="slider"></span></label></div>
+</div>
+</article>
+</section>
+<aside>
+<article class="push-card">
+<div class="push-head"><h2>Dispositivos registrados</h2><button class="push-btn secondary" id="reloadDevices" title="Actualizar"><i class="ti ti-refresh"></i></button></div>
+<div class="push-body" id="deviceList"><div class="empty-state">Cargando dispositivos…</div></div>
+</article>
+<article class="push-card" style="margin-top:14px">
+<div class="push-head"><h2>Avisos recientes</h2><span class="device-badge off" id="unreadCount">0 nuevos</span></div>
+<div class="section-tabs"><button class="section-tab active" data-tab="push">MiZona</button><button class="section-tab" data-tab="social">Actividad social</button></div>
+<div class="push-body" id="pushInbox"><div class="empty-state">Cargando avisos…</div></div>
+<div class="push-body" hidden="" id="socialInbox"><div class="empty-state">Cargando actividad…</div></div>
+</article>
+</aside>
+</div>
+</main>
+</div>
 <nav class="mz-bottom-nav"><div class="mz-bn-inner">
-  <div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
-  <div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell-ringing"></i><span>Alertas</span></div>
-  <div class="mz-bn-item" onclick="location.href='mapa.html'"><i class="ti ti-map"></i><span>Mapa</span></div>
-  <div class="mz-bn-item active"><i class="ti ti-bell"></i><span>Avisos</span></div>
-  <div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
+<div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
+<div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell-ringing"></i><span>Alertas</span></div>
+<div class="mz-bn-item" onclick="location.href='mapa.html'"><i class="ti ti-map"></i><span>Mapa</span></div>
+<div class="mz-bn-item active"><i class="ti ti-bell"></i><span>Avisos</span></div>
+<div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
 </div></nav>
-
 <script type="module">
 import { supabase, getCurrentUser } from './js/supabase.js';
 import {
@@ -258,7 +252,7 @@ if(isOneSignalConfigured()) bootstrapPushNotifications().catch(()=>{});
 await Promise.all([renderStatus(),loadPreferences(),loadDevices(),loadPushInbox(),loadSocialInbox()]);
 supabase.channel(`push-inbox-${user.id}`).on('postgres_changes',{event:'*',schema:'public',table:'notification_inbox',filter:`user_id=eq.${user.id}`},()=>loadPushInbox()).subscribe();
 </script>
-<script type="module" src="./js/mizona-core.js"></script>
-<script type="module" src="./js/mizona-master-shell.js"></script>
+<script src="./js/mizona-core.js" type="module"></script>
+<script src="./js/mizona-master-shell.js" type="module"></script>
 </body>
 </html>

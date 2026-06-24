@@ -1,108 +1,102 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#185FA5">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#185FA5" name="theme-color"/>
 <title>Servicios | MiZona.pe</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
-<link rel="stylesheet" href="css/mizona-dark.css">
-<link rel="stylesheet" href="css/mizona-unified.css">
-<link rel="stylesheet" href="css/mizona-phase2.css">
-<link rel="stylesheet" href="css/mizona-master-shell.css">
-</head>
+<link href="manifest.json" rel="manifest"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet"/>
+<link href="css/mizona-dark.css" rel="stylesheet"/>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
+<link href="css/mizona-phase2.css" rel="stylesheet"/>
+<link href="css/mizona-master-shell.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
 <body>
 <div class="mz-app">
 <aside class="mz-sidebar">
-  <a class="mz-brand" href="index.html">
-    <span class="mz-brand-badge">MZ</span>
-    <span><strong><span data-brand-name>MiZona</span><span>.pe</span></strong><small data-brand-slogan>Tu zona, tu gente, tus oportunidades.</small></span>
-  </a>
-  <nav class="mz-nav">
-    <a href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
-    <a href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
-    <a href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
-    <a class="active" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
-    <a href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
-    <a href="perfil.html"><i class="ti ti-user"></i><span>Perfil</span></a>
-  </nav>
-  <section class="mz-side-card"><strong>Profesionales de tu zona</strong><p>Compara especialidades, reputación, disponibilidad y contacto antes de contratar.</p></section>
+<a class="mz-brand" href="index.html"><img alt="MiZona.pe" class="mz-logo-img" src="assets/mizona-logo-blanco.svg"/></a>
+<nav class="mz-nav">
+<a href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
+<a href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
+<a href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
+<a class="active" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
+<a href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
+<a href="perfil.html"><i class="ti ti-user"></i><span>Perfil</span></a>
+</nav>
+<section class="mz-side-card"><strong>Profesionales de tu zona</strong><p>Compara especialidades, reputación, disponibilidad y contacto antes de contratar.</p></section>
 </aside>
 <main class="mz-main">
 <header class="mz-topbar">
-  <button class="mz-btn ghost mz-menu-btn" data-menu aria-label="Abrir menú"><i class="ti ti-menu-2"></i></button>
-  <button class="mz-zone" data-change-zone><i class="ti ti-map-pin"></i> <span data-zone>Ventanilla, Callao</span></button>
-  <label class="mz-search"><i class="ti ti-search"></i><input id="serviceSearch" type="search" placeholder="Buscar electricista, gasfitero, limpieza..."></label>
-  <div class="mz-actions">
-    <button class="mz-btn primary" id="openServiceForm"><i class="ti ti-plus"></i> <span class="text">Publicar servicio</span></button>
-    <a class="mz-btn ghost" href="notificaciones.html" aria-label="Notificaciones"><i class="ti ti-bell"></i></a>
-    <a class="mz-btn ghost" href="perfil.html"><i class="ti ti-user"></i> <span class="text">Perfil</span></a>
-  </div>
+<button aria-label="Abrir menú" class="mz-btn ghost mz-menu-btn" data-menu=""><i class="ti ti-menu-2"></i></button>
+<button class="mz-zone" data-change-zone=""><i class="ti ti-map-pin"></i> <span data-zone="">Ventanilla, Callao</span></button>
+<label class="mz-search"><i class="ti ti-search"></i><input id="serviceSearch" placeholder="Buscar electricista, gasfitero, limpieza..." type="search"/></label>
+<div class="mz-actions">
+<button class="mz-btn primary" id="openServiceForm"><i class="ti ti-plus"></i> <span class="text">Publicar servicio</span></button>
+<a aria-label="Notificaciones" class="mz-btn ghost" href="notificaciones.html"><i class="ti ti-bell"></i></a>
+<a class="mz-btn ghost" href="perfil.html"><i class="ti ti-user"></i> <span class="text">Perfil</span></a>
+</div>
 </header>
 <div class="mz-content">
-  <div class="mz-page-title">
-    <div><h1>Servicios cerca de ti</h1><p>Encuentra profesionales y negocios de confianza en tu distrito.</p></div>
-    <button class="mz-btn primary" id="openServiceFormSecondary"><i class="ti ti-speakerphone"></i> Ofrecer mi servicio</button>
-  </div>
-
-  <section class="mz-card">
-    <div class="mz-card-pad">
-      <div class="mz-form">
-        <label class="mz-field"><span>Buscar</span><input id="serviceSearchMobile" placeholder="Nombre, categoría o descripción"></label>
-        <label class="mz-field"><span>Categoría</span>
-          <select id="serviceCategory">
-            <option value="todas">Todas</option>
-            <option value="Electricidad">Electricidad</option>
-            <option value="Gasfitería">Gasfitería</option>
-            <option value="Limpieza">Limpieza</option>
-            <option value="Carpintería">Carpintería</option>
-            <option value="Pintura">Pintura</option>
-            <option value="Tecnología">Tecnología</option>
-            <option value="Otros">Otros</option>
-          </select>
-        </label>
-      </div>
-    </div>
-  </section>
-
-  <section class="mz-card" style="margin-top:14px">
-    <div class="mz-card-head"><h2>Profesionales disponibles</h2><span id="serviceCount" class="mz-tag oficial">Cargando...</span></div>
-    <div id="servicesList"><div class="mz-loader">Cargando servicios...</div></div>
-  </section>
+<div class="mz-page-title">
+<div><h1>Servicios cerca de ti</h1><p>Encuentra profesionales y negocios de confianza en tu distrito.</p></div>
+<button class="mz-btn primary" id="openServiceFormSecondary"><i class="ti ti-speakerphone"></i> Ofrecer mi servicio</button>
+</div>
+<section class="mz-card">
+<div class="mz-card-pad">
+<div class="mz-form">
+<label class="mz-field"><span>Buscar</span><input id="serviceSearchMobile" placeholder="Nombre, categoría o descripción"/></label>
+<label class="mz-field"><span>Categoría</span>
+<select id="serviceCategory">
+<option value="todas">Todas</option>
+<option value="Electricidad">Electricidad</option>
+<option value="Gasfitería">Gasfitería</option>
+<option value="Limpieza">Limpieza</option>
+<option value="Carpintería">Carpintería</option>
+<option value="Pintura">Pintura</option>
+<option value="Tecnología">Tecnología</option>
+<option value="Otros">Otros</option>
+</select>
+</label>
+</div>
+</div>
+</section>
+<section class="mz-card" style="margin-top:14px">
+<div class="mz-card-head"><h2>Profesionales disponibles</h2><span class="mz-tag oficial" id="serviceCount">Cargando...</span></div>
+<div id="servicesList"><div class="mz-loader">Cargando servicios...</div></div>
+</section>
 </div>
 </main>
 </div>
-
-<dialog id="serviceDialog" class="mz-dialog">
-  <form id="serviceForm" method="dialog">
-    <div class="mz-dialog-head"><h2>Publicar mi servicio</h2><button type="button" class="mz-dialog-close" data-close-dialog aria-label="Cerrar">✕</button></div>
-    <div class="mz-dialog-body">
-      <div id="serviceStatus" class="notice" hidden></div>
-      <div class="mz-form">
-        <label class="mz-field full"><span>Nombre del servicio *</span><input name="nombre" maxlength="100" required placeholder="Ej: Electricista Luis Quispe"></label>
-        <label class="mz-field"><span>Categoría *</span><select name="categoria" required><option>Electricidad</option><option>Gasfitería</option><option>Limpieza</option><option>Carpintería</option><option>Pintura</option><option>Tecnología</option><option>Otros</option></select></label>
-        <label class="mz-field"><span>Distrito *</span><input name="distrito" required placeholder="Ej: Ventanilla"></label>
-        <label class="mz-field full"><span>Descripción</span><textarea name="descripcion" rows="4" maxlength="800" placeholder="Experiencia, trabajos que realizas y horarios"></textarea></label>
-        <label class="mz-field"><span>Zona de atención</span><input name="zona_atencion" maxlength="120" placeholder="Distritos o urbanizaciones"></label>
-        <label class="mz-field"><span>WhatsApp</span><input name="whatsapp" inputmode="tel" maxlength="18" placeholder="999 999 999"></label>
-        <label class="mz-field"><span>Tarifa desde</span><input name="tarifa_desde" type="number" min="0" step="0.01" placeholder="S/ 0"></label>
-        <label class="mz-field"><span>Tarifa hasta</span><input name="tarifa_hasta" type="number" min="0" step="0.01" placeholder="S/ 0"></label>
-      </div>
-    </div>
-    <div class="mz-dialog-actions"><button type="button" class="mz-btn ghost" data-close-dialog>Cancelar</button><button class="mz-btn primary" type="submit"><i class="ti ti-send"></i> Publicar servicio</button></div>
-  </form>
+<dialog class="mz-dialog" id="serviceDialog">
+<form id="serviceForm" method="dialog">
+<div class="mz-dialog-head"><h2>Publicar mi servicio</h2><button aria-label="Cerrar" class="mz-dialog-close" data-close-dialog="" type="button">✕</button></div>
+<div class="mz-dialog-body">
+<div class="notice" hidden="" id="serviceStatus"></div>
+<div class="mz-form">
+<label class="mz-field full"><span>Nombre del servicio *</span><input maxlength="100" name="nombre" placeholder="Ej: Electricista Luis Quispe" required=""/></label>
+<label class="mz-field"><span>Categoría *</span><select name="categoria" required=""><option>Electricidad</option><option>Gasfitería</option><option>Limpieza</option><option>Carpintería</option><option>Pintura</option><option>Tecnología</option><option>Otros</option></select></label>
+<label class="mz-field"><span>Distrito *</span><input name="distrito" placeholder="Ej: Ventanilla" required=""/></label>
+<label class="mz-field full"><span>Descripción</span><textarea maxlength="800" name="descripcion" placeholder="Experiencia, trabajos que realizas y horarios" rows="4"></textarea></label>
+<label class="mz-field"><span>Zona de atención</span><input maxlength="120" name="zona_atencion" placeholder="Distritos o urbanizaciones"/></label>
+<label class="mz-field"><span>WhatsApp</span><input inputmode="tel" maxlength="18" name="whatsapp" placeholder="999 999 999"/></label>
+<label class="mz-field"><span>Tarifa desde</span><input min="0" name="tarifa_desde" placeholder="S/ 0" step="0.01" type="number"/></label>
+<label class="mz-field"><span>Tarifa hasta</span><input min="0" name="tarifa_hasta" placeholder="S/ 0" step="0.01" type="number"/></label>
+</div>
+</div>
+<div class="mz-dialog-actions"><button class="mz-btn ghost" data-close-dialog="" type="button">Cancelar</button><button class="mz-btn primary" type="submit"><i class="ti ti-send"></i> Publicar servicio</button></div>
+</form>
 </dialog>
-
 <nav class="mz-mobile-bottom">
-  <a href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
-  <a href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
-  <a class="plus" href="#registrar" id="mobileServiceAdd"><i class="ti ti-plus"></i></a>
-  <a href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
-  <a href="perfil.html"><i class="ti ti-user"></i><span>Perfil</span></a>
+<a href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
+<a href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
+<a class="plus" href="#registrar" id="mobileServiceAdd"><i class="ti ti-plus"></i></a>
+<a href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
+<a href="perfil.html"><i class="ti ti-user"></i><span>Perfil</span></a>
 </nav>
-<script type="module" src="./js/servicios-mizona.js"></script>
-<script type="module" src="./js/mizona-core.js"></script>
-<script type="module" src="./js/mizona-master-shell.js"></script>
+<script src="./js/servicios-mizona.js" type="module"></script>
+<script src="./js/mizona-core.js" type="module"></script>
+<script src="./js/mizona-master-shell.js" type="module"></script>
 </body>
 </html>

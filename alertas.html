@@ -1,16 +1,17 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#185FA5">
-<meta name="description" content="Alertas vecinales de MiZona.pe">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#185FA5" name="theme-color"/>
+<meta content="Alertas vecinales de MiZona.pe" name="description"/>
 <title>Alertas — MiZona.pe</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
-<link rel="stylesheet" href="css/mizona.css">
-<link rel="stylesheet" href="css/mizona-unified.css">
-<link rel="stylesheet" href="css/mizona-phase2.css">
+<link href="manifest.json" rel="manifest"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet"/>
+<link href="css/mizona.css" rel="stylesheet"/>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
+<link href="css/mizona-phase2.css" rel="stylesheet"/>
 <style>
 /* Alertas con el mismo sistema visual de Inicio */
 .mz-alerts-hero{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,var(--az-bg),#fff);border:1px solid var(--az-bd);border-radius:var(--r);padding:14px 16px}
@@ -74,118 +75,108 @@
   .mz-feed-body{padding-bottom:96px}
 }
 </style>
-<link rel="stylesheet" href="css/mizona-master-shell.css">
-</head>
+<link href="css/mizona-master-shell.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
 <body class="estado-guest">
-<div id="mz-toast" class="mz-toast"></div>
+<div class="mz-toast" id="mz-toast"></div>
 <div class="mz-layout">
-  <aside class="mz-sidebar">
-    <div class="mz-logo">
-      <div class="mz-logo-mark">MZ</div>
-      <div><div class="mz-logo-name">MiZona</div><div class="mz-logo-domain">mizona.pe</div></div>
-    </div>
-    <div class="mz-sidebar-user hide-guest" id="sb-user">
-      <div class="mz-user-av" id="sb-av">U</div>
-      <div><div class="mz-user-name" id="sb-name">Usuario</div><div class="mz-user-dist"><i class="ti ti-map-pin"></i><span id="sb-dist">Tu zona</span></div></div>
-    </div>
-    <div class="mz-sidebar-user hide-logged" style="flex-direction:column;align-items:flex-start;gap:6px">
-      <a href="login.html" style="width:100%;background:var(--az);color:#fff;border-radius:6px;padding:7px 10px;font-size:10px;font-weight:700;text-align:center;display:block">Iniciar sesión</a>
-      <a href="registro.html" style="width:100%;background:transparent;color:#64748b;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:7px 10px;font-size:10px;font-weight:600;text-align:center;display:block">Crear cuenta gratis</a>
-    </div>
-    <div class="mz-nav-sec">Principal</div>
-    <a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
-    <a class="mz-nav-item active" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span><span class="mz-nav-badge" id="nb-alertas">0</span></a>
-    <a class="mz-nav-item" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
-    <a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
-    <a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
-    <div class="mz-nav-sec">Comunidad</div>
-    <a class="mz-nav-item" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
-    <a class="mz-nav-item" href="ride.html"><i class="ti ti-car"></i><span>MiZonaRide</span></a>
-    <a class="mz-nav-item" href="empleos.html"><i class="ti ti-briefcase"></i><span>Empleos</span></a>
-    <div class="mz-nav-sec">Cuenta</div>
-    <a class="mz-nav-item" href="mensajes.html"><i class="ti ti-message"></i><span>Mensajes</span></a>
-    <a class="mz-nav-item hide-guest" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
-    <a class="mz-nav-item hide-guest" href="negocio.html"><i class="ti ti-building-store"></i><span>Mi negocio</span></a>
-    <a class="mz-nav-item hide-guest" href="admin.html" id="link-admin" style="display:none"><i class="ti ti-shield"></i><span>Admin</span></a>
-    <div class="mz-sidebar-spacer"></div>
-    <a class="mz-sidebar-btn" href="#reportar"><i class="ti ti-plus"></i> Reportar alerta</a>
-  </aside>
-
-  <main class="mz-feed">
-    <div class="mz-topbar">
-      <div class="mz-search" onclick="location.href='explorar.html'"><i class="ti ti-search"></i><span>Buscar en tu zona...</span></div>
-      <div class="mz-dist-tag"><i class="ti ti-map-pin"></i><span id="dist-nombre">Mi zona</span></div>
-      <div class="mz-icon-btn" onclick="location.href='notificaciones.html'"><i class="ti ti-bell"></i><div class="mz-notif-dot" id="notif-dot" style="display:none"></div></div>
-      <div class="mz-icon-btn hide-guest" onclick="location.href='mensajes.html'"><i class="ti ti-message"></i></div>
-      <div class="mz-icon-btn hide-logged" onclick="location.href='login.html'"><i class="ti ti-user"></i></div>
-    </div>
-
-    <div class="mz-feed-body">
-      <section class="mz-alerts-hero">
-        <div><h1>Alertas de tu zona</h1><p>Reporta hechos, confirma información y sigue las actualizaciones.</p></div>
-        <a class="mz-btn-new" href="#reportar"><i class="ti ti-plus"></i> Nueva alerta</a>
-      </section>
-
-      <div class="mz-alerts-grid">
-        <section class="mz-card">
-          <div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-bell"></i> Alertas recientes</div><span class="mz-tag reportada">Información ciudadana</span></div>
-          <div id="alertasLista"><div class="mz-loader">Cargando alertas...</div></div>
-        </section>
-
-        <aside class="mz-card" id="reportar">
-          <div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-alert-triangle"></i> Reportar alerta</div></div>
-          <div class="mz-card-pad">
-            <form id="alertaForm" class="mz-form">
-              <label class="mz-field"><span>Categoría</span>
-                <select name="categoria" required>
-                  <option value="robo">Robo o asalto</option><option value="accidente">Accidente</option><option value="agua">Corte o fuga de agua</option><option value="luz">Corte de luz</option><option value="persona">Persona desaparecida</option><option value="mascota">Mascota perdida</option><option value="incendio">Incendio</option><option value="otro">Otro</option>
-                </select>
-              </label>
-              <label class="mz-field"><span>Distrito</span><input name="distrito" id="form-distrito" value="Ventanilla" required></label>
-              <label class="mz-field full"><span>Título</span><input name="titulo" maxlength="120" required placeholder="Describe brevemente lo ocurrido"></label>
-              <label class="mz-field full"><span>Descripción</span><textarea name="descripcion" rows="5" maxlength="1200" required placeholder="Incluye hora, referencia y detalles útiles. No publiques acusaciones ni datos sensibles."></textarea></label>
-              <label class="mz-field full"><span>Zona o referencia</span><input name="zona_referencia" placeholder="Ej.: Av. Las Palmeras, cerca del mercado"></label>
-              <input name="latitud" type="hidden"><input name="longitud" type="hidden">
-              <div class="mz-field full mz-form-actions">
-                <button type="button" class="mz-btn ghost" data-use-location><i class="ti ti-current-location"></i> Usar ubicación</button>
-                <button type="submit" class="mz-btn danger"><i class="ti ti-send"></i> Enviar alerta</button>
-              </div>
-            </form>
-            <div id="alertaStatus" hidden></div>
-            <div class="mz-form-note"><i class="ti ti-shield-check"></i> MiZona muestra hechos reportados por la comunidad. No publiques datos personales ni acusaciones sin verificar.</div>
-          </div>
-        </aside>
-      </div>
-    </div>
-  </main>
-
-  <aside class="mz-sidebar-right">
-    <div class="mz-widget">
-      <div class="mz-widget-head"><i class="ti ti-map-pin"></i> Tu zona hoy</div>
-      <div class="mz-stat-row"><div class="mz-stat-label"><i class="ti ti-bell" style="color:var(--rj)"></i><div><div>Alertas activas</div><div style="font-size:7px;color:var(--txt3)" id="sr-dist">Tu distrito</div></div></div><div class="mz-stat-val" style="color:var(--rj)" id="sr-alertas">0</div></div>
-      <div class="mz-stat-row"><div class="mz-stat-label"><i class="ti ti-map"></i><div>Ver mapa completo</div></div><a class="mz-card-link" href="mapa.html">Abrir</a></div>
-    </div>
-    <div class="mz-widget">
-      <div class="mz-widget-head"><i class="ti ti-shield-check"></i> Reporta con responsabilidad</div>
-      <div class="mz-alert-help"><strong>Describe hechos concretos</strong><p>Indica hora, zona y referencias útiles sin exponer información sensible.</p></div>
-      <div class="mz-alert-help"><strong>Confirma solo lo que viste</strong><p>Las confirmaciones ayudan a validar una alerta para otros vecinos.</p></div>
-      <div class="mz-alert-help"><strong>Emergencias reales</strong><p>Ante peligro inmediato, comunícate también con las autoridades correspondientes.</p></div>
-    </div>
-    <div class="mz-cta" onclick="location.href='mapa.html'"><div class="mz-cta-title">Mapa de alertas</div><div class="mz-cta-sub">Revisa lo que ocurre cerca de ti →</div></div>
-  </aside>
+<aside class="mz-sidebar">
+<div class="mz-logo"><img alt="MiZona.pe" class="mz-logo-img" src="assets/mizona-logo-blanco.svg"/></div>
+<div class="mz-sidebar-user hide-guest" id="sb-user">
+<div class="mz-user-av" id="sb-av">U</div>
+<div><div class="mz-user-name" id="sb-name">Usuario</div><div class="mz-user-dist"><i class="ti ti-map-pin"></i><span id="sb-dist">Tu zona</span></div></div>
 </div>
-
+<div class="mz-sidebar-user hide-logged" style="flex-direction:column;align-items:flex-start;gap:6px">
+<a href="login.html" style="width:100%;background:var(--az);color:#fff;border-radius:6px;padding:7px 10px;font-size:10px;font-weight:700;text-align:center;display:block">Iniciar sesión</a>
+<a href="registro.html" style="width:100%;background:transparent;color:#64748b;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:7px 10px;font-size:10px;font-weight:600;text-align:center;display:block">Crear cuenta gratis</a>
+</div>
+<div class="mz-nav-sec">Principal</div>
+<a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
+<a class="mz-nav-item active" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span><span class="mz-nav-badge" id="nb-alertas">0</span></a>
+<a class="mz-nav-item" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
+<a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
+<a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
+<div class="mz-nav-sec">Comunidad</div>
+<a class="mz-nav-item" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
+<a class="mz-nav-item" href="ride.html"><i class="ti ti-car"></i><span>MiZonaRide</span></a>
+<a class="mz-nav-item" href="empleos.html"><i class="ti ti-briefcase"></i><span>Empleos</span></a>
+<div class="mz-nav-sec">Cuenta</div>
+<a class="mz-nav-item" href="mensajes.html"><i class="ti ti-message"></i><span>Mensajes</span></a>
+<a class="mz-nav-item hide-guest" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
+<a class="mz-nav-item hide-guest" href="negocio.html"><i class="ti ti-building-store"></i><span>Mi negocio</span></a>
+<a class="mz-nav-item hide-guest" href="admin.html" id="link-admin" style="display:none"><i class="ti ti-shield"></i><span>Admin</span></a>
+<div class="mz-sidebar-spacer"></div>
+<a class="mz-sidebar-btn" href="#reportar"><i class="ti ti-plus"></i> Reportar alerta</a>
+</aside>
+<main class="mz-feed">
+<div class="mz-topbar">
+<div class="mz-search" onclick="location.href='explorar.html'"><i class="ti ti-search"></i><span>Buscar en tu zona...</span></div>
+<div class="mz-dist-tag"><i class="ti ti-map-pin"></i><span id="dist-nombre">Mi zona</span></div>
+<div class="mz-icon-btn" onclick="location.href='notificaciones.html'"><i class="ti ti-bell"></i><div class="mz-notif-dot" id="notif-dot" style="display:none"></div></div>
+<div class="mz-icon-btn hide-guest" onclick="location.href='mensajes.html'"><i class="ti ti-message"></i></div>
+<div class="mz-icon-btn hide-logged" onclick="location.href='login.html'"><i class="ti ti-user"></i></div>
+</div>
+<div class="mz-feed-body">
+<section class="mz-alerts-hero">
+<div><h1>Alertas de tu zona</h1><p>Reporta hechos, confirma información y sigue las actualizaciones.</p></div>
+<a class="mz-btn-new" href="#reportar"><i class="ti ti-plus"></i> Nueva alerta</a>
+</section>
+<div class="mz-alerts-grid">
+<section class="mz-card">
+<div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-bell"></i> Alertas recientes</div><span class="mz-tag reportada">Información ciudadana</span></div>
+<div id="alertasLista"><div class="mz-loader">Cargando alertas...</div></div>
+</section>
+<aside class="mz-card" id="reportar">
+<div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-alert-triangle"></i> Reportar alerta</div></div>
+<div class="mz-card-pad">
+<form class="mz-form" id="alertaForm">
+<label class="mz-field"><span>Categoría</span>
+<select name="categoria" required="">
+<option value="robo">Robo o asalto</option><option value="accidente">Accidente</option><option value="agua">Corte o fuga de agua</option><option value="luz">Corte de luz</option><option value="persona">Persona desaparecida</option><option value="mascota">Mascota perdida</option><option value="incendio">Incendio</option><option value="otro">Otro</option>
+</select>
+</label>
+<label class="mz-field"><span>Distrito</span><input id="form-distrito" name="distrito" required="" value="Ventanilla"/></label>
+<label class="mz-field full"><span>Título</span><input maxlength="120" name="titulo" placeholder="Describe brevemente lo ocurrido" required=""/></label>
+<label class="mz-field full"><span>Descripción</span><textarea maxlength="1200" name="descripcion" placeholder="Incluye hora, referencia y detalles útiles. No publiques acusaciones ni datos sensibles." required="" rows="5"></textarea></label>
+<label class="mz-field full"><span>Zona o referencia</span><input name="zona_referencia" placeholder="Ej.: Av. Las Palmeras, cerca del mercado"/></label>
+<input name="latitud" type="hidden"/><input name="longitud" type="hidden"/>
+<div class="mz-field full mz-form-actions">
+<button class="mz-btn ghost" data-use-location="" type="button"><i class="ti ti-current-location"></i> Usar ubicación</button>
+<button class="mz-btn danger" type="submit"><i class="ti ti-send"></i> Enviar alerta</button>
+</div>
+</form>
+<div hidden="" id="alertaStatus"></div>
+<div class="mz-form-note"><i class="ti ti-shield-check"></i> MiZona muestra hechos reportados por la comunidad. No publiques datos personales ni acusaciones sin verificar.</div>
+</div>
+</aside>
+</div>
+</div>
+</main>
+<aside class="mz-sidebar-right">
+<div class="mz-widget">
+<div class="mz-widget-head"><i class="ti ti-map-pin"></i> Tu zona hoy</div>
+<div class="mz-stat-row"><div class="mz-stat-label"><i class="ti ti-bell" style="color:var(--rj)"></i><div><div>Alertas activas</div><div id="sr-dist" style="font-size:7px;color:var(--txt3)">Tu distrito</div></div></div><div class="mz-stat-val" id="sr-alertas" style="color:var(--rj)">0</div></div>
+<div class="mz-stat-row"><div class="mz-stat-label"><i class="ti ti-map"></i><div>Ver mapa completo</div></div><a class="mz-card-link" href="mapa.html">Abrir</a></div>
+</div>
+<div class="mz-widget">
+<div class="mz-widget-head"><i class="ti ti-shield-check"></i> Reporta con responsabilidad</div>
+<div class="mz-alert-help"><strong>Describe hechos concretos</strong><p>Indica hora, zona y referencias útiles sin exponer información sensible.</p></div>
+<div class="mz-alert-help"><strong>Confirma solo lo que viste</strong><p>Las confirmaciones ayudan a validar una alerta para otros vecinos.</p></div>
+<div class="mz-alert-help"><strong>Emergencias reales</strong><p>Ante peligro inmediato, comunícate también con las autoridades correspondientes.</p></div>
+</div>
+<div class="mz-cta" onclick="location.href='mapa.html'"><div class="mz-cta-title">Mapa de alertas</div><div class="mz-cta-sub">Revisa lo que ocurre cerca de ti →</div></div>
+</aside>
+</div>
 <nav class="mz-bottom-nav">
-  <div class="mz-bn-inner">
-    <div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
-    <div class="mz-bn-item active" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
-    <div class="mz-bn-item" onclick="location.href='#reportar'"><div class="mz-bn-center"><i class="ti ti-plus"></i></div></div>
-    <div class="mz-bn-item" onclick="location.href='mapa.html'"><i class="ti ti-map"></i><span>Mapa</span></div>
-    <div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
-  </div>
+<div class="mz-bn-inner">
+<div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
+<div class="mz-bn-item active" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
+<div class="mz-bn-item" onclick="location.href='#reportar'"><div class="mz-bn-center"><i class="ti ti-plus"></i></div></div>
+<div class="mz-bn-item" onclick="location.href='mapa.html'"><i class="ti ti-map"></i><span>Mapa</span></div>
+<div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
+</div>
 </nav>
-
-<script type="module" src="js/alertas-mizona.js"></script>
+<script src="js/alertas-mizona.js" type="module"></script>
 <script type="module">
 import { supabase } from './js/supabase.js';
 
@@ -223,7 +214,7 @@ async function countAlerts(){
 }
 loadShell(); countAlerts();
 </script>
-<script type="module" src="./js/mizona-core.js"></script>
-<script type="module" src="./js/mizona-master-shell.js"></script>
+<script src="./js/mizona-core.js" type="module"></script>
+<script src="./js/mizona-master-shell.js" type="module"></script>
 </body>
 </html>

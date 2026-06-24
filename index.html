@@ -1,329 +1,305 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#185FA5">
-<meta name="description" content="MiZona — Tu zona, tu gente, tus oportunidades. Alertas vecinales, servicios locales y solicitudes en tu distrito.">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#185FA5" name="theme-color"/>
+<meta content="MiZona — Tu zona, tu gente, tus oportunidades. Alertas vecinales, servicios locales y solicitudes en tu distrito." name="description"/>
 <title>Inicio — MiZona.pe</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="css/mizona.css">
-<link rel="stylesheet" href="css/mizona-unified.css">
-<link rel="stylesheet" href="css/mizona-phase2.css">
-</head>
+<link href="manifest.json" rel="manifest"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet"/>
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
+<link href="css/mizona.css" rel="stylesheet"/>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
+<link href="css/mizona-phase2.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
 <body class="estado-guest">
-
-<div id="mz-toast" class="mz-toast"></div>
-
+<div class="mz-toast" id="mz-toast"></div>
 <!-- MODAL ALERTA -->
 <div class="mz-modal-overlay" id="modal-alerta">
-  <div class="mz-modal">
-    <div class="mz-modal-head">
-      <span class="mz-modal-title"><i class="ti ti-bell" style="color:var(--rj);margin-right:5px"></i>Publicar alerta</span>
-      <button class="mz-modal-close" onclick="cerrarModal('modal-alerta')">✕</button>
-    </div>
-    <div class="mz-modal-body">
-      <div class="mz-field"><label class="mz-label">¿Qué ocurrió? *</label><input class="mz-input" id="al-titulo" placeholder="Ej: Robo de celular, mascota perdida..."></div>
-      <div class="mz-field"><label class="mz-label">Categoría</label>
-        <select class="mz-input" id="al-cat">
-          <option value="robo">Robo o delito</option>
-          <option value="mascota">Mascota perdida</option>
-          <option value="persona">Persona desaparecida</option>
-          <option value="accidente">Accidente</option>
-          <option value="agua">Corte de agua</option>
-          <option value="luz">Corte de luz</option>
-          <option value="incendio">Incendio</option>
-          <option value="otro">Otro</option>
-        </select>
-      </div>
-      <div class="mz-field"><label class="mz-label">Descripción</label><textarea class="mz-input mz-textarea" id="al-desc" placeholder="Más detalles..."></textarea></div>
-      <div class="mz-row">
-        <div class="mz-field"><label class="mz-label">Calle o referencia</label><input class="mz-input" id="al-zona" placeholder="Jr. Las Palmeras cdra 4"></div>
-        <div class="mz-field"><label class="mz-label">Urgencia</label>
-          <select class="mz-input" id="al-urg">
-            <option value="alta">Alta</option>
-            <option value="media">Media</option>
-            <option value="informativa">Informativa</option>
-          </select>
-        </div>
-      </div>
-      <div style="font-size:9px;color:var(--txt3);background:var(--az-bg);border-radius:6px;padding:7px 10px;border:1px solid var(--az-bd)">
-        <i class="ti ti-info-circle" style="color:var(--az);margin-right:3px"></i>
+<div class="mz-modal">
+<div class="mz-modal-head">
+<span class="mz-modal-title"><i class="ti ti-bell" style="color:var(--rj);margin-right:5px"></i>Publicar alerta</span>
+<button class="mz-modal-close" onclick="cerrarModal('modal-alerta')">✕</button>
+</div>
+<div class="mz-modal-body">
+<div class="mz-field"><label class="mz-label">¿Qué ocurrió? *</label><input class="mz-input" id="al-titulo" placeholder="Ej: Robo de celular, mascota perdida..."/></div>
+<div class="mz-field"><label class="mz-label">Categoría</label>
+<select class="mz-input" id="al-cat">
+<option value="robo">Robo o delito</option>
+<option value="mascota">Mascota perdida</option>
+<option value="persona">Persona desaparecida</option>
+<option value="accidente">Accidente</option>
+<option value="agua">Corte de agua</option>
+<option value="luz">Corte de luz</option>
+<option value="incendio">Incendio</option>
+<option value="otro">Otro</option>
+</select>
+</div>
+<div class="mz-field"><label class="mz-label">Descripción</label><textarea class="mz-input mz-textarea" id="al-desc" placeholder="Más detalles..."></textarea></div>
+<div class="mz-row">
+<div class="mz-field"><label class="mz-label">Calle o referencia</label><input class="mz-input" id="al-zona" placeholder="Jr. Las Palmeras cdra 4"/></div>
+<div class="mz-field"><label class="mz-label">Urgencia</label>
+<select class="mz-input" id="al-urg">
+<option value="alta">Alta</option>
+<option value="media">Media</option>
+<option value="informativa">Informativa</option>
+</select>
+</div>
+</div>
+<div style="font-size:9px;color:var(--txt3);background:var(--az-bg);border-radius:6px;padding:7px 10px;border:1px solid var(--az-bd)">
+<i class="ti ti-info-circle" style="color:var(--az);margin-right:3px"></i>
         Tu alerta aparecerá como "Reportada" hasta que 5 vecinos la confirmen.
       </div>
-    </div>
-    <div class="mz-modal-foot">
-      <button class="mz-btn-cancel" onclick="cerrarModal('modal-alerta')">Cancelar</button>
-      <button class="mz-btn-submit" onclick="publicarAlerta()">Publicar alerta</button>
-    </div>
-  </div>
 </div>
-
+<div class="mz-modal-foot">
+<button class="mz-btn-cancel" onclick="cerrarModal('modal-alerta')">Cancelar</button>
+<button class="mz-btn-submit" onclick="publicarAlerta()">Publicar alerta</button>
+</div>
+</div>
+</div>
 <!-- MODAL SOLICITUD -->
 <div class="mz-modal-overlay" id="modal-solicitud">
-  <div class="mz-modal">
-    <div class="mz-modal-head">
-      <span class="mz-modal-title"><i class="ti ti-clipboard-list" style="color:var(--vd);margin-right:5px"></i>Pedir cotización</span>
-      <button class="mz-modal-close" onclick="cerrarModal('modal-solicitud')">✕</button>
-    </div>
-    <div class="mz-modal-body">
-      <div class="mz-field"><label class="mz-label">¿Qué necesitas? *</label><input class="mz-input" id="sol-titulo" placeholder="Ej: Reparar tubería, instalar cámara..."></div>
-      <div class="mz-field"><label class="mz-label">Categoría</label>
-        <select class="mz-input" id="sol-cat">
-          <option>Gasfitería</option><option>Electricidad</option><option>Limpieza</option>
-          <option>Carpintería</option><option>Pintura</option><option>Técnico electrónico</option><option>Otro</option>
-        </select>
-      </div>
-      <div class="mz-field"><label class="mz-label">Descripción</label><textarea class="mz-input mz-textarea" id="sol-desc" placeholder="Con más detalle mejor..."></textarea></div>
-      <div class="mz-row">
-        <div class="mz-field"><label class="mz-label">Presupuesto aprox.</label><input class="mz-input" id="sol-pres" placeholder="S/. 0 – 200"></div>
-        <div class="mz-field"><label class="mz-label">Urgencia</label>
-          <select class="mz-input" id="sol-urg"><option>Hoy mismo</option><option>Esta semana</option><option>Sin urgencia</option></select>
-        </div>
-      </div>
-    </div>
-    <div class="mz-modal-foot">
-      <button class="mz-btn-cancel" onclick="cerrarModal('modal-solicitud')">Cancelar</button>
-      <button class="mz-btn-submit vd" onclick="publicarSolicitud()">Publicar solicitud</button>
-    </div>
-  </div>
+<div class="mz-modal">
+<div class="mz-modal-head">
+<span class="mz-modal-title"><i class="ti ti-clipboard-list" style="color:var(--vd);margin-right:5px"></i>Pedir cotización</span>
+<button class="mz-modal-close" onclick="cerrarModal('modal-solicitud')">✕</button>
 </div>
-
+<div class="mz-modal-body">
+<div class="mz-field"><label class="mz-label">¿Qué necesitas? *</label><input class="mz-input" id="sol-titulo" placeholder="Ej: Reparar tubería, instalar cámara..."/></div>
+<div class="mz-field"><label class="mz-label">Categoría</label>
+<select class="mz-input" id="sol-cat">
+<option>Gasfitería</option><option>Electricidad</option><option>Limpieza</option>
+<option>Carpintería</option><option>Pintura</option><option>Técnico electrónico</option><option>Otro</option>
+</select>
+</div>
+<div class="mz-field"><label class="mz-label">Descripción</label><textarea class="mz-input mz-textarea" id="sol-desc" placeholder="Con más detalle mejor..."></textarea></div>
+<div class="mz-row">
+<div class="mz-field"><label class="mz-label">Presupuesto aprox.</label><input class="mz-input" id="sol-pres" placeholder="S/. 0 – 200"/></div>
+<div class="mz-field"><label class="mz-label">Urgencia</label>
+<select class="mz-input" id="sol-urg"><option>Hoy mismo</option><option>Esta semana</option><option>Sin urgencia</option></select>
+</div>
+</div>
+</div>
+<div class="mz-modal-foot">
+<button class="mz-btn-cancel" onclick="cerrarModal('modal-solicitud')">Cancelar</button>
+<button class="mz-btn-submit vd" onclick="publicarSolicitud()">Publicar solicitud</button>
+</div>
+</div>
+</div>
 <!-- LAYOUT -->
 <div class="mz-layout">
-
-  <!-- SIDEBAR IZQUIERDA -->
-  <aside class="mz-sidebar">
-    <div class="mz-logo">
-      <div class="mz-logo-mark">MZ</div>
-      <div><div class="mz-logo-name">MiZona</div><div class="mz-logo-domain">mizona.pe</div></div>
-    </div>
-    <div class="mz-sidebar-user hide-guest" id="sb-user">
-      <div class="mz-user-av" id="sb-av">JH</div>
-      <div><div class="mz-user-name" id="sb-name">Usuario</div><div class="mz-user-dist"><i class="ti ti-map-pin"></i><span id="sb-dist">Tu zona</span></div></div>
-    </div>
-    <div class="mz-sidebar-user hide-logged" style="flex-direction:column;align-items:flex-start;gap:6px">
-      <a href="login.html" style="width:100%;background:var(--az);color:#fff;border-radius:6px;padding:7px 10px;font-size:10px;font-weight:700;text-align:center;display:block">Iniciar sesión</a>
-      <a href="registro.html" style="width:100%;background:transparent;color:#64748b;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:7px 10px;font-size:10px;font-weight:600;text-align:center;display:block">Crear cuenta gratis</a>
-    </div>
-    <div class="mz-nav-sec">Principal</div>
-    <a class="mz-nav-item active" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
-    <a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span><span class="mz-nav-badge" id="nb-alertas">0</span></a>
-    <a class="mz-nav-item" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
-    <a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
-    <a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
-    <div class="mz-nav-sec">Comunidad</div>
-    <a class="mz-nav-item" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
-    <a class="mz-nav-item" href="ride.html"><i class="ti ti-car"></i><span>MiZonaRide</span></a>
-    <a class="mz-nav-item" href="empleos.html"><i class="ti ti-briefcase"></i><span>Empleos</span></a>
-    <div class="mz-nav-sec">Cuenta</div>
-    <a class="mz-nav-item" href="mensajes.html"><i class="ti ti-message"></i><span>Mensajes</span></a>
-    <a class="mz-nav-item hide-guest" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
-    <a class="mz-nav-item hide-guest" href="negocio.html"><i class="ti ti-building-store"></i><span>Mi negocio</span></a>
-    <a class="mz-nav-item hide-guest" href="admin.html" id="link-admin" style="display:none"><i class="ti ti-shield"></i><span>Admin</span></a>
-    <div class="mz-sidebar-spacer"></div>
-    <button class="mz-sidebar-btn" onclick="abrirPublicar()"><i class="ti ti-plus"></i> Publicar en mi zona</button>
-  </aside>
-
-  <!-- FEED CENTRAL -->
-  <main class="mz-feed">
-    <div class="mz-topbar">
-      <div class="mz-search" onclick="location.href='explorar.html'"><i class="ti ti-search"></i><span>Buscar en tu zona...</span></div>
-      <div class="mz-dist-tag" id="dist-tag"><i class="ti ti-map-pin"></i><span id="dist-nombre">Mi zona</span></div>
-      <div class="mz-icon-btn" onclick="location.href='notificaciones.html'"><i class="ti ti-bell"></i><div class="mz-notif-dot" id="notif-dot" style="display:none"></div></div>
-      <div class="mz-icon-btn hide-guest" onclick="location.href='mensajes.html'"><i class="ti ti-message"></i></div>
-      <div class="mz-icon-btn hide-logged" onclick="location.href='login.html'"><i class="ti ti-user"></i></div>
-    </div>
-
-    <div class="mz-feed-body">
-
-      <!-- PÁNICO -->
-      <div class="mz-panic" onclick="activarPanico()">
-        <div class="mz-panic-pulse">🆘</div>
-        <div class="mz-panic-text"><h3>Botón de emergencia</h3><p>Alerta a vecinos en radio de 500m · GPS activo</p></div>
-        <button class="mz-panic-btn" type="button" onclick="event.stopPropagation();activarPanico()">ACTIVAR</button>
-      </div>
-
-      <!-- ALERTA OFICIAL -->
-      <div>
-        <span class="mz-zona">Zona Segura — Alerta oficial</span>
-        <div class="mz-alerta-oficial" id="alerta-oficial">
-          <div class="mz-ao-icon"><i class="ti ti-droplet"></i></div>
-          <div style="flex:1">
-            <div class="mz-ao-badge"><i class="ti ti-shield-check" style="font-size:8px"></i> Fuente verificada · Sedapal</div>
-            <div class="mz-ao-title">Corte de agua — Av. Universitaria 1200–1800</div>
-            <div class="mz-ao-meta">Hoy 14:00 – 18:00 · Tu distrito · Guarda agua ahora</div>
-          </div>
-          <div class="mz-ao-timer" id="timer-oficial">...</div>
-        </div>
-      </div>
-
-      <!-- CREAR PUBLICACIÓN -->
-      <div class="mz-crear hide-guest">
-        <div class="mz-crear-top">
-          <div class="mz-user-av" id="crear-av" style="width:34px;height:34px;font-size:11px">JH</div>
-          <div class="mz-crear-input" onclick="abrirPublicar()">¿Qué pasa en tu zona?</div>
-        </div>
-        <div class="mz-crear-tipos">
-          <div class="mz-tipo-btn" onclick="abrirModal('modal-alerta')"><i class="ti ti-bell" style="color:var(--rj)"></i> Alerta</div>
-          <div class="mz-tipo-btn" onclick="abrirModal('modal-solicitud')"><i class="ti ti-clipboard-list" style="color:var(--vd)"></i> Solicitud</div>
-          <div class="mz-tipo-btn" onclick="location.href='servicios.html#registrar'"><i class="ti ti-tool" style="color:var(--az)"></i> Mi servicio</div>
-          <div class="mz-tipo-btn"><i class="ti ti-photo" style="color:var(--am)"></i> Foto</div>
-        </div>
-      </div>
-
-      <!-- ALERTA CIUDADANA -->
-      <div class="mz-alerta-ciudadana" id="ac-1">
-        <div class="mz-ac-icon"><i class="ti ti-alert-circle" style="color:var(--rj)"></i></div>
-        <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
-            <div class="mz-ac-title">Robo de celular — Jr. Las Palmeras cdra. 4</div>
-            <span class="mz-ac-badge">Urgente</span>
-          </div>
-          <div class="mz-ac-meta"><i class="ti ti-map-pin" style="font-size:9px"></i> Tu zona · Hace 12 min <span class="mz-ac-confirm">· ✓ 3 vecinos confirmaron</span></div>
-          <div class="mz-ac-actions">
-            <button class="mz-ac-btn" style="background:var(--vd-bg);color:#14532d;border-color:var(--vd-bd)" onclick="confirmar('ac-1',this)">✓ También lo vi</button>
-            <button class="mz-ac-btn" style="background:var(--az-bg);color:#1d4ed8;border-color:var(--az-bd)" onclick="compartirWhatsApp('Alerta en mi zona: Robo de celular Jr. Las Palmeras cdra 4. Cuidado vecinos. Vía mizona.pe')">📱 Compartir</button>
-            <button class="mz-ac-btn" style="background:var(--vd-bg);color:#14532d;border-color:var(--vd-bd);margin-left:auto" onclick="this.textContent='✓ Resuelto';this.disabled=true;mostrarToast('Gracias por confirmar que fue resuelto')">✓ Resuelto</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- MAPA -->
-      <div>
-        <span class="mz-zona">Mapa de alertas en vivo</span>
-        <div class="mz-card">
-          <div class="mz-card-head">
-            <div class="mz-card-title"><i class="ti ti-map"></i> Alertas en tu zona</div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:9px;font-weight:700;color:var(--vd);display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;background:var(--vd);border-radius:50%;animation:blink-map 1.5s ease-in-out infinite;display:inline-block"></span> En vivo</span>
-              <a href="mapa.html" class="mz-card-link">Ver completo</a>
-            </div>
-          </div>
-          <div style="padding:6px 10px;background:var(--card);display:flex;gap:5px;overflow-x:auto;border-bottom:1px solid var(--bd2)">
-            <button class="mz-tipo-btn active" style="font-size:8px;padding:3px 9px;background:var(--az);color:#fff;border-color:var(--az)" onclick="filtrarMapa('todas',this)">Todas</button>
-            <button class="mz-tipo-btn" style="font-size:8px;padding:3px 9px" onclick="filtrarMapa('robo',this)">🔴 Robos</button>
-            <button class="mz-tipo-btn" style="font-size:8px;padding:3px 9px" onclick="filtrarMapa('agua',this)">💧 Agua/Luz</button>
-            <button class="mz-tipo-btn" style="font-size:8px;padding:3px 9px" onclick="filtrarMapa('mascota',this)">🐾 Mascotas</button>
-          </div>
-          <div id="mapa-alertas" style="height:220px;width:100%"></div>
-          <div style="padding:7px 12px;background:var(--bg);border-top:1px solid var(--bd2);display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:8px;color:var(--txt2)">
-            <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:50%;background:var(--rj);display:inline-block"></span>Robo</span>
-            <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:50%;background:var(--az);display:inline-block"></span>Agua/Luz</span>
-            <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:50%;background:var(--am);display:inline-block"></span>Mascota</span>
-            <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:50%;background:var(--vd);display:inline-block"></span>Verificada</span>
-            <span id="mapa-count" style="margin-left:auto;font-weight:700">Cargando...</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- SERVICIOS -->
-      <div>
-        <span class="mz-zona">Zona Servicios</span>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div class="mz-card-title" style="font-size:12px"><i class="ti ti-tool"></i> Profesionales cerca de ti</div>
-          <a href="servicios.html" style="font-size:10px;color:var(--az);font-weight:600">Ver todos</a>
-        </div>
-        <div class="mz-svc-grid" id="inicio-servicios">
-          <div class="mz-svc-card"><div class="mz-svc-av">…</div><div class="mz-svc-name">Cargando</div><div class="mz-svc-trade">Servicios de tu zona</div></div>
-          <div class="mz-svc-card" style="border:1px dashed var(--bd);background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer" onclick="location.href='servicios.html#registrar'"><i class="ti ti-plus" style="font-size:22px;color:var(--txt3);margin-bottom:6px"></i><div style="font-size:9px;color:var(--txt3);text-align:center">¿Ofreces un servicio? <strong style="color:var(--az)">Regístrate</strong></div></div>
-        </div>
-      </div>
-
-      <!-- SOLICITUD -->
-      <div>
-        <span class="mz-zona vd">Zona Solicitudes</span>
-        <div class="mz-sol">
-          <span class="mz-sol-badge">📋 Solicitud abierta</span>
-          <div class="mz-sol-title">Necesito gasfitero urgente — tubería rota en baño</div>
-          <div class="mz-sol-meta"><span><i class="ti ti-user" style="font-size:10px"></i> Ana Torres</span><span><i class="ti ti-map-pin" style="font-size:10px"></i> Tu zona</span><span><i class="ti ti-clock" style="font-size:10px"></i> Hace 20 min</span></div>
-          <div class="mz-sol-presup">Presupuesto: S/. 80 – S/. 150</div>
-          <button class="mz-sol-btn hide-guest" onclick="mostrarToast('Abriendo formulario de cotización...')"><i class="ti ti-send"></i> Enviar cotización privada</button>
-          <a href="login.html" class="mz-sol-btn hide-logged" style="background:var(--az);color:#fff;margin-top:8px;display:inline-flex;align-items:center;gap:5px;border:none;text-decoration:none;padding:7px 14px;border-radius:var(--rs);font-size:10px;font-weight:700"><i class="ti ti-login"></i> Inicia sesión para responder</a>
-        </div>
-      </div>
-
-      <!-- POST VECINAL -->
-      <div class="mz-post">
-        <div class="mz-post-head">
-          <div class="mz-post-av" style="background:var(--vd-bg);color:#14532d">MF</div>
-          <div><div class="mz-post-name">María Fernández</div><div class="mz-post-meta"><i class="ti ti-map-pin"></i> Tu zona · Hace 1 hora</div></div>
-          <div style="margin-left:auto"><i class="ti ti-dots" style="font-size:16px;color:var(--txt3)"></i></div>
-        </div>
-        <div class="mz-post-body">Vecinos, mañana la Municipalidad hará limpieza en el Parque El Naranjal desde las 8am. ¡Gracias a todos los que se animaron! 🌳</div>
-        <div class="mz-post-footer">
-          <button class="mz-post-action" onclick="this.style.color='var(--az)'"><i class="ti ti-thumb-up"></i> 24</button>
-          <button class="mz-post-action" onclick="mostrarToast('Los comentarios de esta publicación de demostración se activarán al cargar publicaciones reales.')"><i class="ti ti-message"></i> 8</button>
-          <button class="mz-post-action" onclick="compartirWhatsApp('Vi esto en MiZona: Limpieza en Parque El Naranjal mañana 8am. mizona.pe')"><i class="ti ti-share"></i> Compartir</button>
-        </div>
-      </div>
-
-      <!-- ALERTA MASCOTA -->
-      <div class="mz-alerta-ciudadana" style="border-left-color:var(--am);border-color:var(--am-bd)">
-        <div class="mz-ac-icon" style="background:var(--am-bg)">🐾</div>
-        <div style="flex:1">
-          <div class="mz-ac-title" style="margin-bottom:3px">Mascota perdida — Golden Retriever "Max"</div>
-          <div class="mz-ac-meta"><i class="ti ti-map-pin" style="font-size:9px"></i> Tu zona · Hace 2 h · Collar azul con placa</div>
-          <div class="mz-ac-actions">
-            <button class="mz-ac-btn" style="background:var(--am-bg);color:#713f12;border-color:var(--am-bd)" onclick="mostrarToast('Gracias por ayudar. El dueño será notificado.')">Lo vi</button>
-            <button class="mz-ac-btn" style="background:var(--az-bg);color:#1d4ed8;border-color:var(--az-bd)" onclick="compartirWhatsApp('Mascota perdida: Golden Retriever Max, collar azul. Si lo ves avisa. Vía mizona.pe')">📱 WhatsApp</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- CTA GUEST -->
-      <div class="hide-logged mz-guest-box">
-        <div class="mz-guest-emoji">🏘️</div>
-        <div class="mz-guest-title">Únete a tu comunidad</div>
-        <div class="mz-guest-sub">Recibe alertas, encuentra servicios y conecta con vecinos de tu zona. Completamente gratis.</div>
-        <div class="mz-guest-btns">
-          <a href="registro.html" class="mz-btn-primary"><i class="ti ti-user-plus"></i> Crear cuenta gratis</a>
-          <a href="login.html" class="mz-btn-secondary">Ya tengo cuenta</a>
-        </div>
-      </div>
-
-    </div>
-  </main>
-
-  <!-- SIDEBAR DERECHA -->
-  <aside class="mz-sidebar-right">
-    <div class="mz-widget">
-      <div class="mz-widget-head"><i class="ti ti-map-pin"></i> Tu zona hoy</div>
-      <div class="mz-stat-row"><div class="mz-stat-label"><i class="ti ti-bell" style="color:var(--rj)"></i><div><div>Alertas activas</div><div style="font-size:7px;color:var(--txt3)" id="sr-dist">Tu distrito</div></div></div><div class="mz-stat-val" style="color:var(--rj)" id="sr-alertas">7</div></div>
-      <div class="mz-stat-row"><div class="mz-stat-label"><i class="ti ti-tool"></i><div>Servicios cerca</div></div><div class="mz-stat-val" style="color:var(--az)" id="sr-svc">34</div></div>
-      <div class="mz-stat-row"><div class="mz-stat-label"><i class="ti ti-clipboard-list" style="color:var(--vd)"></i><div>Solicitudes abiertas</div></div><div class="mz-stat-val" style="color:var(--vd)" id="sr-sol">12</div></div>
-    </div>
-    <div class="mz-widget">
-      <div class="mz-widget-head"><i class="ti ti-building-store"></i> Negocios destacados</div>
-      <div class="mz-neg-row" onclick="mostrarToast('Abriendo Ferretería Don Carlos...')"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px"><div style="width:22px;height:22px;background:var(--am-bg);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#713f12">F</div><div class="mz-neg-name">Ferretería Don Carlos</div></div><div style="display:flex;gap:4px;align-items:center"><span class="mz-neg-badge">⭐ Destacado</span></div><div class="mz-neg-info">⭐ 4.8 · Abierto ahora</div></div>
-      <div class="mz-neg-row" onclick="mostrarToast('Abriendo Farmacia Económica...')"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px"><div style="width:22px;height:22px;background:var(--vd-bg);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#14532d">F</div><div class="mz-neg-name">Farmacia Económica</div></div><div class="mz-neg-info">⭐ 4.6 · 24 horas</div></div>
-    </div>
-    <div class="mz-cta" onclick="location.href='servicios.html#registrar'">
-      <div class="mz-cta-title">¿Tienes un negocio?</div>
-      <div class="mz-cta-sub">Aparece en MiZona gratis →</div>
-    </div>
-    <div class="mz-ride-widget" onclick="location.href='ride.html'" style="cursor:pointer">
-      <div style="font-size:11px;font-weight:800;color:#fff;display:flex;align-items:center;gap:5px;margin-bottom:3px">🚗 MiZonaRide</div>
-      <div style="font-size:9px;color:rgba(255,255,255,.7)">4 conductores disponibles en tu zona</div>
-      <div style="background:rgba(255,255,255,.15);color:#fff;border-radius:6px;padding:4px 10px;font-size:9px;font-weight:700;display:inline-block;margin-top:7px;border:1px solid rgba(255,255,255,.2)">Pedir taxi →</div>
-    </div>
-  </aside>
-
+<!-- SIDEBAR IZQUIERDA -->
+<aside class="mz-sidebar">
+<div class="mz-logo"><img alt="MiZona.pe" class="mz-logo-img" src="assets/mizona-logo-blanco.svg"/></div>
+<div class="mz-sidebar-user hide-guest" id="sb-user">
+<div class="mz-user-av" id="sb-av">JH</div>
+<div><div class="mz-user-name" id="sb-name">Usuario</div><div class="mz-user-dist"><i class="ti ti-map-pin"></i><span id="sb-dist">Tu zona</span></div></div>
 </div>
-
+<div class="mz-sidebar-user hide-logged" style="flex-direction:column;align-items:flex-start;gap:6px">
+<a href="login.html" style="width:100%;background:var(--az);color:#fff;border-radius:6px;padding:7px 10px;font-size:10px;font-weight:700;text-align:center;display:block">Iniciar sesión</a>
+<a href="registro.html" style="width:100%;background:transparent;color:#64748b;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:7px 10px;font-size:10px;font-weight:600;text-align:center;display:block">Crear cuenta gratis</a>
+</div>
+<div class="mz-nav-sec">Principal</div>
+<a class="mz-nav-item active" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
+<a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span><span class="mz-nav-badge" id="nb-alertas">0</span></a>
+<a class="mz-nav-item" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
+<a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
+<a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
+<div class="mz-nav-sec">Comunidad</div>
+<a class="mz-nav-item" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
+<a class="mz-nav-item" href="ride.html"><i class="ti ti-car"></i><span>MiZonaRide</span></a>
+<a class="mz-nav-item" href="empleos.html"><i class="ti ti-briefcase"></i><span>Empleos</span></a>
+<div class="mz-nav-sec">Cuenta</div>
+<a class="mz-nav-item" href="mensajes.html"><i class="ti ti-message"></i><span>Mensajes</span></a>
+<a class="mz-nav-item hide-guest" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
+<a class="mz-nav-item hide-guest" href="negocio.html"><i class="ti ti-building-store"></i><span>Mi negocio</span></a>
+<a class="mz-nav-item hide-guest" href="admin.html" id="link-admin" style="display:none"><i class="ti ti-shield"></i><span>Admin</span></a>
+<div class="mz-sidebar-spacer"></div>
+<button class="mz-sidebar-btn" onclick="abrirPublicar()"><i class="ti ti-plus"></i> Publicar en mi zona</button>
+</aside>
+<!-- FEED CENTRAL -->
+<main class="mz-feed">
+<div class="mz-topbar">
+<div class="mz-search" onclick="location.href='explorar.html'"><i class="ti ti-search"></i><span>Buscar en tu zona...</span></div>
+<div class="mz-dist-tag" id="dist-tag"><i class="ti ti-map-pin"></i><span id="dist-nombre">Mi zona</span></div>
+<div class="mz-icon-btn" onclick="location.href='notificaciones.html'"><i class="ti ti-bell"></i><div class="mz-notif-dot" id="notif-dot" style="display:none"></div></div>
+<div class="mz-icon-btn hide-guest" onclick="location.href='mensajes.html'"><i class="ti ti-message"></i></div>
+<div class="mz-icon-btn hide-logged" onclick="location.href='login.html'"><i class="ti ti-user"></i></div>
+</div>
+<div class="mz-feed-body">
+<!-- PÁNICO -->
+<div class="mz-panic" onclick="activarPanico()">
+<div class="mz-panic-pulse">🆘</div>
+<div class="mz-panic-text"><h3>Botón de emergencia</h3><p>Alerta a vecinos en radio de 500m · GPS activo</p></div>
+<button class="mz-panic-btn" onclick="event.stopPropagation();activarPanico()" type="button">ACTIVAR</button>
+</div>
+<!-- ALERTA OFICIAL -->
+<div>
+<span class="mz-zona">Zona Segura — Alerta oficial</span>
+<div class="mz-alerta-oficial" id="alerta-oficial">
+<div class="mz-ao-icon"><i class="ti ti-droplet"></i></div>
+<div style="flex:1">
+<div class="mz-ao-badge"><i class="ti ti-shield-check" style="font-size:8px"></i> Fuente verificada · Sedapal</div>
+<div class="mz-ao-title">Corte de agua — Av. Universitaria 1200–1800</div>
+<div class="mz-ao-meta">Hoy 14:00 – 18:00 · Tu distrito · Guarda agua ahora</div>
+</div>
+<div class="mz-ao-timer" id="timer-oficial">...</div>
+</div>
+</div>
+<!-- CREAR PUBLICACIÓN -->
+<div class="mz-crear hide-guest">
+<div class="mz-crear-top">
+<div class="mz-user-av" id="crear-av" style="width:34px;height:34px;font-size:11px">JH</div>
+<div class="mz-crear-input" onclick="abrirPublicar()">¿Qué pasa en tu zona?</div>
+</div>
+<div class="mz-crear-tipos">
+<div class="mz-tipo-btn" onclick="abrirModal('modal-alerta')"><i class="ti ti-bell" style="color:var(--rj)"></i> Alerta</div>
+<div class="mz-tipo-btn" onclick="abrirModal('modal-solicitud')"><i class="ti ti-clipboard-list" style="color:var(--vd)"></i> Solicitud</div>
+<div class="mz-tipo-btn" onclick="location.href='servicios.html#registrar'"><i class="ti ti-tool" style="color:var(--az)"></i> Mi servicio</div>
+<div class="mz-tipo-btn"><i class="ti ti-photo" style="color:var(--am)"></i> Foto</div>
+</div>
+</div>
+<!-- ALERTA CIUDADANA -->
+<div class="mz-alerta-ciudadana" id="ac-1">
+<div class="mz-ac-icon"><i class="ti ti-alert-circle" style="color:var(--rj)"></i></div>
+<div style="flex:1">
+<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
+<div class="mz-ac-title">Robo de celular — Jr. Las Palmeras cdra. 4</div>
+<span class="mz-ac-badge">Urgente</span>
+</div>
+<div class="mz-ac-meta"><i class="ti ti-map-pin" style="font-size:9px"></i> Tu zona · Hace 12 min <span class="mz-ac-confirm">· ✓ 3 vecinos confirmaron</span></div>
+<div class="mz-ac-actions">
+<button class="mz-ac-btn" onclick="confirmar('ac-1',this)" style="background:var(--vd-bg);color:#14532d;border-color:var(--vd-bd)">✓ También lo vi</button>
+<button class="mz-ac-btn" onclick="compartirWhatsApp('Alerta en mi zona: Robo de celular Jr. Las Palmeras cdra 4. Cuidado vecinos. Vía mizona.pe')" style="background:var(--az-bg);color:#1d4ed8;border-color:var(--az-bd)">📱 Compartir</button>
+<button class="mz-ac-btn" onclick="this.textContent='✓ Resuelto';this.disabled=true;mostrarToast('Gracias por confirmar que fue resuelto')" style="background:var(--vd-bg);color:#14532d;border-color:var(--vd-bd);margin-left:auto">✓ Resuelto</button>
+</div>
+</div>
+</div>
+<!-- MAPA -->
+<div>
+<span class="mz-zona">Mapa de alertas en vivo</span>
+<div class="mz-card">
+<div class="mz-card-head">
+<div class="mz-card-title"><i class="ti ti-map"></i> Alertas en tu zona</div>
+<div style="display:flex;align-items:center;gap:8px">
+<span style="font-size:9px;font-weight:700;color:var(--vd);display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;background:var(--vd);border-radius:50%;animation:blink-map 1.5s ease-in-out infinite;display:inline-block"></span> En vivo</span>
+<a class="mz-card-link" href="mapa.html">Ver completo</a>
+</div>
+</div>
+<div style="padding:6px 10px;background:var(--card);display:flex;gap:5px;overflow-x:auto;border-bottom:1px solid var(--bd2)">
+<button class="mz-tipo-btn active" onclick="filtrarMapa('todas',this)" style="font-size:8px;padding:3px 9px;background:var(--az);color:#fff;border-color:var(--az)">Todas</button>
+<button class="mz-tipo-btn" onclick="filtrarMapa('robo',this)" style="font-size:8px;padding:3px 9px">🔴 Robos</button>
+<button class="mz-tipo-btn" onclick="filtrarMapa('agua',this)" style="font-size:8px;padding:3px 9px">💧 Agua/Luz</button>
+<button class="mz-tipo-btn" onclick="filtrarMapa('mascota',this)" style="font-size:8px;padding:3px 9px">🐾 Mascotas</button>
+</div>
+<div id="mapa-alertas" style="height:220px;width:100%"></div>
+<div style="padding:7px 12px;background:var(--bg);border-top:1px solid var(--bd2);display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:8px;color:var(--txt2)">
+<span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:50%;background:var(--rj);display:inline-block"></span>Robo</span>
+<span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:50%;background:var(--az);display:inline-block"></span>Agua/Luz</span>
+<span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:50%;background:var(--am);display:inline-block"></span>Mascota</span>
+<span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:50%;background:var(--vd);display:inline-block"></span>Verificada</span>
+<span id="mapa-count" style="margin-left:auto;font-weight:700">Cargando...</span>
+</div>
+</div>
+</div>
+<!-- SERVICIOS -->
+<div>
+<span class="mz-zona">Zona Servicios</span>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+<div class="mz-card-title" style="font-size:12px"><i class="ti ti-tool"></i> Profesionales cerca de ti</div>
+<a href="servicios.html" style="font-size:10px;color:var(--az);font-weight:600">Ver todos</a>
+</div>
+<div class="mz-svc-grid" id="inicio-servicios">
+<div class="mz-svc-card"><div class="mz-svc-av">…</div><div class="mz-svc-name">Cargando</div><div class="mz-svc-trade">Servicios de tu zona</div></div>
+<div class="mz-svc-card" onclick="location.href='servicios.html#registrar'" style="border:1px dashed var(--bd);background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer"><i class="ti ti-plus" style="font-size:22px;color:var(--txt3);margin-bottom:6px"></i><div style="font-size:9px;color:var(--txt3);text-align:center">¿Ofreces un servicio? <strong style="color:var(--az)">Regístrate</strong></div></div>
+</div>
+</div>
+<!-- SOLICITUD -->
+<div>
+<span class="mz-zona vd">Zona Solicitudes</span>
+<div class="mz-sol">
+<span class="mz-sol-badge">📋 Solicitud abierta</span>
+<div class="mz-sol-title">Necesito gasfitero urgente — tubería rota en baño</div>
+<div class="mz-sol-meta"><span><i class="ti ti-user" style="font-size:10px"></i> Ana Torres</span><span><i class="ti ti-map-pin" style="font-size:10px"></i> Tu zona</span><span><i class="ti ti-clock" style="font-size:10px"></i> Hace 20 min</span></div>
+<div class="mz-sol-presup">Presupuesto: S/. 80 – S/. 150</div>
+<button class="mz-sol-btn hide-guest" onclick="mostrarToast('Abriendo formulario de cotización...')"><i class="ti ti-send"></i> Enviar cotización privada</button>
+<a class="mz-sol-btn hide-logged" href="login.html" style="background:var(--az);color:#fff;margin-top:8px;display:inline-flex;align-items:center;gap:5px;border:none;text-decoration:none;padding:7px 14px;border-radius:var(--rs);font-size:10px;font-weight:700"><i class="ti ti-login"></i> Inicia sesión para responder</a>
+</div>
+</div>
+<!-- POST VECINAL -->
+<div class="mz-post">
+<div class="mz-post-head">
+<div class="mz-post-av" style="background:var(--vd-bg);color:#14532d">MF</div>
+<div><div class="mz-post-name">María Fernández</div><div class="mz-post-meta"><i class="ti ti-map-pin"></i> Tu zona · Hace 1 hora</div></div>
+<div style="margin-left:auto"><i class="ti ti-dots" style="font-size:16px;color:var(--txt3)"></i></div>
+</div>
+<div class="mz-post-body">Vecinos, mañana la Municipalidad hará limpieza en el Parque El Naranjal desde las 8am. ¡Gracias a todos los que se animaron! 🌳</div>
+<div class="mz-post-footer">
+<button class="mz-post-action" onclick="this.style.color='var(--az)'"><i class="ti ti-thumb-up"></i> 24</button>
+<button class="mz-post-action" onclick="mostrarToast('Los comentarios de esta publicación de demostración se activarán al cargar publicaciones reales.')"><i class="ti ti-message"></i> 8</button>
+<button class="mz-post-action" onclick="compartirWhatsApp('Vi esto en MiZona: Limpieza en Parque El Naranjal mañana 8am. mizona.pe')"><i class="ti ti-share"></i> Compartir</button>
+</div>
+</div>
+<!-- ALERTA MASCOTA -->
+<div class="mz-alerta-ciudadana" style="border-left-color:var(--am);border-color:var(--am-bd)">
+<div class="mz-ac-icon" style="background:var(--am-bg)">🐾</div>
+<div style="flex:1">
+<div class="mz-ac-title" style="margin-bottom:3px">Mascota perdida — Golden Retriever "Max"</div>
+<div class="mz-ac-meta"><i class="ti ti-map-pin" style="font-size:9px"></i> Tu zona · Hace 2 h · Collar azul con placa</div>
+<div class="mz-ac-actions">
+<button class="mz-ac-btn" onclick="mostrarToast('Gracias por ayudar. El dueño será notificado.')" style="background:var(--am-bg);color:#713f12;border-color:var(--am-bd)">Lo vi</button>
+<button class="mz-ac-btn" onclick="compartirWhatsApp('Mascota perdida: Golden Retriever Max, collar azul. Si lo ves avisa. Vía mizona.pe')" style="background:var(--az-bg);color:#1d4ed8;border-color:var(--az-bd)">📱 WhatsApp</button>
+</div>
+</div>
+</div>
+<!-- CTA GUEST -->
+<div class="hide-logged mz-guest-box">
+<div class="mz-guest-emoji">🏘️</div>
+<div class="mz-guest-title">Únete a tu comunidad</div>
+<div class="mz-guest-sub">Recibe alertas, encuentra servicios y conecta con vecinos de tu zona. Completamente gratis.</div>
+<div class="mz-guest-btns">
+<a class="mz-btn-primary" href="registro.html"><i class="ti ti-user-plus"></i> Crear cuenta gratis</a>
+<a class="mz-btn-secondary" href="login.html">Ya tengo cuenta</a>
+</div>
+</div>
+</div>
+</main>
+<!-- SIDEBAR DERECHA -->
+<aside class="mz-sidebar-right">
+<div class="mz-widget">
+<div class="mz-widget-head"><i class="ti ti-map-pin"></i> Tu zona hoy</div>
+<div class="mz-stat-row"><div class="mz-stat-label"><i class="ti ti-bell" style="color:var(--rj)"></i><div><div>Alertas activas</div><div id="sr-dist" style="font-size:7px;color:var(--txt3)">Tu distrito</div></div></div><div class="mz-stat-val" id="sr-alertas" style="color:var(--rj)">7</div></div>
+<div class="mz-stat-row"><div class="mz-stat-label"><i class="ti ti-tool"></i><div>Servicios cerca</div></div><div class="mz-stat-val" id="sr-svc" style="color:var(--az)">34</div></div>
+<div class="mz-stat-row"><div class="mz-stat-label"><i class="ti ti-clipboard-list" style="color:var(--vd)"></i><div>Solicitudes abiertas</div></div><div class="mz-stat-val" id="sr-sol" style="color:var(--vd)">12</div></div>
+</div>
+<div class="mz-widget">
+<div class="mz-widget-head"><i class="ti ti-building-store"></i> Negocios destacados</div>
+<div class="mz-neg-row" onclick="mostrarToast('Abriendo Ferretería Don Carlos...')"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px"><div style="width:22px;height:22px;background:var(--am-bg);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#713f12">F</div><div class="mz-neg-name">Ferretería Don Carlos</div></div><div style="display:flex;gap:4px;align-items:center"><span class="mz-neg-badge">⭐ Destacado</span></div><div class="mz-neg-info">⭐ 4.8 · Abierto ahora</div></div>
+<div class="mz-neg-row" onclick="mostrarToast('Abriendo Farmacia Económica...')"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px"><div style="width:22px;height:22px;background:var(--vd-bg);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#14532d">F</div><div class="mz-neg-name">Farmacia Económica</div></div><div class="mz-neg-info">⭐ 4.6 · 24 horas</div></div>
+</div>
+<div class="mz-cta" onclick="location.href='servicios.html#registrar'">
+<div class="mz-cta-title">¿Tienes un negocio?</div>
+<div class="mz-cta-sub">Aparece en MiZona gratis →</div>
+</div>
+<div class="mz-ride-widget" onclick="location.href='ride.html'" style="cursor:pointer">
+<div style="font-size:11px;font-weight:800;color:#fff;display:flex;align-items:center;gap:5px;margin-bottom:3px">🚗 MiZonaRide</div>
+<div style="font-size:9px;color:rgba(255,255,255,.7)">4 conductores disponibles en tu zona</div>
+<div style="background:rgba(255,255,255,.15);color:#fff;border-radius:6px;padding:4px 10px;font-size:9px;font-weight:700;display:inline-block;margin-top:7px;border:1px solid rgba(255,255,255,.2)">Pedir taxi →</div>
+</div>
+</aside>
+</div>
 <!-- BOTTOM NAV -->
 <nav class="mz-bottom-nav">
-  <div class="mz-bn-inner">
-    <div class="mz-bn-item active" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
-    <div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
-    <div class="mz-bn-item" onclick="abrirPublicar()"><div class="mz-bn-center"><i class="ti ti-plus"></i></div></div>
-    <div class="mz-bn-item" onclick="location.href='servicios.html'"><i class="ti ti-tool"></i><span>Servicios</span></div>
-    <div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
-  </div>
+<div class="mz-bn-inner">
+<div class="mz-bn-item active" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
+<div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
+<div class="mz-bn-item" onclick="abrirPublicar()"><div class="mz-bn-center"><i class="ti ti-plus"></i></div></div>
+<div class="mz-bn-item" onclick="location.href='servicios.html'"><i class="ti ti-tool"></i><span>Servicios</span></div>
+<div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
+</div>
 </nav>
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script type="module">
@@ -599,6 +575,6 @@ initAuth();
 initMapa();
 cargarServiciosInicio();
 </script>
-<script type="module" src="./js/mizona-core.js"></script>
+<script src="./js/mizona-core.js" type="module"></script>
 </body>
 </html>

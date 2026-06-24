@@ -1,56 +1,52 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#185FA5">
-  <title>Mensajes · MiZona</title>
-  <link rel="stylesheet" href="css/global.css">
-  <link rel="stylesheet" href="css/mizona-unified.css">
-  <link rel="stylesheet" href="css/mizona-phase2.css">
-<link rel="stylesheet" href="css/mizona-master-shell.css">
-</head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="#185FA5" name="theme-color"/>
+<title>Mensajes · MiZona</title>
+<link href="css/global.css" rel="stylesheet"/>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
+<link href="css/mizona-phase2.css" rel="stylesheet"/>
+<link href="css/mizona-master-shell.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
 <body>
-  <main class="page-shell mz-chat-page">
-    <header class="mz-legacy-header">
-      <a class="brand" href="index.html"><span class="brand-mark">MZ</span><span data-brand-name>MiZona</span></a>
-      <a class="secondary" href="index.html">← Volver</a>
-    </header>
-
-    <section id="chatLayout" class="chat-layout" aria-label="Mensajería">
-      <aside class="conversations-list">
-        <div class="conversation-list-head">
-          <strong>Conversaciones</strong>
-          <small>Contacta con vecinos y proveedores de forma privada.</small>
-          <label class="conversation-search">
-            <i class="ti ti-search" aria-hidden="true"></i>
-            <input id="conversationSearch" type="search" placeholder="Buscar conversación" autocomplete="off">
-          </label>
-        </div>
-        <div id="conversationsItems">
-          <div class="chat-empty"><div><i class="ti ti-loader-2"></i><span>Cargando conversaciones…</span></div></div>
-        </div>
-      </aside>
-
-      <section class="chat-panel">
-        <header id="chatHeader" class="chat-header">
-          <button id="chatBack" class="chat-back" type="button" aria-label="Volver a conversaciones"><i class="ti ti-arrow-left"></i></button>
-          <div class="chat-header-profile"><strong>Selecciona una conversación</strong><small>Elige un contacto para comenzar</small></div>
-        </header>
-
-        <div id="messagesList" class="messages-list">
-          <div class="chat-empty"><div><i class="ti ti-messages"></i><strong>Tu mensajería de MiZona</strong><p>Selecciona una conversación o contacta a un proveedor.</p></div></div>
-        </div>
-
-        <form id="messageForm" class="message-form">
-          <input id="messageInput" maxlength="2000" placeholder="Escribe un mensaje" autocomplete="off" disabled>
-          <button id="sendButton" class="primary" type="submit" disabled>Enviar</button>
-        </form>
-      </section>
-    </section>
-  </main>
-
-  <script type="module">
+<main class="page-shell mz-chat-page">
+<header class="mz-legacy-header">
+<a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a>
+<a class="secondary" href="index.html">← Volver</a>
+</header>
+<section aria-label="Mensajería" class="chat-layout" id="chatLayout">
+<aside class="conversations-list">
+<div class="conversation-list-head">
+<strong>Conversaciones</strong>
+<small>Contacta con vecinos y proveedores de forma privada.</small>
+<label class="conversation-search">
+<i aria-hidden="true" class="ti ti-search"></i>
+<input autocomplete="off" id="conversationSearch" placeholder="Buscar conversación" type="search"/>
+</label>
+</div>
+<div id="conversationsItems">
+<div class="chat-empty"><div><i class="ti ti-loader-2"></i><span>Cargando conversaciones…</span></div></div>
+</div>
+</aside>
+<section class="chat-panel">
+<header class="chat-header" id="chatHeader">
+<button aria-label="Volver a conversaciones" class="chat-back" id="chatBack" type="button"><i class="ti ti-arrow-left"></i></button>
+<div class="chat-header-profile"><strong>Selecciona una conversación</strong><small>Elige un contacto para comenzar</small></div>
+</header>
+<div class="messages-list" id="messagesList">
+<div class="chat-empty"><div><i class="ti ti-messages"></i><strong>Tu mensajería de MiZona</strong><p>Selecciona una conversación o contacta a un proveedor.</p></div></div>
+</div>
+<form class="message-form" id="messageForm">
+<input autocomplete="off" disabled="" id="messageInput" maxlength="2000" placeholder="Escribe un mensaje"/>
+<button class="primary" disabled="" id="sendButton" type="submit">Enviar</button>
+</form>
+</section>
+</section>
+</main>
+<script type="module">
     import { applyBrand } from "./js/brand.js";
     import { supabase, getCurrentUser } from "./js/supabase.js";
 
@@ -351,7 +347,7 @@
 
     await loadConversations();
   </script>
-  <script type="module" src="./js/mizona-core.js"></script>
-<script type="module" src="./js/mizona-master-shell.js"></script>
+<script src="./js/mizona-core.js" type="module"></script>
+<script src="./js/mizona-master-shell.js" type="module"></script>
 </body>
 </html>

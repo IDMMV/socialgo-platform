@@ -90,7 +90,7 @@ function buildShell(page,main){
   shell.className='mz3-shell';
   shell.innerHTML=`
     <aside class="mz3-sidebar" id="mz3Sidebar">
-      <a class="mz3-brand" href="index.html"><span class="mz3-brand-mark">MZ</span><span class="mz3-brand-text"><strong>MiZona</strong><small>mizona.pe</small></span></a>
+      <a class="mz3-brand" href="index.html" aria-label="MiZona.pe"><img class="mz3-brand-logo" src="assets/mizona-logo-blanco.svg" alt="MiZona.pe"></a>
       <a class="mz3-account" id="mz3Account" href="perfil.html" hidden><span class="mz3-account-avatar" id="mz3SideAvatar">U</span><span class="mz3-account-copy"><strong id="mz3SideName">Usuario</strong><small id="mz3SideMeta">Tu zona</small></span></a>
       <div class="mz3-guest" id="mz3Guest" hidden><a href="login.html">Ingresar</a><a href="registro.html">Crear cuenta</a></div>
       ${navHtml(page)}

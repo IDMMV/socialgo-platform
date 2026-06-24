@@ -1,215 +1,182 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#185FA5">
-  <title>Clips · MiZona</title>
-  <link rel="stylesheet" href="css/global.css">
-<link rel="stylesheet" href="css/mizona-unified.css">
-<link rel="stylesheet" href="css/mizona-phase2.css">
-</head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#185FA5" name="theme-color"/>
+<title>Clips · MiZona</title>
+<link href="css/global.css" rel="stylesheet"/>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
+<link href="css/mizona-phase2.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
 <body class="clips-page">
-  <header class="clips-header">
-    <a class="clips-logo" href="index.html">
-      <span class="brand-mark">MZ</span>
-      <strong data-brand-name>MiZona</strong>
-    </a>
-    <nav class="clips-tabs">
-      <button class="active" type="button" data-feed-mode="all">Para ti</button>
-      <button type="button" data-feed-mode="following">Siguiendo</button>
-    </nav>
-    <a class="clips-search" href="explorar.html" aria-label="Buscar">⌕</a>
-  </header>
-
-  <button id="createClipButton" class="clip-create-button" type="button" aria-label="Crear clip">＋</button>
-
-  <main id="clipsFeed" class="clips-feed" aria-live="polite">
-    <section class="clip-empty">
-      <div class="notice">Cargando clips…</div>
-    </section>
-  </main>
-
-  <dialog id="clipUploadDialog" class="clip-editor-dialog">
-    <section class="clip-editor-shell">
-      <header class="clip-editor-header">
-        <button id="closeClipEditor" class="icon-button" type="button" aria-label="Cerrar">←</button>
-        <div>
-          <h2>Crear clip</h2>
-          <small>Máximo 3 minutos</small>
-        </div>
-        <button id="publishClipButton" class="primary" type="button">Siguiente</button>
-      </header>
-
-      <div class="clip-editor-body">
-        <section class="clip-editor-preview">
-          <div class="phone-preview">
-            <video id="clipPreviewVideo" playsinline controls></video>
-            <div id="clipTextOverlay" class="clip-text-overlay hidden">Texto</div>
-          </div>
-
-          <div class="editor-quick-tools">
-            <button id="toggleMute" type="button">🔊<small>Sonido</small></button>
-            <button id="addClipText" type="button">T<small>Texto</small></button>
-            <button id="chooseCover" type="button">▣<small>Portada</small></button>
-            <button id="resetTrim" type="button">↺<small>Restablecer</small></button>
-          </div>
-        </section>
-
-        <section class="clip-editor-controls">
-          <label class="file-picker clip-source-picker">
+<header class="clips-header">
+<a class="clips-logo" href="index.html"><img alt="MiZona.pe" class="clips-logo-img" src="assets/mizona-logo-blanco.svg"/></a>
+<nav class="clips-tabs">
+<button class="active" data-feed-mode="all" type="button">Para ti</button>
+<button data-feed-mode="following" type="button">Siguiendo</button>
+</nav>
+<a aria-label="Buscar" class="clips-search" href="explorar.html">⌕</a>
+</header>
+<button aria-label="Crear clip" class="clip-create-button" id="createClipButton" type="button">＋</button>
+<main aria-live="polite" class="clips-feed" id="clipsFeed">
+<section class="clip-empty">
+<div class="notice">Cargando clips…</div>
+</section>
+</main>
+<dialog class="clip-editor-dialog" id="clipUploadDialog">
+<section class="clip-editor-shell">
+<header class="clip-editor-header">
+<button aria-label="Cerrar" class="icon-button" id="closeClipEditor" type="button">←</button>
+<div>
+<h2>Crear clip</h2>
+<small>Máximo 3 minutos</small>
+</div>
+<button class="primary" id="publishClipButton" type="button">Siguiente</button>
+</header>
+<div class="clip-editor-body">
+<section class="clip-editor-preview">
+<div class="phone-preview">
+<video controls="" id="clipPreviewVideo" playsinline=""></video>
+<div class="clip-text-overlay hidden" id="clipTextOverlay">Texto</div>
+</div>
+<div class="editor-quick-tools">
+<button id="toggleMute" type="button">🔊<small>Sonido</small></button>
+<button id="addClipText" type="button">T<small>Texto</small></button>
+<button id="chooseCover" type="button">▣<small>Portada</small></button>
+<button id="resetTrim" type="button">↺<small>Restablecer</small></button>
+</div>
+</section>
+<section class="clip-editor-controls">
+<label class="file-picker clip-source-picker">
             🎥 Grabar o elegir video
-            <input
-              id="clipFile"
-              type="file"
-              accept="video/mp4,video/webm,video/quicktime"
-              capture="environment">
-          </label>
-
-          <div id="editorEmptyState" class="notice">
+            <input accept="video/mp4,video/webm,video/quicktime" capture="environment" id="clipFile" type="file"/>
+</label>
+<div class="notice" id="editorEmptyState">
             Selecciona o graba un video para comenzar.
           </div>
-
-          <div id="editorControls" hidden>
-            <div class="clip-file-info">
-              <span>Duración original</span>
-              <strong id="originalDuration">00:00</strong>
-            </div>
-
-            <section class="trim-editor">
-              <div class="trim-heading">
-                <strong>Recortar video</strong>
-                <span id="selectedDuration">00:00 / 03:00</span>
-              </div>
-
-              <div id="thumbnailTimeline" class="thumbnail-timeline"></div>
-
-              <div class="range-stack">
-                <input id="trimStart" type="range" min="0" value="0" step="0.1">
-                <input id="trimEnd" type="range" min="0" value="0" step="0.1">
-              </div>
-
-              <div class="trim-times">
-                <label>
+<div hidden="" id="editorControls">
+<div class="clip-file-info">
+<span>Duración original</span>
+<strong id="originalDuration">00:00</strong>
+</div>
+<section class="trim-editor">
+<div class="trim-heading">
+<strong>Recortar video</strong>
+<span id="selectedDuration">00:00 / 03:00</span>
+</div>
+<div class="thumbnail-timeline" id="thumbnailTimeline"></div>
+<div class="range-stack">
+<input id="trimStart" min="0" step="0.1" type="range" value="0"/>
+<input id="trimEnd" min="0" step="0.1" type="range" value="0"/>
+</div>
+<div class="trim-times">
+<label>
                   Inicio
-                  <input id="trimStartTime" type="text" value="00:00.0" readonly>
-                </label>
-                <label>
+                  <input id="trimStartTime" readonly="" type="text" value="00:00.0"/>
+</label>
+<label>
                   Final
-                  <input id="trimEndTime" type="text" value="00:00.0" readonly>
-                </label>
-              </div>
-            </section>
-
-            <section id="coverPickerPanel" class="cover-picker-panel hidden">
-              <div class="trim-heading">
-                <strong>Elegir portada</strong>
-                <span id="coverTimeLabel">00:00</span>
-              </div>
-              <input id="coverTime" type="range" min="0" value="0" step="0.1">
-              <canvas id="coverCanvas" width="360" height="640"></canvas>
-            </section>
-
-            <section id="clipTextPanel" class="clip-text-panel hidden">
-              <label class="field">
+                  <input id="trimEndTime" readonly="" type="text" value="00:00.0"/>
+</label>
+</div>
+</section>
+<section class="cover-picker-panel hidden" id="coverPickerPanel">
+<div class="trim-heading">
+<strong>Elegir portada</strong>
+<span id="coverTimeLabel">00:00</span>
+</div>
+<input id="coverTime" min="0" step="0.1" type="range" value="0"/>
+<canvas height="640" id="coverCanvas" width="360"></canvas>
+</section>
+<section class="clip-text-panel hidden" id="clipTextPanel">
+<label class="field">
                 Texto dentro del video
-                <input id="clipTextInput" maxlength="80" placeholder="Escribe un texto">
-              </label>
-
-              <div class="text-style-grid">
-                <label>
+                <input id="clipTextInput" maxlength="80" placeholder="Escribe un texto"/>
+</label>
+<div class="text-style-grid">
+<label>
                   Color
-                  <input id="clipTextColor" type="color" value="#ffffff">
-                </label>
-
-                <label>
+                  <input id="clipTextColor" type="color" value="#ffffff"/>
+</label>
+<label>
                   Fondo
                   <select id="clipTextBackground">
-                    <option value="dark">Oscuro</option>
-                    <option value="light">Claro</option>
-                    <option value="transparent">Sin fondo</option>
-                    <option value="purple">Morado</option>
-                    <option value="pink">Rosado</option>
-                  </select>
-                </label>
-
-                <label>
+<option value="dark">Oscuro</option>
+<option value="light">Claro</option>
+<option value="transparent">Sin fondo</option>
+<option value="purple">Morado</option>
+<option value="pink">Rosado</option>
+</select>
+</label>
+<label>
                   Tamaño
-                  <input id="clipTextSize" type="range" min="18" max="52" value="28">
-                </label>
-              </div>
-
-              <p class="notice">
+                  <input id="clipTextSize" max="52" min="18" type="range" value="28"/>
+</label>
+</div>
+<p class="notice">
                 Arrastra el texto directamente sobre el video para colocarlo donde deseas.
               </p>
-            </section>
-
-            <label class="field">
+</section>
+<label class="field">
               Descripción
-              <textarea id="clipDescription" maxlength="1000" rows="3" placeholder="Escribe una descripción"></textarea>
-            </label>
-
-            <label class="field">
+              <textarea id="clipDescription" maxlength="1000" placeholder="Escribe una descripción" rows="3"></textarea>
+</label>
+<label class="field">
               Visibilidad
               <select id="clipVisibility">
-                <option value="public">Público</option>
-                <option value="followers">Solo seguidores</option>
-                <option value="friends">Solo amigos</option>
-                <option value="private">Solo yo</option>
-              </select>
-            </label>
-
-            <label class="toggle-row">
-              <span>Permitir comentarios</span>
-              <input id="clipAllowComments" type="checkbox" checked>
-            </label>
-
-            <label class="toggle-row">
-              <span>Permitir descargar el video</span>
-              <input id="clipAllowDownload" type="checkbox">
-            </label>
-
-            <div id="clipUploadStatus" class="notice hidden"></div>
-
-            <div id="processingBox" class="processing-box hidden">
-              <div class="processing-header">
-                <strong id="processingTitle">Procesando video…</strong>
-                <span id="processingPercent">0%</span>
-              </div>
-              <progress id="processingProgress" max="100" value="0"></progress>
-              <small id="processingHint">No cierres esta ventana. La carga puede continuar por partes.</small>
-            </div>
-          </div>
-        </section>
-      </div>
-    </section>
-  </dialog>
-
-  <dialog id="clipCommentsDialog">
-    <section class="modal-card">
-      <header>
-        <h2>Comentarios</h2>
-        <button type="button" id="closeClipComments">✕</button>
-      </header>
-      <div id="clipCommentsList" class="comments-list">
-        <p class="notice">Cargando…</p>
-      </div>
-      <form id="clipCommentForm" class="comment-form">
-        <input id="clipCommentText" maxlength="1000" placeholder="Escribe un comentario">
-        <button class="primary" type="submit">Enviar</button>
-      </form>
-    </section>
-  </dialog>
-
-  <nav class="clips-bottom-nav">
-    <a href="index.html">⌂<small>Inicio</small></a>
-    <a href="explorar.html">⌕<small>Explorar</small></a>
-    <button id="bottomCreateClip" type="button">＋<small>Crear</small></button>
-    <a class="active" href="clips.html">▶<small>Clips</small></a>
-    <a href="perfil.html">◉<small>Perfil</small></a>
-  </nav>
-
-  <script type="module" src="js/clips.js"></script>
-<script type="module" src="./js/mizona-core.js"></script>
+<option value="public">Público</option>
+<option value="followers">Solo seguidores</option>
+<option value="friends">Solo amigos</option>
+<option value="private">Solo yo</option>
+</select>
+</label>
+<label class="toggle-row">
+<span>Permitir comentarios</span>
+<input checked="" id="clipAllowComments" type="checkbox"/>
+</label>
+<label class="toggle-row">
+<span>Permitir descargar el video</span>
+<input id="clipAllowDownload" type="checkbox"/>
+</label>
+<div class="notice hidden" id="clipUploadStatus"></div>
+<div class="processing-box hidden" id="processingBox">
+<div class="processing-header">
+<strong id="processingTitle">Procesando video…</strong>
+<span id="processingPercent">0%</span>
+</div>
+<progress id="processingProgress" max="100" value="0"></progress>
+<small id="processingHint">No cierres esta ventana. La carga puede continuar por partes.</small>
+</div>
+</div>
+</section>
+</div>
+</section>
+</dialog>
+<dialog id="clipCommentsDialog">
+<section class="modal-card">
+<header>
+<h2>Comentarios</h2>
+<button id="closeClipComments" type="button">✕</button>
+</header>
+<div class="comments-list" id="clipCommentsList">
+<p class="notice">Cargando…</p>
+</div>
+<form class="comment-form" id="clipCommentForm">
+<input id="clipCommentText" maxlength="1000" placeholder="Escribe un comentario"/>
+<button class="primary" type="submit">Enviar</button>
+</form>
+</section>
+</dialog>
+<nav class="clips-bottom-nav">
+<a href="index.html">⌂<small>Inicio</small></a>
+<a href="explorar.html">⌕<small>Explorar</small></a>
+<button id="bottomCreateClip" type="button">＋<small>Crear</small></button>
+<a class="active" href="clips.html">▶<small>Clips</small></a>
+<a href="perfil.html">◉<small>Perfil</small></a>
+</nav>
+<script src="js/clips.js" type="module"></script>
+<script src="./js/mizona-core.js" type="module"></script>
 </body>
 </html>

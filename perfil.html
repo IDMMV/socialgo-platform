@@ -1,13 +1,14 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#185FA5">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#185FA5" name="theme-color"/>
 <title>Mi perfil — MiZona.pe</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
-<link rel="stylesheet" href="css/mizona.css">
+<link href="manifest.json" rel="manifest"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet"/>
+<link href="css/mizona.css" rel="stylesheet"/>
 <style>
 .perfil-portada{height:160px;background:linear-gradient(135deg,#185FA5,#1D9E75);position:relative;border-radius:var(--r) var(--r) 0 0;overflow:hidden}
 .perfil-portada img{width:100%;height:100%;object-fit:cover}
@@ -60,199 +61,180 @@
 
 @media(max-width:640px){.perfil-form-grid{grid-template-columns:1fr}}
 </style>
-<link rel="stylesheet" href="css/mizona-unified.css">
-<link rel="stylesheet" href="css/mizona-phase2.css">
-<link rel="stylesheet" href="css/mizona-master-shell.css">
-</head>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
+<link href="css/mizona-phase2.css" rel="stylesheet"/>
+<link href="css/mizona-master-shell.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
 <body>
-
-<div id="mz-toast" class="mz-toast"></div>
-<input type="file" id="input-avatar" accept="image/*" hidden>
-<input type="file" id="input-portada" accept="image/*" hidden>
-
+<div class="mz-toast" id="mz-toast"></div>
+<input accept="image/*" hidden="" id="input-avatar" type="file"/>
+<input accept="image/*" hidden="" id="input-portada" type="file"/>
 <div class="mz-layout-2col">
-
-  <!-- SIDEBAR -->
-  <aside class="mz-sidebar">
-    <div class="mz-logo">
-      <div class="mz-logo-mark">MZ</div>
-      <div><div class="mz-logo-name">MiZona</div><div class="mz-logo-domain">mizona.pe</div></div>
-    </div>
-    <div class="mz-nav-sec">Principal</div>
-    <a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
-    <a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
-    <a class="mz-nav-item" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
-    <a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
-    <a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
-    <div class="mz-nav-sec">Comunidad</div>
-    <a class="mz-nav-item" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
-    <a class="mz-nav-item" href="ride.html"><i class="ti ti-car"></i><span>MiZonaRide</span></a>
-    <div class="mz-nav-sec">Cuenta</div>
-    <a class="mz-nav-item" href="mensajes.html"><i class="ti ti-message"></i><span>Mensajes</span></a>
-    <a class="mz-nav-item active" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
-    <a class="mz-nav-item" href="negocio.html"><i class="ti ti-building-store"></i><span>Mi negocio</span></a>
-    <div class="mz-sidebar-spacer"></div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="mz-feed">
-    <div class="mz-topbar">
-      <div style="flex:1;font-size:14px;font-weight:700;color:var(--txt)">Mi perfil</div>
-      <a href="index.html" style="font-size:10px;color:var(--txt3);display:flex;align-items:center;gap:4px;text-decoration:none"><i class="ti ti-arrow-left" style="font-size:14px"></i> Volver</a>
-    </div>
-
-    <div class="mz-feed-body">
-
-      <!-- CARD PERFIL -->
-      <div class="mz-card" id="perfil-card">
-        <!-- PORTADA -->
-        <div class="perfil-portada" id="portada-wrap">
-          <img id="portada-img" style="display:none">
-          <button class="perfil-portada-btn" onclick="document.getElementById('input-portada').click()">
-            <i class="ti ti-photo" style="font-size:11px"></i> Cambiar portada
-          </button>
-        </div>
-
-        <!-- AVATAR + INFO -->
-        <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px 0 0">
-          <div class="perfil-avatar-wrap">
-            <div class="perfil-avatar" id="avatar-box">
-              <img id="avatar-img" style="display:none">
-              <span id="avatar-iniciales">U</span>
-            </div>
-            <div class="perfil-avatar-btn" onclick="document.getElementById('input-avatar').click()">
-              <i class="ti ti-camera"></i>
-            </div>
-          </div>
-          <div style="padding:10px 0 8px;display:flex;gap:6px">
-            <button class="perfil-edit-btn" id="btn-editar" onclick="toggleEditar()">
-              <i class="ti ti-pencil" style="font-size:13px"></i> Editar perfil
-            </button>
-            <button class="logout-btn" onclick="cerrarSesion()">
-              <i class="ti ti-logout" style="font-size:13px"></i> Salir
-            </button>
-          </div>
-        </div>
-
-        <div class="perfil-info-row">
-          <div>
-            <div class="perfil-nombre" id="perfil-nombre">Cargando...</div>
-            <div class="perfil-usuario"><i class="ti ti-at" style="font-size:11px"></i><span id="perfil-username">@usuario</span></div>
-            <div class="perfil-dist"><i class="ti ti-map-pin" style="font-size:11px"></i><span id="perfil-dist">Tu zona</span></div>
-          </div>
-          <div id="perfil-bio" style="font-size:11px;color:var(--txt2);max-width:300px;line-height:1.5"></div>
-        </div>
-
-        <!-- STATS -->
-        <div class="perfil-stats">
-          <div class="perfil-stat">
-            <div class="perfil-stat-val" id="stat-alertas">0</div>
-            <div class="perfil-stat-label">Alertas</div>
-          </div>
-          <div class="perfil-stat">
-            <div class="perfil-stat-val" id="stat-servicios">0</div>
-            <div class="perfil-stat-label">Servicios</div>
-          </div>
-          <div class="perfil-stat">
-            <div class="perfil-stat-val" id="stat-confirmaciones">0</div>
-            <div class="perfil-stat-label">Confirmaciones</div>
-          </div>
-          <div class="perfil-stat">
-            <div class="perfil-stat-val" id="stat-solicitudes">0</div>
-            <div class="perfil-stat-label">Solicitudes</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- FORMULARIO EDITAR -->
-      <div class="mz-card" id="form-editar" style="display:none">
-        <div class="mz-card-head">
-          <div class="mz-card-title"><i class="ti ti-pencil"></i> Editar información</div>
-        </div>
-        <div style="padding:14px">
-          <div class="perfil-form-grid">
-            <div class="campo">
-              <label>Nombre visible</label>
-              <input id="f-nombre" type="text" maxlength="80" placeholder="Tu nombre completo">
-            </div>
-            <div class="campo">
-              <label>Usuario</label>
-              <input id="f-username" type="text" readonly style="opacity:.6">
-              <small>El usuario no se puede cambiar</small>
-            </div>
-            <div class="campo">
-              <label>Correo de acceso</label>
-              <input id="f-email" type="email">
-            </div>
-            <div class="campo">
-              <label>Teléfono de contacto</label>
-              <input id="f-telefono" type="tel" placeholder="+51 999 999 999">
-            </div>
-            <div class="campo">
-              <label>Distrito</label>
-              <input id="f-distrito" type="text" placeholder="Ej: Los Olivos, Surco...">
-            </div>
-            <div class="campo">
-              <label>Zona o urbanización</label>
-              <input id="f-zona" type="text" placeholder="Ej: Urb. El Naranjal">
-            </div>
-            <div class="campo full">
-              <label>Biografía</label>
-              <textarea id="f-bio" maxlength="300" placeholder="Cuéntanos algo sobre ti..."></textarea>
-            </div>
-          </div>
-
-          <div style="margin-top:12px;background:var(--bg);border-radius:var(--rs);padding:10px 12px">
-            <div style="font-size:10px;font-weight:700;color:var(--txt2);margin-bottom:8px">Privacidad</div>
-            <div class="toggle-fila">
-              <label>Permitir que me encuentren por correo</label>
-              <button class="toggle-switch on" id="tog-email" onclick="this.classList.toggle('on')"></button>
-            </div>
-            <div class="toggle-fila">
-              <label>Permitir que me encuentren por teléfono</label>
-              <button class="toggle-switch" id="tog-tel" onclick="this.classList.toggle('on')"></button>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:8px;margin-top:12px">
-            <button onclick="guardarPerfil()" style="background:var(--az);color:#fff;border:none;border-radius:var(--rs);padding:9px 20px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">
-              <i class="ti ti-device-floppy" style="font-size:14px"></i> Guardar cambios
-            </button>
-            <button onclick="toggleEditar()" style="background:var(--bg);color:var(--txt2);border:1px solid var(--bd);border-radius:var(--rs);padding:9px 16px;font-size:11px;cursor:pointer">Cancelar</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ACTIVIDAD -->
-      <div class="mz-card">
-        <div class="act-tabs">
-          <button class="act-tab active" onclick="verActividad('alertas',this)"><i class="ti ti-bell" style="font-size:13px"></i> Alertas</button>
-          <button class="act-tab" onclick="verActividad('servicios',this)"><i class="ti ti-tool" style="font-size:13px"></i> Servicios</button>
-          <button class="act-tab" onclick="verActividad('solicitudes',this)"><i class="ti ti-clipboard-list" style="font-size:13px"></i> Solicitudes</button>
-          <button class="act-tab" onclick="verActividad('confirmaciones',this)"><i class="ti ti-check" style="font-size:13px"></i> Confirmaciones</button>
-        </div>
-        <div class="act-content" id="act-content">
-          <i class="ti ti-bell" style="font-size:30px;color:var(--bd)"></i>
-          <div>No hay alertas publicadas aún</div>
-          <a href="alertas.html#reportar" style="color:var(--az);font-size:10px;font-weight:700;text-decoration:none">Publicar primera alerta →</a>
-        </div>
-      </div>
-
-    </div>
-  </main>
+<!-- SIDEBAR -->
+<aside class="mz-sidebar">
+<div class="mz-logo"><img alt="MiZona.pe" class="mz-logo-img" src="assets/mizona-logo-blanco.svg"/></div>
+<div class="mz-nav-sec">Principal</div>
+<a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
+<a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
+<a class="mz-nav-item" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
+<a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
+<a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
+<div class="mz-nav-sec">Comunidad</div>
+<a class="mz-nav-item" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
+<a class="mz-nav-item" href="ride.html"><i class="ti ti-car"></i><span>MiZonaRide</span></a>
+<div class="mz-nav-sec">Cuenta</div>
+<a class="mz-nav-item" href="mensajes.html"><i class="ti ti-message"></i><span>Mensajes</span></a>
+<a class="mz-nav-item active" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
+<a class="mz-nav-item" href="negocio.html"><i class="ti ti-building-store"></i><span>Mi negocio</span></a>
+<div class="mz-sidebar-spacer"></div>
+</aside>
+<!-- MAIN -->
+<main class="mz-feed">
+<div class="mz-topbar">
+<div style="flex:1;font-size:14px;font-weight:700;color:var(--txt)">Mi perfil</div>
+<a href="index.html" style="font-size:10px;color:var(--txt3);display:flex;align-items:center;gap:4px;text-decoration:none"><i class="ti ti-arrow-left" style="font-size:14px"></i> Volver</a>
 </div>
-
+<div class="mz-feed-body">
+<!-- CARD PERFIL -->
+<div class="mz-card" id="perfil-card">
+<!-- PORTADA -->
+<div class="perfil-portada" id="portada-wrap">
+<img id="portada-img" style="display:none"/>
+<button class="perfil-portada-btn" onclick="document.getElementById('input-portada').click()">
+<i class="ti ti-photo" style="font-size:11px"></i> Cambiar portada
+          </button>
+</div>
+<!-- AVATAR + INFO -->
+<div style="display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px 0 0">
+<div class="perfil-avatar-wrap">
+<div class="perfil-avatar" id="avatar-box">
+<img id="avatar-img" style="display:none"/>
+<span id="avatar-iniciales">U</span>
+</div>
+<div class="perfil-avatar-btn" onclick="document.getElementById('input-avatar').click()">
+<i class="ti ti-camera"></i>
+</div>
+</div>
+<div style="padding:10px 0 8px;display:flex;gap:6px">
+<button class="perfil-edit-btn" id="btn-editar" onclick="toggleEditar()">
+<i class="ti ti-pencil" style="font-size:13px"></i> Editar perfil
+            </button>
+<button class="logout-btn" onclick="cerrarSesion()">
+<i class="ti ti-logout" style="font-size:13px"></i> Salir
+            </button>
+</div>
+</div>
+<div class="perfil-info-row">
+<div>
+<div class="perfil-nombre" id="perfil-nombre">Cargando...</div>
+<div class="perfil-usuario"><i class="ti ti-at" style="font-size:11px"></i><span id="perfil-username">@usuario</span></div>
+<div class="perfil-dist"><i class="ti ti-map-pin" style="font-size:11px"></i><span id="perfil-dist">Tu zona</span></div>
+</div>
+<div id="perfil-bio" style="font-size:11px;color:var(--txt2);max-width:300px;line-height:1.5"></div>
+</div>
+<!-- STATS -->
+<div class="perfil-stats">
+<div class="perfil-stat">
+<div class="perfil-stat-val" id="stat-alertas">0</div>
+<div class="perfil-stat-label">Alertas</div>
+</div>
+<div class="perfil-stat">
+<div class="perfil-stat-val" id="stat-servicios">0</div>
+<div class="perfil-stat-label">Servicios</div>
+</div>
+<div class="perfil-stat">
+<div class="perfil-stat-val" id="stat-confirmaciones">0</div>
+<div class="perfil-stat-label">Confirmaciones</div>
+</div>
+<div class="perfil-stat">
+<div class="perfil-stat-val" id="stat-solicitudes">0</div>
+<div class="perfil-stat-label">Solicitudes</div>
+</div>
+</div>
+</div>
+<!-- FORMULARIO EDITAR -->
+<div class="mz-card" id="form-editar" style="display:none">
+<div class="mz-card-head">
+<div class="mz-card-title"><i class="ti ti-pencil"></i> Editar información</div>
+</div>
+<div style="padding:14px">
+<div class="perfil-form-grid">
+<div class="campo">
+<label>Nombre visible</label>
+<input id="f-nombre" maxlength="80" placeholder="Tu nombre completo" type="text"/>
+</div>
+<div class="campo">
+<label>Usuario</label>
+<input id="f-username" readonly="" style="opacity:.6" type="text"/>
+<small>El usuario no se puede cambiar</small>
+</div>
+<div class="campo">
+<label>Correo de acceso</label>
+<input id="f-email" type="email"/>
+</div>
+<div class="campo">
+<label>Teléfono de contacto</label>
+<input id="f-telefono" placeholder="+51 999 999 999" type="tel"/>
+</div>
+<div class="campo">
+<label>Distrito</label>
+<input id="f-distrito" placeholder="Ej: Los Olivos, Surco..." type="text"/>
+</div>
+<div class="campo">
+<label>Zona o urbanización</label>
+<input id="f-zona" placeholder="Ej: Urb. El Naranjal" type="text"/>
+</div>
+<div class="campo full">
+<label>Biografía</label>
+<textarea id="f-bio" maxlength="300" placeholder="Cuéntanos algo sobre ti..."></textarea>
+</div>
+</div>
+<div style="margin-top:12px;background:var(--bg);border-radius:var(--rs);padding:10px 12px">
+<div style="font-size:10px;font-weight:700;color:var(--txt2);margin-bottom:8px">Privacidad</div>
+<div class="toggle-fila">
+<label>Permitir que me encuentren por correo</label>
+<button class="toggle-switch on" id="tog-email" onclick="this.classList.toggle('on')"></button>
+</div>
+<div class="toggle-fila">
+<label>Permitir que me encuentren por teléfono</label>
+<button class="toggle-switch" id="tog-tel" onclick="this.classList.toggle('on')"></button>
+</div>
+</div>
+<div style="display:flex;gap:8px;margin-top:12px">
+<button onclick="guardarPerfil()" style="background:var(--az);color:#fff;border:none;border-radius:var(--rs);padding:9px 20px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">
+<i class="ti ti-device-floppy" style="font-size:14px"></i> Guardar cambios
+            </button>
+<button onclick="toggleEditar()" style="background:var(--bg);color:var(--txt2);border:1px solid var(--bd);border-radius:var(--rs);padding:9px 16px;font-size:11px;cursor:pointer">Cancelar</button>
+</div>
+</div>
+</div>
+<!-- ACTIVIDAD -->
+<div class="mz-card">
+<div class="act-tabs">
+<button class="act-tab active" onclick="verActividad('alertas',this)"><i class="ti ti-bell" style="font-size:13px"></i> Alertas</button>
+<button class="act-tab" onclick="verActividad('servicios',this)"><i class="ti ti-tool" style="font-size:13px"></i> Servicios</button>
+<button class="act-tab" onclick="verActividad('solicitudes',this)"><i class="ti ti-clipboard-list" style="font-size:13px"></i> Solicitudes</button>
+<button class="act-tab" onclick="verActividad('confirmaciones',this)"><i class="ti ti-check" style="font-size:13px"></i> Confirmaciones</button>
+</div>
+<div class="act-content" id="act-content">
+<i class="ti ti-bell" style="font-size:30px;color:var(--bd)"></i>
+<div>No hay alertas publicadas aún</div>
+<a href="alertas.html#reportar" style="color:var(--az);font-size:10px;font-weight:700;text-decoration:none">Publicar primera alerta →</a>
+</div>
+</div>
+</div>
+</main>
+</div>
 <!-- BOTTOM NAV -->
 <nav class="mz-bottom-nav">
-  <div class="mz-bn-inner">
-    <div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
-    <div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
-    <div class="mz-bn-item"><div class="mz-bn-center" onclick="location.href='index.html'"><i class="ti ti-plus"></i></div></div>
-    <div class="mz-bn-item" onclick="location.href='servicios.html'"><i class="ti ti-tool"></i><span>Servicios</span></div>
-    <div class="mz-bn-item active"><i class="ti ti-user"></i><span>Perfil</span></div>
-  </div>
+<div class="mz-bn-inner">
+<div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
+<div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
+<div class="mz-bn-item"><div class="mz-bn-center" onclick="location.href='index.html'"><i class="ti ti-plus"></i></div></div>
+<div class="mz-bn-item" onclick="location.href='servicios.html'"><i class="ti ti-tool"></i><span>Servicios</span></div>
+<div class="mz-bn-item active"><i class="ti ti-user"></i><span>Perfil</span></div>
+</div>
 </nav>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script type="module">
 import { PUBLIC_ENV } from './js/env.public.js';
@@ -401,7 +383,7 @@ document.head.appendChild(st);
 
 init();
 </script>
-<script type="module" src="./js/mizona-core.js"></script>
-<script type="module" src="./js/mizona-master-shell.js"></script>
+<script src="./js/mizona-core.js" type="module"></script>
+<script src="./js/mizona-master-shell.js" type="module"></script>
 </body>
 </html>

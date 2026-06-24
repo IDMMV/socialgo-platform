@@ -1,9 +1,10 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Amigos · MiZona</title><link rel="stylesheet" href="css/global.css"><link rel="stylesheet" href="css/mizona-unified.css">
-<link rel="stylesheet" href="css/mizona-phase2.css">
-<link rel="stylesheet" href="css/mizona-master-shell.css">
-</head><body>
-<main class="page-shell"><header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px"><a class="brand" href="index.html"><span class="brand-mark">MZ</span><span data-brand-name>MiZona</span></a><a class="secondary" href="index.html">← Volver</a></header>
-<section class="page-card"><h1>Amigos</h1><div class="friend-tabs"><button class="active" data-tab="friends">Mis amigos</button><button data-tab="received">Solicitudes recibidas</button><button data-tab="sent">Solicitudes enviadas</button></div><div id="friendsContent" class="people-grid"><p class="notice">Cargando…</p></div></section></main>
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Amigos · MiZona</title><link href="css/global.css" rel="stylesheet"/><link href="css/mizona-unified.css" rel="stylesheet"/>
+<link href="css/mizona-phase2.css" rel="stylesheet"/>
+<link href="css/mizona-master-shell.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head><body>
+<main class="page-shell"><header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px"><a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a><a class="secondary" href="index.html">← Volver</a></header>
+<section class="page-card"><h1>Amigos</h1><div class="friend-tabs"><button class="active" data-tab="friends">Mis amigos</button><button data-tab="received">Solicitudes recibidas</button><button data-tab="sent">Solicitudes enviadas</button></div><div class="people-grid" id="friendsContent"><p class="notice">Cargando…</p></div></section></main>
 <script type="module">
 import { applyBrand } from "./js/brand.js"; import { supabase,getCurrentUser } from "./js/supabase.js"; applyBrand();
 const user=await getCurrentUser(); if(!user) location.replace("login.html?next=amistades.html"); const content=document.querySelector("#friendsContent");
@@ -16,6 +17,6 @@ async function received(){content.innerHTML='<p class="notice">Cargando solicitu
 async function respond(id,r){const {error}=await supabase.rpc("responder_solicitud_amistad",{p_solicitud_id:id,p_respuesta:r});if(error)alert(error.message);else received()}
 async function sent(){content.innerHTML='<p class="notice">Cargando solicitudes…</p>';const {data,error}=await supabase.from("solicitudes_enviadas_detalle").select("*").order("creado_en",{ascending:false});if(error){content.innerHTML=`<p class="notice">${esc(error.message)}</p>`;return}content.innerHTML=data?.length?data.map(p=>card(p,`<span class="status-badge">${esc(p.estado)}</span>${p.estado==="pendiente"?`<button class="secondary" data-cancel="${p.solicitud_id}">Cancelar</button>`:""}`)).join(""):'<p class="notice">No tienes solicitudes enviadas.</p>';document.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=async()=>{const {error}=await supabase.from("solicitudes_amistad").delete().eq("id",b.dataset.cancel).eq("solicitante_id",user.id);if(error)alert(error.message);else sent()})}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove("active"));b.classList.add("active");({friends,received,sent})[b.dataset.tab]()}); await friends();
-</script><script type="module" src="./js/mizona-core.js"></script>
-<script type="module" src="./js/mizona-master-shell.js"></script>
+</script><script src="./js/mizona-core.js" type="module"></script>
+<script src="./js/mizona-master-shell.js" type="module"></script>
 </body></html>

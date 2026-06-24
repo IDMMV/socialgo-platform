@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v3.2.0-diseno-unificado";
+const CACHE_NAME = "mizona-v3.3.0-logo-oficial";
 
 const CORE = [
   "./",
@@ -25,6 +25,11 @@ const CORE = [
   "./restablecer.html",
   "./manifest.json",
   "./assets/mizona-logo.svg",
+  "./assets/mizona-logo-horizontal.svg",
+  "./assets/mizona-logo-blanco.svg",
+  "./assets/mizona-icon-app.svg",
+  "./assets/apple-touch-icon.png",
+  "./assets/favicon-32.png",
   "./assets/icon-192.png",
   "./assets/icon-512.png",
   "./css/mizona.css",
@@ -33,6 +38,7 @@ const CORE = [
   "./css/mizona-unified.css",
   "./css/mizona-phase2.css",
   "./css/mizona-master-shell.css",
+  "./css/mizona-logo.css",
   "./js/mizona-core.js",
   "./js/mizona-master-shell.js",
   "./js/mizona-ui-v2.js",

@@ -11,6 +11,26 @@
 <link href="assets/favicon-32.png" rel="icon" type="image/png"/>
 <link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/>
 <link href="css/mizona-logo.css" rel="stylesheet"/>
+
+<style>
+.confirm-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.58);display:none;align-items:center;justify-content:center;padding:18px;z-index:5000}
+.confirm-backdrop.show{display:flex}
+.confirm-dialog{width:min(440px,100%);background:#fff;border-radius:22px;border:1px solid #dbe4f0;box-shadow:0 24px 70px rgba(15,23,42,.28);padding:24px}
+.confirm-icon{width:54px;height:54px;border-radius:16px;background:#eef6ff;color:#1677c8;display:grid;place-items:center;font-size:26px;font-weight:900;margin-bottom:14px}
+.confirm-dialog h2{margin:0 0 8px;font-size:24px;color:#10233f}
+.confirm-dialog p{margin:0;color:#64748b;line-height:1.55}
+.confirm-summary{margin:16px 0;padding:14px 16px;border:1px solid #dbe4f0;background:#f8fbff;border-radius:14px;color:#334155;font-size:14px}
+.confirm-summary strong{display:block;color:#10233f;margin-bottom:4px}
+.confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.confirm-actions button{min-height:46px;border-radius:12px;font-weight:800;cursor:pointer}
+.confirm-correct{background:#fff;border:1px solid #b8c7da;color:#17324d}
+.confirm-save{background:#1677c8;border:1px solid #1677c8;color:#fff}
+.confirm-actions button:disabled{opacity:.65;cursor:not-allowed}
+.redirecting{display:flex;align-items:center;gap:8px}
+.redirecting::before{content:'';width:16px;height:16px;border:2px solid #bfdbfe;border-top-color:#1677c8;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:520px){.confirm-dialog{padding:20px}.confirm-actions{grid-template-columns:1fr}.confirm-dialog h2{font-size:21px}}
+</style>
 </head>
 <body class="auth-page">
 <main class="auth-card">
@@ -38,6 +58,22 @@
   <div class="security-note"><strong>Consejo:</strong> utiliza una respuesta que no aparezca en redes sociales. MiZona guarda únicamente un hash; no puede mostrarte la respuesta después.</div>
   <div class="auth-actions"><a class="secondary-wide" href="perfil.html">Volver a mi perfil</a><a class="secondary-wide" href="index.html">Configurar después</a></div>
 </main>
+
+<div class="confirm-backdrop" id="confirmBackdrop" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <section class="confirm-dialog">
+    <div class="confirm-icon">?</div>
+    <h2 id="confirmTitle">¿Estás seguro?</h2>
+    <p>La respuesta quedará protegida y MiZona no podrá mostrártela después.</p>
+    <div class="confirm-summary">
+      <strong id="confirmQuestion">Pregunta seleccionada</strong>
+      <span>Respuesta escrita: ••••••••</span>
+    </div>
+    <div class="confirm-actions">
+      <button class="confirm-correct" id="correctBtn" type="button">Corregir respuesta</button>
+      <button class="confirm-save" id="confirmSaveBtn" type="button">Sí, guardar</button>
+    </div>
+  </section>
+</div>
 <script type="module">
 import {RECOVERY_QUESTIONS,configureRecoveryQuestion,getRecoveryQuestionStatus} from './js/auth.js';
 import {getCurrentUser} from './js/supabase.js';
@@ -51,17 +87,67 @@ try{
   if(status?.configurada){securityStatus.classList.add('configured');securityStatus.querySelector('span:last-child').textContent='Pregunta de recuperación configurada';question.value=status.pregunta_id||'';saveBtn.textContent='Actualizar pregunta de recuperación'}
   else securityStatus.querySelector('span:last-child').textContent='Aún no has configurado una pregunta de recuperación';
 }catch{securityStatus.querySelector('span:last-child').textContent='Ejecuta primero el SQL de seguridad en Supabase'}
-form.onsubmit=async e=>{
+let pendingData=null;
+
+function openConfirmation(){
+  const option=question.options[question.selectedIndex];
+  confirmQuestion.textContent=option?.textContent||'Pregunta seleccionada';
+  confirmBackdrop.classList.add('show');
+  confirmSaveBtn.focus();
+}
+
+function closeConfirmation(){
+  confirmBackdrop.classList.remove('show');
+}
+
+form.onsubmit=e=>{
   e.preventDefault();
+  msg.hidden=true;
+  if(!question.value){show('Selecciona una pregunta de recuperación.','error');return}
+  if(answer.value.length<4){show('La respuesta debe tener al menos 4 caracteres.','error');return}
   if(answer.value!==answer2.value){show('Las respuestas no coinciden.','error');return}
+  pendingData={questionId:question.value,answerText:answer.value};
+  openConfirmation();
+};
+
+correctBtn.onclick=()=>{
+  closeConfirmation();
+  answer.focus();
+};
+
+confirmBackdrop.addEventListener('click',e=>{
+  if(e.target===confirmBackdrop){closeConfirmation();answer.focus()}
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&confirmBackdrop.classList.contains('show')){closeConfirmation();answer.focus()}
+});
+
+confirmSaveBtn.onclick=async()=>{
+  if(!pendingData)return;
+  confirmSaveBtn.disabled=true;
+  correctBtn.disabled=true;
+  confirmSaveBtn.textContent='Guardando…';
   saveBtn.disabled=true;
   try{
-    await configureRecoveryQuestion(question.value,answer.value);
-    show('Pregunta de recuperación guardada correctamente.','ok');
-    securityStatus.classList.add('configured');securityStatus.querySelector('span:last-child').textContent='Pregunta de recuperación configurada';
-    form.reset();saveBtn.textContent='Actualizar pregunta de recuperación';
-  }catch(x){show(x.message||'No se pudo guardar la pregunta.','error')}
-  finally{saveBtn.disabled=false}
+    await configureRecoveryQuestion(pendingData.questionId,pendingData.answerText);
+    closeConfirmation();
+    securityStatus.classList.add('configured');
+    securityStatus.querySelector('span:last-child').textContent='Pregunta de recuperación configurada';
+    show('Pregunta guardada correctamente. Te llevaremos a tu perfil…','ok');
+    msg.classList.add('redirecting');
+    form.reset();
+    pendingData=null;
+    setTimeout(()=>{location.href='perfil.html'},1400);
+  }catch(x){
+    closeConfirmation();
+    show(x.message||'No se pudo guardar la pregunta.','error');
+    saveBtn.disabled=false;
+    confirmSaveBtn.disabled=false;
+    correctBtn.disabled=false;
+    confirmSaveBtn.textContent='Sí, guardar';
+    answer.focus();
+  }
 };
 </script>
 <script src="./js/mizona-core.js" type="module"></script>

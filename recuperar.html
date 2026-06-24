@@ -25,8 +25,50 @@
 .login-return{margin:18px 0 0;text-align:center;font-size:13px}
 .login-return a{font-weight:800;color:#185fa5;text-decoration:none}
 .login-return a:hover{text-decoration:underline}
+/* La página debe desplazarse completa; nunca ocultar las opciones inferiores */
+html{min-height:100%;overflow-y:auto}
+body.auth-page{
+  display:block!important;
+  min-height:100vh!important;
+  min-height:100dvh!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  padding:18px 12px 28px!important;
+}
+body.auth-page .auth-card{
+  width:min(480px,100%)!important;
+  max-height:none!important;
+  overflow:visible!important;
+  margin:0 auto!important;
+}
+
+/* En pantallas de poca altura reduce espacios sin reducir el zoom */
+@media (min-width:700px) and (max-height:850px){
+  body.auth-page{padding:10px 12px 20px!important}
+  body.auth-page .auth-card{padding:18px 24px!important}
+  .auth-back{margin-bottom:8px;padding:7px 10px}
+  .auth-card .brand{margin-bottom:10px!important}
+  .auth-card .mz-brand-horizontal{max-height:48px}
+  .auth-card h1{font-size:24px!important;margin-bottom:8px!important}
+  .auth-card .auth-subtitle{margin-bottom:10px!important;line-height:1.4}
+  .auth-card label{margin:9px 0!important;gap:5px!important}
+  .auth-card input,.auth-card select{padding:10px 12px!important}
+  .auth-card .primary.wide{padding:11px 14px!important}
+  .legacy-box{margin-top:10px;padding:11px}
+  .legacy-box p{margin-bottom:7px}
+  .auth-card .security-note{margin:10px 0!important;padding:10px 12px!important}
+  .login-return{margin-top:10px}
+}
+
 @media(max-width:560px){
-  .auth-back{position:sticky;top:8px;z-index:5;box-shadow:0 4px 14px rgba(15,23,42,.08)}
+  body.auth-page{padding:10px 8px calc(24px + env(safe-area-inset-bottom))!important}
+  body.auth-page .auth-card{padding:18px 14px!important;border-radius:16px!important}
+  .auth-back{position:sticky;top:6px;z-index:5;box-shadow:0 4px 14px rgba(15,23,42,.08);margin-bottom:10px}
+  .auth-card .brand{margin-bottom:14px!important}
+  .auth-card h1{font-size:25px!important}
+  .auth-card label{margin:11px 0!important}
+  .legacy-box{padding:12px}
+  .login-return{padding-bottom:4px}
 }
 </style>
 </head>

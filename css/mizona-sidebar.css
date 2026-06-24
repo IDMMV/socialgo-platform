@@ -1,0 +1,563 @@
+/* ============================================================
+   MiZona.pe — SIDEBAR ÚNICO Y CONSISTENTE
+   Este archivo reemplaza TODAS las variaciones del sidebar.
+   Clases: .mz-sidebar, .mz-nav-item, .mz-nav-sec, .mz-logo
+   ============================================================ */
+
+/* ===== VARIABLES GLOBALES ===== */
+:root {
+  --mz-az:      #185FA5;
+  --mz-az-l:    #378ADD;
+  --mz-az-bg:   #EFF6FF;
+  --mz-az-bd:   #bfdbfe;
+  --mz-vd:      #1D9E75;
+  --mz-vd-bg:   #F0FDF4;
+  --mz-vd-bd:   #86efac;
+  --mz-rj:      #E24B4A;
+  --mz-rj-bg:   #FEF2F2;
+  --mz-rj-bd:   #fecaca;
+  --mz-am:      #d97706;
+  --mz-nav:     #111827;
+  --mz-nav2:    #1e293b;
+  --mz-bg:      #f1f5f9;
+  --mz-card:    #fff;
+  --mz-txt:     #1e293b;
+  --mz-txt2:    #475569;
+  --mz-txt3:    #94a3b8;
+  --mz-bd:      #e2e8f0;
+  --mz-bd2:     #f1f5f9;
+  --mz-r:       12px;
+  --mz-rs:      8px;
+  --mz-sh:      0 1px 3px rgba(0,0,0,.08);
+  --mz-sh2:     0 4px 12px rgba(0,0,0,.1);
+  --mz-sidebar-w: 210px;
+
+  /* Aliases para compatibilidad con código antiguo */
+  --az:  var(--mz-az);
+  --az-l: var(--mz-az-l);
+  --az-bg: var(--mz-az-bg);
+  --az-bd: var(--mz-az-bd);
+  --vd:  var(--mz-vd);
+  --vd-bg: var(--mz-vd-bg);
+  --vd-bd: var(--mz-vd-bd);
+  --rj:  var(--mz-rj);
+  --rj-bg: var(--mz-rj-bg);
+  --rj-bd: var(--mz-rj-bd);
+  --am:  var(--mz-am);
+  --nav: var(--mz-nav);
+  --nav2: var(--mz-nav2);
+  --bg:  var(--mz-bg);
+  --card: var(--mz-card);
+  --txt: var(--mz-txt);
+  --txt2: var(--mz-txt2);
+  --txt3: var(--mz-txt3);
+  --bd:  var(--mz-bd);
+  --bd2: var(--mz-bd2);
+  --r:   var(--mz-r);
+  --rs:  var(--mz-rs);
+  --sh:  var(--mz-sh);
+  --sh2: var(--mz-sh2);
+  
+  /* Master shell aliases */
+  --mz3-primary: var(--mz-az);
+  --mz3-accent:  var(--mz-vd);
+  --mz3-sidebar: var(--mz-nav);
+  --mz3-sidebar-width: var(--mz-sidebar-w);
+}
+
+/* ===== RESET BASE ===== */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--mz-bg);
+  color: var(--mz-txt);
+  overflow-x: hidden;
+}
+
+/* ===== SIDEBAR CONTENEDOR ===== */
+.mz-sidebar,
+.mz3-sidebar {
+  background: var(--mz-nav) !important;
+  background-image: none !important;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: var(--mz-sidebar-w);
+  display: flex !important;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-right: 1px solid rgba(255,255,255,.06);
+  scrollbar-width: thin;
+  scrollbar-color: #1e293b transparent;
+}
+
+/* ===== LOGO / MARCA ===== */
+.mz-logo,
+.mz-brand,
+.mz3-brand {
+  padding: 15px 14px 12px !important;
+  border-bottom: 1px solid rgba(255,255,255,.07) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  text-decoration: none !important;
+  flex-shrink: 0;
+}
+.mz-logo-mark,
+.mz3-brand-mark,
+.mz-brand-badge {
+  width: 32px !important;
+  height: 32px !important;
+  background: var(--mz-az) !important;
+  background-image: none !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #fff !important;
+  flex-shrink: 0 !important;
+}
+.mz-logo-name,
+.mz3-brand-text strong,
+.mz-brand strong {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #f1f5f9 !important;
+  letter-spacing: -.2px;
+}
+.mz-logo-domain,
+.mz3-brand-text small,
+.mz-brand small {
+  font-size: 8px !important;
+  color: var(--mz-az-l) !important;
+  font-weight: 600 !important;
+  margin-top: 1px !important;
+  display: block;
+}
+/* Logo SVG imagen */
+.mz-logo-img {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+/* ===== USUARIO / CUENTA ===== */
+.mz-sidebar-user,
+.mz3-account {
+  padding: 10px 14px !important;
+  border-bottom: 1px solid rgba(255,255,255,.06) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: transparent !important;
+  text-decoration: none !important;
+  color: #fff !important;
+  border-radius: 0 !important;
+  border-left: none !important;
+  min-height: unset !important;
+  flex-shrink: 0;
+}
+.mz-sidebar-user:hover,
+.mz3-account:hover {
+  background: rgba(255,255,255,.04) !important;
+}
+.mz-user-av,
+.mz3-account-avatar {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  background: var(--mz-az) !important;
+  background-image: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  flex-shrink: 0 !important;
+  overflow: hidden;
+}
+.mz-user-av img,
+.mz3-account-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.mz-user-name,
+.mz3-account-copy strong {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #e2e8f0 !important;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mz-user-dist,
+.mz3-account-copy small {
+  font-size: 9px !important;
+  color: #64748b !important;
+  margin-top: 1px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px;
+}
+/* Guest: botones login/registro */
+.mz-sidebar-user.hide-logged,
+.mz3-guest {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 6px !important;
+  padding: 10px 14px !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  border-bottom: 1px solid rgba(255,255,255,.06) !important;
+}
+.mz3-guest a:first-child {
+  background: var(--mz-az) !important;
+  color: #fff !important;
+  border-radius: 7px !important;
+  padding: 7px 8px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  text-decoration: none !important;
+}
+.mz3-guest a:last-child {
+  border: 1px solid rgba(255,255,255,.12) !important;
+  color: #94a3b8 !important;
+  border-radius: 7px !important;
+  padding: 7px 8px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  text-decoration: none !important;
+}
+
+/* ===== SECCIÓN LABEL ===== */
+.mz-nav-sec,
+.mz3-nav-label,
+.mz-nav-label {
+  font-size: 8px !important;
+  color: #334155 !important;
+  padding: 10px 14px 3px !important;
+  text-transform: uppercase !important;
+  letter-spacing: .1em !important;
+  font-weight: 700 !important;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* ===== ITEMS DE NAVEGACIÓN ===== */
+.mz-nav-item,
+.mz3-nav a,
+.mz-nav a {
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 8px 14px !important;
+  min-height: 36px !important;
+  cursor: pointer !important;
+  border-left: 2px solid transparent !important;
+  border-radius: 0 !important;
+  transition: all .15s !important;
+  text-decoration: none !important;
+  color: #64748b !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  position: relative;
+  flex-shrink: 0;
+}
+.mz-nav-item:hover,
+.mz3-nav a:hover,
+.mz-nav a:hover {
+  background: rgba(255,255,255,.04) !important;
+  color: #94a3b8 !important;
+}
+.mz-nav-item.active,
+.mz3-nav a.active,
+.mz-nav a.active {
+  background: rgba(24,95,165,.18) !important;
+  border-left-color: var(--mz-az-l) !important;
+  color: #e2e8f0 !important;
+  font-weight: 600 !important;
+}
+
+/* Íconos dentro de nav items */
+.mz-nav-item i,
+.mz3-nav a i,
+.mz-nav a i {
+  font-size: 17px !important;
+  color: #475569 !important;
+  width: 19px !important;
+  text-align: center !important;
+  flex-shrink: 0 !important;
+  transition: color .15s !important;
+}
+.mz-nav-item:hover i,
+.mz3-nav a:hover i,
+.mz-nav a:hover i { color: #64748b !important; }
+.mz-nav-item.active i,
+.mz3-nav a.active i,
+.mz-nav a.active i { color: #60a5fa !important; }
+
+/* Texto del nav item */
+.mz-nav-item span:not(.mz-nav-badge):not(.mz3-nav-badge),
+.mz3-nav a span:not(.mz3-nav-badge),
+.mz-nav a span { color: inherit !important; font-size: 10px !important; }
+
+/* ===== BADGES (contadores) ===== */
+.mz-nav-badge,
+.mz3-nav-badge {
+  background: var(--mz-rj) !important;
+  color: #fff !important;
+  font-size: 8px !important;
+  font-weight: 700 !important;
+  padding: 1px 6px !important;
+  border-radius: 20px !important;
+  margin-left: auto !important;
+  min-width: 18px !important;
+  text-align: center !important;
+}
+
+/* ===== SPACER Y BOTÓN PUBLICAR ===== */
+.mz-sidebar-spacer, .mz3-sidebar-spacer { flex: 1 !important; }
+.mz-sidebar-btn,
+.mz3-publish {
+  margin: 10px 14px 14px !important;
+  background: var(--mz-az) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: var(--mz-rs) !important;
+  padding: 10px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+  width: calc(100% - 28px) !important;
+  transition: background .15s !important;
+  text-decoration: none !important;
+  flex-shrink: 0;
+}
+.mz-sidebar-btn:hover,
+.mz3-publish:hover { background: var(--mz-az-l) !important; }
+.mz-sidebar-btn i,
+.mz3-publish i { font-size: 15px !important; }
+
+/* ===== BOTÓN INSTALAR PWA ===== */
+#btn-instalar-pwa {
+  display: none;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, var(--mz-az), var(--mz-vd));
+  color: #fff;
+  border: none;
+  border-radius: var(--mz-rs);
+  padding: 9px 14px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  width: calc(100% - 28px);
+  margin: 4px 14px 0;
+  justify-content: center;
+  transition: opacity .15s;
+  flex-shrink: 0;
+}
+#btn-instalar-pwa:hover { opacity: .9; }
+
+/* ===== LAYOUTS ===== */
+.mz-layout {
+  display: grid;
+  grid-template-columns: var(--mz-sidebar-w) 1fr 200px;
+  min-height: 100vh;
+  max-width: 100vw;
+}
+.mz-layout-2col,
+.mz3-shell {
+  display: grid !important;
+  grid-template-columns: var(--mz-sidebar-w) minmax(0, 1fr) !important;
+  min-height: 100vh;
+  max-width: 100vw;
+}
+@media (max-width: 900px) {
+  .mz-layout { grid-template-columns: var(--mz-sidebar-w) 1fr; }
+  .mz-sidebar-right { display: none !important; }
+}
+@media (max-width: 640px) {
+  .mz-layout, .mz-layout-2col, .mz3-shell {
+    grid-template-columns: 1fr !important;
+  }
+  .mz-sidebar, .mz3-sidebar { display: none !important; }
+  .mz-bottom-nav { display: block !important; }
+}
+@media (min-width: 641px) {
+  .mz-sidebar, .mz3-sidebar { display: flex !important; }
+  .mz-bottom-nav { display: none !important; }
+}
+
+/* ===== BOTTOM NAV MÓVIL ===== */
+.mz-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--mz-card);
+  border-top: 1px solid var(--mz-bd);
+  z-index: 200;
+  padding: 7px 0 calc(7px + env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 20px rgba(0,0,0,.08);
+}
+.mz-bn-inner {
+  display: flex;
+  justify-content: space-around;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.mz-bn-item {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 2px;
+  cursor: pointer; padding: 2px 10px;
+}
+.mz-bn-item i { font-size: 22px; color: #cbd5e1; transition: color .15s; }
+.mz-bn-item.active i { color: var(--mz-az); }
+.mz-bn-item span { font-size: 8px; color: #cbd5e1; font-weight: 600; transition: color .15s; }
+.mz-bn-item.active span { color: var(--mz-az); }
+.mz-bn-center {
+  width: 48px; height: 48px;
+  background: var(--mz-az);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: -18px;
+  box-shadow: 0 4px 14px rgba(24,95,165,.4);
+  border: 3px solid var(--mz-card);
+}
+.mz-bn-center i { font-size: 22px; color: #fff; }
+
+/* ===== CARD LATERAL DEL SIDEBAR (servicios) ===== */
+.mz-side-card {
+  margin: 12px 14px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: var(--mz-rs);
+  padding: 10px 12px;
+  font-size: 10px;
+  color: #64748b;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+.mz-side-card strong { color: #94a3b8; font-size: 10px; display: block; margin-bottom: 4px; }
+
+/* ===== TOAST GLOBAL ===== */
+.mz-toast {
+  position: fixed; bottom: 20px;
+  left: 50%; transform: translateX(-50%);
+  background: var(--mz-nav2); color: #fff;
+  border-radius: 20px; padding: 10px 20px;
+  font-size: 11px; font-weight: 600;
+  z-index: 9999; opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none; white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+}
+.mz-toast.show { opacity: 1; }
+
+/* ===== ESTADOS AUTH ===== */
+.estado-guest .hide-guest { display: none !important; }
+.estado-logged .hide-logged { display: none !important; }
+
+/* ============================================================
+   OVERRIDES FINALES — Neutralizar estilos conflictivos de
+   mizona-dark.css y mizona-master-shell.css que sobreescriben
+   el sidebar unificado. Estas reglas van al final para ganar.
+   ============================================================ */
+
+/* Forzar fondo oscuro uniforme — mizona-dark.css usa gradiente */
+.mz-sidebar,
+.mz3-sidebar,
+aside.mz-sidebar {
+  background: #111827 !important;
+  background-image: none !important;
+  background: var(--mz-nav) !important;
+}
+
+/* Forzar tamaño de fuente uniforme en nav items */
+.mz-nav a,
+.mz-nav a span,
+.mz3-nav a,
+.mz3-nav a span,
+.mz-nav-item,
+.mz-nav-item span:not(.mz-nav-badge) {
+  font-size: 10px !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Forzar padding uniforme — mizona-dark usa padding:11px 12px */
+.mz-nav a,
+.mz3-nav a {
+  padding: 8px 14px !important;
+  border-radius: 0 !important;
+  min-height: 36px !important;
+}
+
+/* Forzar color de íconos uniforme */
+.mz-nav a i,
+.mz3-nav a i,
+.mz-nav-item i {
+  font-size: 17px !important;
+  color: #475569 !important;
+}
+.mz-nav a.active i,
+.mz3-nav a.active i,
+.mz-nav-item.active i {
+  color: #60a5fa !important;
+}
+
+/* Neutralizar border-radius que pone mizona-dark en nav items */
+.mz-nav a:hover,
+.mz3-nav a:hover,
+.mz-nav a.active,
+.mz3-nav a.active {
+  border-radius: 0 !important;
+}
+
+/* Forzar color activo uniforme */
+.mz-nav a.active,
+.mz3-nav a.active,
+.mz-nav-item.active {
+  background: rgba(24,95,165,.18) !important;
+  border-left: 2px solid #378ADD !important;
+  color: #e2e8f0 !important;
+}
+
+/* Logo: forzar tamaño y estilo uniforme */
+.mz-brand,
+.mz3-brand,
+.mz-logo {
+  background: transparent !important;
+  padding: 15px 14px 12px !important;
+}
+
+/* Ancho del sidebar en todas las páginas */
+.mz-sidebar { width: 210px !important; min-width: 210px !important; max-width: 210px !important; }
+.mz3-sidebar { width: 210px !important; min-width: 210px !important; max-width: 210px !important; }
+
+/* Grilla layout para páginas con master-shell */
+.mz3-shell {
+  grid-template-columns: 210px minmax(0, 1fr) !important;
+}
+
+/* Separador de secciones uniforme */
+.mz3-nav-label,
+.mz-nav-sec {
+  font-size: 8px !important;
+  color: #334155 !important;
+  padding: 10px 14px 3px !important;
+  text-transform: uppercase !important;
+  letter-spacing: .1em !important;
+  font-weight: 700 !important;
+  background: transparent !important;
+}

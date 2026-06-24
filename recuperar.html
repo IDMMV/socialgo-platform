@@ -11,59 +11,123 @@
 <link href="assets/favicon-32.png" rel="icon" type="image/png"/>
 <link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/>
 <link href="css/mizona-logo.css" rel="stylesheet"/>
+<style>
+.auth-card{position:relative}
+.auth-back{
+  display:inline-flex;align-items:center;gap:7px;margin-bottom:14px;padding:9px 12px;
+  border:1px solid var(--border);border-radius:11px;background:#fff;color:#334155;
+  font-size:13px;font-weight:800;text-decoration:none
+}
+.auth-back:hover{border-color:#185fa5;color:#185fa5;background:#f8fbff}
+.legacy-box{margin-top:14px;padding:14px;border:1px solid #dbe7f7;border-radius:14px;background:#f8fbff}
+.legacy-box h2{font-size:15px;margin:0 0 5px;color:#0f172a}
+.legacy-box p{font-size:12px;line-height:1.45;color:#64748b;margin:0 0 10px}
+.login-return{margin:18px 0 0;text-align:center;font-size:13px}
+.login-return a{font-weight:800;color:#185fa5;text-decoration:none}
+.login-return a:hover{text-decoration:underline}
+@media(max-width:560px){
+  .auth-back{position:sticky;top:8px;z-index:5;box-shadow:0 4px 14px rgba(15,23,42,.08)}
+}
+</style>
 </head>
 <body class="auth-page">
 <main class="auth-card">
+  <a class="auth-back" href="login.html" aria-label="Volver a iniciar sesión">← Volver a iniciar sesión</a>
   <a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a>
   <h1>Recuperar contraseña</h1>
-  <p class="auth-subtitle">Primero valida tu pregunta de recuperación. Después recibirás un enlace que abrirá MiZona para crear una contraseña nueva.</p>
+  <p class="auth-subtitle">Valida tu pregunta de recuperación. Después recibirás un enlace seguro para crear una contraseña nueva.</p>
   <div class="notice" hidden id="msg"></div>
-  <form id="form">
-    <label>Correo de la cuenta<input autocomplete="email" id="email" required type="email"/></label>
+
+  <form id="form" novalidate>
+    <label>Correo de la cuenta<input autocomplete="email" id="email" inputmode="email" type="email"/></label>
     <label>Pregunta de recuperación
-      <select id="question" required></select>
+      <select id="question">
+        <option value="">Selecciona tu pregunta</option>
+      </select>
     </label>
     <label>Respuesta
       <span class="password-field">
-        <input autocomplete="off" id="answer" minlength="4" required type="password"/>
-        <button class="password-toggle" data-password-toggle="answer" type="button"></button>
+        <input autocomplete="off" id="answer" minlength="4" type="password"/>
+        <button class="password-toggle" data-password-toggle="answer" type="button" aria-label="Mostrar u ocultar respuesta"></button>
       </span>
     </label>
     <button class="primary wide" id="submitBtn" type="submit">Validar y enviar enlace</button>
   </form>
-  <div class="security-note"><strong>Importante:</strong> la pregunta es una verificación adicional. La contraseña solo se cambia desde el enlace seguro enviado a tu correo.</div>
-  <details class="recovery-fallback">
-    <summary>No configuré una pregunta de recuperación</summary>
-    <p>Las cuentas antiguas pueden usar temporalmente la recuperación únicamente por correo.</p>
+
+  <div class="legacy-box">
+    <h2>¿Tu cuenta fue creada antes de tener pregunta de recuperación?</h2>
+    <p>Escribe tu correo arriba y usa esta opción. El enlace solo llegará al correo registrado en tu cuenta.</p>
     <button class="secondary-wide" id="fallbackBtn" type="button">Enviar enlace solo por correo</button>
-  </details>
-  <p><a href="login.html">Volver a iniciar sesión</a></p>
+  </div>
+
+  <div class="security-note"><strong>Importante:</strong> la pregunta es una verificación adicional. La contraseña solo se cambia desde el enlace seguro enviado a tu correo.</div>
+  <p class="login-return">¿Recordaste tu contraseña? <a href="login.html">Iniciar sesión</a></p>
 </main>
 <script type="module">
 import {RECOVERY_QUESTIONS,verifyRecoveryQuestion,requestPasswordReset} from './js/auth.js';
 import {initPasswordToggles} from './js/password-ui.js';
 initPasswordToggles();
+
+const form = document.getElementById('form');
+const email = document.getElementById('email');
+const question = document.getElementById('question');
+const answer = document.getElementById('answer');
+const msg = document.getElementById('msg');
+const submitBtn = document.getElementById('submitBtn');
+const fallbackBtn = document.getElementById('fallbackBtn');
+
 question.innerHTML='<option value="">Selecciona tu pregunta</option>'+RECOVERY_QUESTIONS.map(q=>`<option value="${q.id}">${q.label}</option>`).join('');
-function show(text,type='info'){msg.hidden=false;msg.className=`notice ${type}`;msg.textContent=text}
+
+function show(text,type='info'){
+  msg.hidden=false;
+  msg.className=`notice ${type}`;
+  msg.textContent=text;
+  msg.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function validEmail(){
+  const value=email.value.trim();
+  if(!value){show('Escribe el correo de tu cuenta.','error');email.focus();return false}
+  if(!email.checkValidity()){show('Escribe un correo válido.','error');email.focus();return false}
+  return true;
+}
+
 async function sendReset(){
   await requestPasswordReset(email.value);
-  show('Si los datos corresponden a una cuenta, recibirás un correo de MiZona para crear una nueva contraseña.','ok');
+  show('Si el correo corresponde a una cuenta, recibirás un mensaje de MiZona para crear una nueva contraseña. Revisa también spam o correo no deseado.','ok');
 }
-form.onsubmit=async e=>{
-  e.preventDefault();submitBtn.disabled=true;show('Validando datos…','info');
+
+form.addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!validEmail()) return;
+  if(!question.value){show('Selecciona tu pregunta de recuperación. Si tu cuenta es antigua, usa el botón “Enviar enlace solo por correo”.','error');question.focus();return}
+  if(answer.value.trim().length<4){show('Escribe la respuesta de recuperación.','error');answer.focus();return}
+
+  submitBtn.disabled=true;
+  show('Validando datos…','info');
   try{
     const result=await verifyRecoveryQuestion(email.value,question.value,answer.value);
+    if(result?.sin_configurar){
+      show('Esta cuenta no tiene una pregunta configurada. Usa “Enviar enlace solo por correo”.','info');
+      fallbackBtn.focus();
+      return;
+    }
     if(result?.bloqueada){show('Demasiados intentos. Espera unos minutos antes de volver a probar.','error');return}
     if(!result?.valida){show('No pudimos validar los datos. Revisa la pregunta y la respuesta.','error');return}
-    await sendReset();form.reset();
+    await sendReset();
+    form.reset();
   }catch(x){show(x.message||'No se pudo iniciar la recuperación.','error')}
   finally{submitBtn.disabled=false}
-};
-fallbackBtn.onclick=async()=>{
-  if(!email.value){show('Escribe primero el correo de tu cuenta.','error');email.focus();return}
+});
+
+fallbackBtn.addEventListener('click',async()=>{
+  if(!validEmail()) return;
   fallbackBtn.disabled=true;
-  try{await sendReset()}catch(x){show(x.message||'No se pudo enviar el enlace.','error')}finally{fallbackBtn.disabled=false}
-};
+  fallbackBtn.textContent='Enviando enlace…';
+  try{await sendReset()}
+  catch(x){show(x.message||'No se pudo enviar el enlace.','error')}
+  finally{fallbackBtn.disabled=false;fallbackBtn.textContent='Enviar enlace solo por correo'}
+});
 </script>
 <script src="./js/mizona-core.js" type="module"></script>
 </body>

@@ -1,0 +1,4 @@
+1. Reemplaza el archivo recuperar.html de la raíz del proyecto.
+2. Commit: Mejorar recuperación para cuentas antiguas
+3. Push origin.
+4. Prueba en https://mizona.pe/recuperar.html

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Fondo redondeado para ícono de app -->
+  <rect width="512" height="512" rx="110" fill="#111827"/>
+
+  <!-- Pin grande centrado -->
+  <path d="M256 60C191.726 60 140 111.726 140 176C140 240.274 256 420 256 420S372 240.274 372 176C372 111.726 320.274 60 256 60Z" fill="#185FA5"/>
+
+  <!-- Círculo blanco interior -->
+  <circle cx="256" cy="172" r="76" fill="#ffffff"/>
+
+  <!-- MZ grande y bold -->
+  <text x="256" y="196"
+    text-anchor="middle"
+    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"
+    font-size="64" font-weight="700" fill="#185FA5" letter-spacing="-2">MZ</text>
+
+  <!-- Punto verde en la punta -->
+  <circle cx="256" cy="420" r="12" fill="#1D9E75"/>
+
+  <!-- Punto brillante en la punta del pin para efecto 3D sutil -->
+  <circle cx="256" cy="420" r="5" fill="#4ade80"/>
+</svg>

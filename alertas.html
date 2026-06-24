@@ -50,6 +50,12 @@
 .mz-form textarea{resize:vertical;min-height:96px}
 .mz-form-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:8px!important}
 .mz-form-actions .mz-btn{border-radius:var(--rs);min-height:38px}
+
+/* === VOZ === */
+.mz-voz-btn{background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);padding:5px 10px;font-size:10px;font-weight:600;color:var(--txt2);cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s;margin-left:6px;vertical-align:middle}
+.mz-voz-btn:hover{border-color:#E24B4A;color:#E24B4A}
+@keyframes blink-mic{0%,100%{opacity:1}50%{opacity:.3}}
+
 .mz-form-note{font-size:9px;line-height:1.55;color:var(--txt3);margin-top:12px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);padding:9px 10px}
 .mz-status{padding:9px 10px;border-radius:var(--rs);margin-top:10px;font-size:9px;font-weight:700}
 .mz-status.error{background:var(--rj-bg);color:#991b1b;border:1px solid var(--rj-bd)}
@@ -144,9 +150,9 @@
                 </select>
               </label>
               <label class="mz-field"><span>Distrito</span><input name="distrito" id="form-distrito" value="Ventanilla" required></label>
-              <label class="mz-field full"><span>Título</span><input name="titulo" maxlength="120" required placeholder="Describe brevemente lo ocurrido"></label>
-              <label class="mz-field full"><span>Descripción</span><textarea name="descripcion" rows="5" maxlength="1200" required placeholder="Incluye hora, referencia y detalles útiles. No publiques acusaciones ni datos sensibles."></textarea></label>
-              <label class="mz-field full"><span>Zona o referencia</span><input name="zona_referencia" id="alertReference" placeholder="Ej.: Av. Las Palmeras, cerca del mercado"></label>
+              <label class="mz-field full"><span>Título <button type="button" class="mz-voz-btn" data-voz-para="titulo" title="Dictar con micrófono"><i class="ti ti-microphone"></i> Dictar</button></span><input name="titulo" id="titulo" maxlength="120" required placeholder="Describe brevemente lo ocurrido"></label>
+              <label class="mz-field full"><span>Descripción <button type="button" class="mz-voz-btn" data-voz-para="descripcion" title="Dictar descripción con micrófono"><i class="ti ti-microphone"></i> Dictar</button></span><textarea name="descripcion" id="descripcion" rows="5" maxlength="1200" required placeholder="Incluye hora, referencia y detalles útiles. No publiques acusaciones ni datos sensibles."></textarea></label>
+              <label class="mz-field full"><span>Zona o referencia <button type="button" class="mz-voz-btn" data-voz-para="zona_referencia" title="Dictar referencia"><i class="ti ti-microphone"></i> Dictar</button></span><input name="zona_referencia" id="zona_referencia" id="alertReference" placeholder="Ej.: Av. Las Palmeras, cerca del mercado"></label>
               <label class="mz-field full"><span>Privacidad de la ubicación</span>
                 <select name="precision_ubicacion" id="alertPrivacy">
                   <option value="aprox_50m">Aproximada a 50 m</option>
@@ -275,5 +281,14 @@ async function countAlerts(){
 loadShell(); countAlerts();
 </script>
 <script type="module" src="./js/mizona-core.js"></script>
+
+<script type="module">
+import { initVozFormulario } from './js/voz-mizona.js';
+// Inicializar botones de voz en el formulario
+document.addEventListener('DOMContentLoaded', () => {
+  initVozFormulario(document);
+});
+</script>
+
 </body>
 </html>

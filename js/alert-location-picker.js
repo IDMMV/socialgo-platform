@@ -123,7 +123,13 @@ export function createAlertLocationPicker(options = {}) {
         const district = address.suburb || address.city_district || address.district || address.city || address.town || '';
         const reference = [address.road || address.pedestrian || address.neighbourhood, district].filter(Boolean).join(', ');
         selected = { ...selected, district, reference, displayName: data.display_name || reference };
-        if (districtInput && district && !districtInput.dataset.userEdited) districtInput.value = district;
+        // Siempre actualizar distrito cuando viene de GPS o mapa (limpiar flag userEdited)
+        if (districtInput && district) {
+          districtInput.dataset.userEdited = '';
+          districtInput.value = district;
+          // Disparar evento change para que otros listeners lo detecten
+          districtInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
         if (referenceInput && reference && !referenceInput.value.trim()) referenceInput.value = reference;
         renderSelected();
       } catch (_) {

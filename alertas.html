@@ -1,316 +1,226 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#185FA5">
-<title>Alertas | MiZona.pe</title>
+<meta name="description" content="Alertas vecinales de MiZona.pe">
+<title>Alertas — MiZona.pe</title>
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.1/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="css/mizona-dark.css">
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="css/mizona.css">
 <link rel="stylesheet" href="css/mizona-unified.css">
 <link rel="stylesheet" href="css/mizona-phase2.css">
 <style>
-/* Alertas — cabecera, perfil y navegación móvil v3 */
-.mz-alertas-page .mz-topbar{
-  gap:10px;
-  min-height:70px!important;
-  padding:10px 16px!important;
-}
-.mz-alertas-page .mz-top-icon,
-.mz-alertas-page .mz-profile-chip,
-.mz-alertas-page .mz-zone{
-  min-height:46px;
-  border:1px solid #dbe4ee!important;
-  background:#fff!important;
-  color:#172235!important;
-  box-shadow:0 3px 12px rgba(15,31,53,.05);
-}
-.mz-alertas-page .mz-top-icon{
-  position:relative;
-  width:46px;
-  min-width:46px;
-  padding:0!important;
-  display:grid;
-  place-items:center;
-  border-radius:14px!important;
-  text-decoration:none;
-}
-.mz-alertas-page .mz-top-icon i{font-size:22px}
-.mz-alertas-page .mz-top-icon.report{
-  color:#fff!important;
-  border-color:transparent!important;
-  background:linear-gradient(135deg,#f04b4b,#d62839)!important;
-  box-shadow:0 8px 18px rgba(214,40,57,.24);
-}
-.mz-alertas-page .mz-top-icon.report:hover{transform:translateY(-1px)}
-.mz-alertas-page .mz-zone{
-  max-width:240px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:0 14px!important;
-  border-radius:14px!important;
-  overflow:hidden;
-}
-.mz-alertas-page .mz-zone i{color:#ef4444;font-size:20px;flex:0 0 auto}
-.mz-alertas-page .mz-zone span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mz-alertas-page .mz-profile-chip{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  max-width:190px;
-  padding:5px 10px 5px 5px!important;
-  border-radius:16px!important;
-  text-decoration:none;
-  overflow:hidden;
-}
-.mz-alertas-page .mz-profile-avatar{
-  width:36px;height:36px;min-width:36px;border-radius:12px;
-  display:grid;place-items:center;overflow:hidden;
-  background:linear-gradient(135deg,#185fa5,#1d9e75);
-  color:#fff;font-size:13px;font-weight:900;
-}
-.mz-alertas-page .mz-profile-avatar img{width:100%;height:100%;object-fit:cover}
-.mz-alertas-page .mz-profile-copy{min-width:0;display:grid;line-height:1.1}
-.mz-alertas-page .mz-profile-copy strong{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mz-alertas-page .mz-profile-copy small{font-size:9px;color:#718096;margin-top:3px}
-.mz-alertas-page .mz-notification-badge{
-  position:absolute;top:-5px;right:-5px;min-width:20px;height:20px;padding:0 5px;
-  border-radius:999px;background:#ef4444;color:#fff;border:2px solid #fff;
-  display:grid;place-items:center;font-size:9px;font-weight:900;
-}
-.mz-alertas-page .mz-notification-badge[hidden]{display:none!important}
-.mz-alertas-page .mz-form-actions{
-  display:grid!important;
-  grid-template-columns:1fr 1fr;
-  gap:10px!important;
-}
-.mz-alertas-page .mz-form-actions .mz-btn{
-  min-height:48px;border-radius:13px!important;display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.mz-alertas-page .mz-form-actions .location-btn{
-  background:#f8fafc!important;color:#26364a!important;border:1px solid #dbe4ee!important;
-}
-.mz-alertas-page .mz-form-actions .submit-btn{
-  background:linear-gradient(135deg,#ef4444,#dc2638)!important;color:#fff!important;border:0!important;
-  box-shadow:0 8px 18px rgba(220,38,56,.18);
-}
-.mz-alertas-page .mz-mobile-bottom a{
-  position:relative;display:flex!important;flex-direction:column;align-items:center;justify-content:center;
-  gap:4px;font-size:11px!important;text-decoration:none;
-}
-.mz-alertas-page .mz-mobile-bottom a i{font-size:22px;line-height:1}
-.mz-alertas-page .mz-mobile-bottom a.active{color:#185fa5!important;font-weight:800}
-.mz-alertas-page .mz-mobile-bottom .plus{
-  width:54px!important;height:54px!important;align-self:center;border-radius:18px!important;
-  background:linear-gradient(135deg,#ef4444,#d62839)!important;
-  box-shadow:0 8px 20px rgba(214,40,57,.28),0 0 0 4px #fff!important;
-  transform:translateY(-12px);
-}
-.mz-alertas-page .mz-mobile-bottom .plus i{font-size:25px;color:#fff}
-.mz-alertas-page .mz-mobile-bottom .plus span{position:absolute;left:-9999px}
-
-@media(max-width:880px){
-  .mz-alertas-page .mz-topbar{
-    position:sticky;top:0;z-index:1100;
-    padding:9px 10px!important;
-    display:grid!important;
-    grid-template-columns:46px minmax(0,1fr) 46px 46px 46px;
-    gap:8px;
-    background:rgba(255,255,255,.97)!important;
-    backdrop-filter:blur(14px);
-  }
-  .mz-alertas-page .mz-search{display:none!important}
-  .mz-alertas-page .mz-actions{display:contents!important}
-  .mz-alertas-page .mz-zone{width:100%;max-width:none!important;padding:0 11px!important}
-  .mz-alertas-page .mz-zone span{font-size:13px}
-  .mz-alertas-page .mz-profile-chip{width:46px;max-width:46px;padding:4px!important;border-radius:14px!important}
-  .mz-alertas-page .mz-profile-avatar{width:36px;height:36px;min-width:36px}
-  .mz-alertas-page .mz-profile-copy{display:none}
-  .mz-alertas-page .mz-mobile-bottom{
-    height:72px!important;
-    padding-bottom:env(safe-area-inset-bottom);
-    z-index:2000!important;
-  }
-  .mz-alertas-page .mz-content{padding-bottom:96px!important}
-}
-@media(max-width:620px){
-  .mz-alertas-page .mz-page-title{display:none}
-  .mz-alertas-page .mz-form-actions{grid-template-columns:1fr}
-  .mz-alertas-page .mz-form-actions .mz-btn{width:100%;font-size:15px}
-  .mz-alertas-page .mz-card-pad{padding:16px}
-}
-@media(max-width:390px){
-  .mz-alertas-page .mz-topbar{grid-template-columns:42px minmax(0,1fr) 42px 42px 42px;gap:6px}
-  .mz-alertas-page .mz-top-icon,.mz-alertas-page .mz-profile-chip{width:42px;min-width:42px;max-width:42px;min-height:42px}
-  .mz-alertas-page .mz-zone{min-height:42px;padding-inline:9px!important}
-  .mz-alertas-page .mz-zone span{font-size:12px}
+/* Alertas con el mismo sistema visual de Inicio */
+.mz-alerts-hero{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,var(--az-bg),#fff);border:1px solid var(--az-bd);border-radius:var(--r);padding:14px 16px}
+.mz-alerts-hero h1{font-size:18px;line-height:1.2;color:var(--txt);margin:0}
+.mz-alerts-hero p{font-size:10px;color:var(--txt2);margin-top:4px}
+.mz-alerts-hero .mz-btn-new{background:var(--rj);color:#fff;border-radius:var(--rs);padding:9px 14px;font-size:10px;font-weight:800;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.mz-alerts-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:10px;align-items:start}
+.mz-card-pad{padding:14px}
+.mz-card-head h2{font-size:12px;color:var(--txt);margin:0}
+.mz-tag{font-size:8px;font-weight:800;border-radius:999px;padding:3px 8px;display:inline-flex;align-items:center;gap:4px;border:1px solid var(--bd)}
+.mz-tag.reportada{background:var(--am-bg);color:#92400e;border-color:var(--am-bd)}
+.mz-tag.verificada{background:var(--vd-bg);color:#14532d;border-color:var(--vd-bd)}
+.mz-tag.oficial{background:var(--az-bg);color:#1d4ed8;border-color:var(--az-bd)}
+.mz-tag.resuelta{background:#f8fafc;color:#475569;border-color:#cbd5e1}
+.mz-loader,.mz-empty{padding:24px;text-align:center;color:var(--txt3);font-size:10px}
+.mz-feed-card{padding:14px;border-bottom:1px solid var(--bd2);background:#fff}
+.mz-feed-card:last-child{border-bottom:none}
+.mz-feed-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mz-feed-head small{font-size:8px;color:var(--txt3)}
+.mz-feed-card h3{font-size:12px;color:var(--txt);margin:7px 0 5px}
+.mz-feed-card p{font-size:10px;color:var(--txt2);line-height:1.55;margin:0}
+.mz-feed-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:9px;color:var(--txt3)}
+.mz-feed-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.mz-btn{border-radius:999px;padding:6px 11px;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;border:1px solid var(--bd);background:#fff;color:var(--txt2)}
+.mz-btn.success{background:var(--vd-bg);color:#14532d;border-color:var(--vd-bd)}
+.mz-btn.ghost{background:var(--bg);color:var(--txt2);border-color:var(--bd)}
+.mz-btn.danger{background:var(--rj);color:#fff;border-color:var(--rj)}
+.mz-btn.sm{padding:5px 10px}
+.mz-form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mz-form .mz-field{display:flex;flex-direction:column;gap:5px}
+.mz-form .mz-field.full{grid-column:1/-1}
+.mz-form .mz-field>span{font-size:9px;font-weight:700;color:var(--txt2)}
+.mz-form input,.mz-form select,.mz-form textarea{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);padding:9px 10px;font-size:10px;color:var(--txt)}
+.mz-form input:focus,.mz-form select:focus,.mz-form textarea:focus{background:#fff;border-color:var(--az)}
+.mz-form textarea{resize:vertical;min-height:96px}
+.mz-form-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:8px!important}
+.mz-form-actions .mz-btn{border-radius:var(--rs);min-height:38px}
+.mz-form-note{font-size:9px;line-height:1.55;color:var(--txt3);margin-top:12px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);padding:9px 10px}
+.mz-status{padding:9px 10px;border-radius:var(--rs);margin-top:10px;font-size:9px;font-weight:700}
+.mz-status.error{background:var(--rj-bg);color:#991b1b;border:1px solid var(--rj-bd)}
+.mz-status.ok{background:var(--vd-bg);color:#14532d;border:1px solid var(--vd-bd)}
+.mz-alert-help{padding:10px 12px;border-bottom:1px solid var(--bd2)}
+.mz-alert-help:last-child{border-bottom:none}
+.mz-alert-help strong{display:block;font-size:10px;color:var(--txt);margin-bottom:3px}
+.mz-alert-help p{font-size:9px;color:var(--txt3);line-height:1.45}
+@media(max-width:900px){.mz-alerts-grid{grid-template-columns:1fr}.mz-sidebar-right{display:none}}
+@media(max-width:640px){
+  .mz-topbar{padding:8px 10px;gap:7px}
+  .mz-search{min-width:0;padding:8px 10px}
+  .mz-dist-tag{max-width:130px;overflow:hidden}
+  .mz-dist-tag span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mz-alerts-hero{padding:12px;align-items:flex-start}
+  .mz-alerts-hero h1{font-size:15px}
+  .mz-alerts-hero p{font-size:9px}
+  .mz-alerts-hero .mz-btn-new{padding:8px 10px;font-size:9px}
+  .mz-alerts-grid{display:flex;flex-direction:column}
+  .mz-alerts-grid>.mz-card{width:100%}
+  .mz-form{grid-template-columns:1fr}
+  .mz-form .mz-field.full{grid-column:auto}
+  .mz-form-actions{grid-template-columns:1fr}
+  .mz-feed-body{padding-bottom:96px}
 }
 </style>
 </head>
-<body class="mz-alertas-page">
-<div class="mz-app">
-<aside class="mz-sidebar">
-  <a class="mz-brand" href="index.html">
-    <span class="mz-brand-badge">MZ</span>
-    <span><strong>MiZona<span>.pe</span></strong><small>Tu zona más segura.</small></span>
-  </a>
-  <nav class="mz-nav"><a class="" href="index.html"><span>⌂</span><span>Inicio</span></a><a class="active" href="alertas.html"><span>◔</span><span>Alertas</span></a><a class="" href="mapa.html"><span>⌖</span><span>Mapa</span></a><a class="" href="servicios.html"><span>▣</span><span>Servicios</span></a><a class="" href="solicitudes.html"><span>▤</span><span>Solicitudes</span></a><a class="" href="perfil.html"><span>♙</span><span>Perfil</span></a></nav>
-  <section class="mz-side-card"><strong>Comunidad verificada</strong><p>Vecinos, negocios e instituciones colaborando para una zona más segura.</p></section>
-  <section class="mz-side-card"><strong>Privacidad primero</strong><p>Las alertas muestran zonas aproximadas. Los datos sensibles se mantienen protegidos.</p></section>
-</aside>
-<main class="mz-main">
-<header class="mz-topbar">
-  <button class="mz-top-icon mz-menu-btn" type="button" data-menu aria-label="Abrir menú">
-    <i class="ti ti-menu-2"></i>
-  </button>
-
-  <button class="mz-zone" type="button" data-change-zone aria-label="Cambiar zona">
-    <i class="ti ti-map-pin-filled"></i>
-    <span data-zone>Ventanilla, Callao</span>
-  </button>
-
-  <label class="mz-search"><input type="search" placeholder="Buscar en MiZona..."></label>
-
-  <div class="mz-actions">
-    <a class="mz-top-icon report" href="alertas.html#reportar" aria-label="Reportar una alerta">
-      <i class="ti ti-plus"></i>
-    </a>
-    <a class="mz-top-icon" href="notificaciones.html" aria-label="Notificaciones">
-      <i class="ti ti-bell"></i>
-      <span class="mz-notification-badge" data-notification-count hidden>0</span>
-    </a>
-    <a class="mz-profile-chip" href="perfil.html" data-profile-link aria-label="Abrir mi perfil">
-      <span class="mz-profile-avatar" data-profile-avatar><i class="ti ti-user"></i></span>
-      <span class="mz-profile-copy">
-        <strong data-profile-name>Mi perfil</strong>
-        <small>Ver cuenta</small>
-      </span>
-    </a>
-  </div>
-</header>
-<div class="mz-content">
-<div class="mz-page-title">
-  <div><h1>Alertas de tu zona</h1><p>Reporta hechos, confirma información y sigue actualizaciones.</p></div>
-  <a class="mz-btn danger" href="#reportar">Nueva alerta</a>
-</div>
-
-<div class="mz-page-grid">
-  <section class="mz-card">
-    <div class="mz-card-head"><h2>Alertas recientes</h2><span class="mz-tag reportada">Información ciudadana</span></div>
-    <div id="alertasLista"><div class="mz-loader">Cargando...</div></div>
-  </section>
-
-  <aside class="mz-card" id="reportar">
-    <div class="mz-card-head"><h2>Reportar alerta</h2></div>
-    <div class="mz-card-pad">
-      <form id="alertaForm" class="mz-form">
-        <label class="mz-field"><span>Categoría</span>
-          <select name="categoria" required>
-            <option value="robo">Robo o asalto</option>
-            <option value="accidente">Accidente</option>
-            <option value="agua">Corte o fuga de agua</option>
-            <option value="luz">Corte de luz</option>
-            <option value="persona">Persona desaparecida</option>
-            <option value="mascota">Mascota perdida</option>
-            <option value="incendio">Incendio</option>
-            <option value="otro">Otro</option>
-          </select>
-        </label>
-        <label class="mz-field"><span>Distrito</span><input name="distrito" value="Ventanilla" required></label>
-        <label class="mz-field full"><span>Título</span><input name="titulo" maxlength="120" required placeholder="Describe brevemente lo ocurrido"></label>
-        <label class="mz-field full"><span>Descripción</span><textarea name="descripcion" rows="5" maxlength="1200" required placeholder="Incluye hora, referencia y detalles útiles. No publiques acusaciones ni datos sensibles."></textarea></label>
-        <label class="mz-field full"><span>Zona o referencia</span><input name="zona_referencia" placeholder="Ej.: Av. Las Palmeras, cerca del mercado"></label>
-        <input name="latitud" type="hidden">
-        <input name="longitud" type="hidden">
-        <div class="mz-field full mz-form-actions">
-          <button type="button" class="mz-btn location-btn" data-use-location>
-            <i class="ti ti-current-location"></i>
-            <span>Usar ubicación aproximada</span>
-          </button>
-          <button type="submit" class="mz-btn submit-btn">
-            <i class="ti ti-send"></i>
-            <span>Enviar alerta</span>
-          </button>
-        </div>
-      </form>
-      <div id="alertaStatus" hidden></div>
-      <p style="color:var(--muted);font-size:12px;line-height:1.5;margin-top:14px">
-        MiZona informa sobre hechos reportados; no determina culpabilidad. Los casos sensibles pueden pasar a revisión.
-      </p>
+<body class="estado-guest">
+<div id="mz-toast" class="mz-toast"></div>
+<div class="mz-layout">
+  <aside class="mz-sidebar">
+    <div class="mz-logo">
+      <div class="mz-logo-mark">MZ</div>
+      <div><div class="mz-logo-name">MiZona</div><div class="mz-logo-domain">mizona.pe</div></div>
     </div>
+    <div class="mz-sidebar-user hide-guest" id="sb-user">
+      <div class="mz-user-av" id="sb-av">U</div>
+      <div><div class="mz-user-name" id="sb-name">Usuario</div><div class="mz-user-dist"><i class="ti ti-map-pin"></i><span id="sb-dist">Tu zona</span></div></div>
+    </div>
+    <div class="mz-sidebar-user hide-logged" style="flex-direction:column;align-items:flex-start;gap:6px">
+      <a href="login.html" style="width:100%;background:var(--az);color:#fff;border-radius:6px;padding:7px 10px;font-size:10px;font-weight:700;text-align:center;display:block">Iniciar sesión</a>
+      <a href="registro.html" style="width:100%;background:transparent;color:#64748b;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:7px 10px;font-size:10px;font-weight:600;text-align:center;display:block">Crear cuenta gratis</a>
+    </div>
+    <div class="mz-nav-sec">Principal</div>
+    <a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
+    <a class="mz-nav-item active" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span><span class="mz-nav-badge" id="nb-alertas">0</span></a>
+    <a class="mz-nav-item" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
+    <a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
+    <a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
+    <div class="mz-nav-sec">Comunidad</div>
+    <a class="mz-nav-item" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
+    <a class="mz-nav-item" href="ride.html"><i class="ti ti-car"></i><span>MiZonaRide</span></a>
+    <a class="mz-nav-item" href="empleos.html"><i class="ti ti-briefcase"></i><span>Empleos</span></a>
+    <div class="mz-nav-sec">Cuenta</div>
+    <a class="mz-nav-item" href="mensajes.html"><i class="ti ti-message"></i><span>Mensajes</span></a>
+    <a class="mz-nav-item hide-guest" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
+    <a class="mz-nav-item hide-guest" href="negocio.html"><i class="ti ti-building-store"></i><span>Mi negocio</span></a>
+    <a class="mz-nav-item hide-guest" href="admin.html" id="link-admin" style="display:none"><i class="ti ti-shield"></i><span>Admin</span></a>
+    <div class="mz-sidebar-spacer"></div>
+    <a class="mz-sidebar-btn" href="#reportar"><i class="ti ti-plus"></i> Reportar alerta</a>
+  </aside>
+
+  <main class="mz-feed">
+    <div class="mz-topbar">
+      <div class="mz-search" onclick="location.href='explorar.html'"><i class="ti ti-search"></i><span>Buscar en tu zona...</span></div>
+      <div class="mz-dist-tag"><i class="ti ti-map-pin"></i><span id="dist-nombre">Mi zona</span></div>
+      <div class="mz-icon-btn" onclick="location.href='notificaciones.html'"><i class="ti ti-bell"></i><div class="mz-notif-dot" id="notif-dot" style="display:none"></div></div>
+      <div class="mz-icon-btn hide-guest" onclick="location.href='mensajes.html'"><i class="ti ti-message"></i></div>
+      <div class="mz-icon-btn hide-logged" onclick="location.href='login.html'"><i class="ti ti-user"></i></div>
+    </div>
+
+    <div class="mz-feed-body">
+      <section class="mz-alerts-hero">
+        <div><h1>Alertas de tu zona</h1><p>Reporta hechos, confirma información y sigue las actualizaciones.</p></div>
+        <a class="mz-btn-new" href="#reportar"><i class="ti ti-plus"></i> Nueva alerta</a>
+      </section>
+
+      <div class="mz-alerts-grid">
+        <section class="mz-card">
+          <div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-bell"></i> Alertas recientes</div><span class="mz-tag reportada">Información ciudadana</span></div>
+          <div id="alertasLista"><div class="mz-loader">Cargando alertas...</div></div>
+        </section>
+
+        <aside class="mz-card" id="reportar">
+          <div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-alert-triangle"></i> Reportar alerta</div></div>
+          <div class="mz-card-pad">
+            <form id="alertaForm" class="mz-form">
+              <label class="mz-field"><span>Categoría</span>
+                <select name="categoria" required>
+                  <option value="robo">Robo o asalto</option><option value="accidente">Accidente</option><option value="agua">Corte o fuga de agua</option><option value="luz">Corte de luz</option><option value="persona">Persona desaparecida</option><option value="mascota">Mascota perdida</option><option value="incendio">Incendio</option><option value="otro">Otro</option>
+                </select>
+              </label>
+              <label class="mz-field"><span>Distrito</span><input name="distrito" id="form-distrito" value="Ventanilla" required></label>
+              <label class="mz-field full"><span>Título</span><input name="titulo" maxlength="120" required placeholder="Describe brevemente lo ocurrido"></label>
+              <label class="mz-field full"><span>Descripción</span><textarea name="descripcion" rows="5" maxlength="1200" required placeholder="Incluye hora, referencia y detalles útiles. No publiques acusaciones ni datos sensibles."></textarea></label>
+              <label class="mz-field full"><span>Zona o referencia</span><input name="zona_referencia" placeholder="Ej.: Av. Las Palmeras, cerca del mercado"></label>
+              <input name="latitud" type="hidden"><input name="longitud" type="hidden">
+              <div class="mz-field full mz-form-actions">
+                <button type="button" class="mz-btn ghost" data-use-location><i class="ti ti-current-location"></i> Usar ubicación</button>
+                <button type="submit" class="mz-btn danger"><i class="ti ti-send"></i> Enviar alerta</button>
+              </div>
+            </form>
+            <div id="alertaStatus" hidden></div>
+            <div class="mz-form-note"><i class="ti ti-shield-check"></i> MiZona muestra hechos reportados por la comunidad. No publiques datos personales ni acusaciones sin verificar.</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <aside class="mz-sidebar-right">
+    <div class="mz-widget">
+      <div class="mz-widget-head"><i class="ti ti-map-pin"></i> Tu zona hoy</div>
+      <div class="mz-stat-row"><div class="mz-stat-label"><i class="ti ti-bell" style="color:var(--rj)"></i><div><div>Alertas activas</div><div style="font-size:7px;color:var(--txt3)" id="sr-dist">Tu distrito</div></div></div><div class="mz-stat-val" style="color:var(--rj)" id="sr-alertas">0</div></div>
+      <div class="mz-stat-row"><div class="mz-stat-label"><i class="ti ti-map"></i><div>Ver mapa completo</div></div><a class="mz-card-link" href="mapa.html">Abrir</a></div>
+    </div>
+    <div class="mz-widget">
+      <div class="mz-widget-head"><i class="ti ti-shield-check"></i> Reporta con responsabilidad</div>
+      <div class="mz-alert-help"><strong>Describe hechos concretos</strong><p>Indica hora, zona y referencias útiles sin exponer información sensible.</p></div>
+      <div class="mz-alert-help"><strong>Confirma solo lo que viste</strong><p>Las confirmaciones ayudan a validar una alerta para otros vecinos.</p></div>
+      <div class="mz-alert-help"><strong>Emergencias reales</strong><p>Ante peligro inmediato, comunícate también con las autoridades correspondientes.</p></div>
+    </div>
+    <div class="mz-cta" onclick="location.href='mapa.html'"><div class="mz-cta-title">Mapa de alertas</div><div class="mz-cta-sub">Revisa lo que ocurre cerca de ti →</div></div>
   </aside>
 </div>
-</div>
-</main>
-</div>
 
-<nav class="mz-mobile-bottom" aria-label="Navegación principal">
-  <a href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
-  <a class="active" href="alertas.html"><i class="ti ti-bell-ringing"></i><span>Alertas</span></a>
-  <a class="plus" href="alertas.html#reportar" aria-label="Nueva alerta"><i class="ti ti-plus"></i><span>Nueva alerta</span></a>
-  <a href="mapa.html"><i class="ti ti-map-2"></i><span>Mapa</span></a>
-  <a href="perfil.html"><i class="ti ti-user-circle"></i><span>Perfil</span></a>
+<nav class="mz-bottom-nav">
+  <div class="mz-bn-inner">
+    <div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
+    <div class="mz-bn-item active" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
+    <div class="mz-bn-item" onclick="location.href='#reportar'"><div class="mz-bn-center"><i class="ti ti-plus"></i></div></div>
+    <div class="mz-bn-item" onclick="location.href='mapa.html'"><i class="ti ti-map"></i><span>Mapa</span></div>
+    <div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
+  </div>
 </nav>
+
 <script type="module" src="js/alertas-mizona.js"></script>
 <script type="module">
-import { supabase, getCurrentUser } from './js/supabase.js';
+import { supabase } from './js/supabase.js';
 
-function initials(value){
-  return String(value || 'U').trim().split(/\s+/).slice(0,2).map(p=>p[0] || '').join('').toUpperCase() || 'U';
+function initials(value='Usuario'){
+  return String(value).trim().split(/\s+/).slice(0,2).map(v=>v[0]||'').join('').toUpperCase() || 'U';
 }
-
-async function loadHeaderProfile(){
-  const profileLink = document.querySelector('[data-profile-link]');
-  const avatar = document.querySelector('[data-profile-avatar]');
-  const name = document.querySelector('[data-profile-name]');
-  const badge = document.querySelector('[data-notification-count]');
-
+async function loadShell(){
+  const { data:{ session } } = await supabase.auth.getSession();
+  if(!session?.user) return;
+  document.body.classList.remove('estado-guest');
+  document.body.classList.add('estado-logged');
   try{
-    const user = await getCurrentUser();
-    if(!user){
-      if(profileLink) profileLink.href = `login.html?next=${encodeURIComponent('alertas.html')}`;
-      if(name) name.textContent = 'Ingresar';
-      return;
-    }
-
-    const { data:profile } = await supabase
-      .from('perfiles')
-      .select('nombre_visible,username,avatar_url')
-      .eq('id',user.id)
-      .maybeSingle();
-
-    const displayName = profile?.nombre_visible || profile?.username || user.email?.split('@')[0] || 'Mi perfil';
-    if(name) name.textContent = displayName;
-    if(avatar){
-      if(profile?.avatar_url){
-        const img = document.createElement('img');
-        img.src = `${profile.avatar_url}${profile.avatar_url.includes('?') ? '&' : '?'}v=${Date.now()}`;
-        img.alt = `Foto de ${displayName}`;
-        avatar.replaceChildren(img);
-      }else{
-        avatar.textContent = initials(displayName);
-      }
-    }
-
-    const { count,error } = await supabase
-      .from('notificaciones')
-      .select('id',{count:'exact',head:true})
-      .eq('usuario_id',user.id)
-      .eq('leida',false);
-
-    if(!error && count && badge){
-      badge.textContent = count > 99 ? '99+' : String(count);
-      badge.hidden = false;
-    }
-  }catch(error){
-    console.warn('No se pudo cargar el perfil de cabecera:',error);
-  }
+    const { data:p } = await supabase.from('perfiles').select('*').eq('id',session.user.id).maybeSingle();
+    const name = p?.full_name || p?.username || session.user.email?.split('@')[0] || 'Usuario';
+    const district = p?.distrito || p?.zona || 'Tu zona';
+    document.getElementById('sb-name').textContent = name;
+    document.getElementById('sb-av').textContent = initials(name);
+    document.getElementById('sb-dist').textContent = district;
+    document.getElementById('dist-nombre').textContent = district;
+    document.getElementById('sr-dist').textContent = district;
+    const districtInput=document.getElementById('form-distrito'); if(districtInput && district!=='Tu zona') districtInput.value=district;
+    if(p?.is_admin) document.getElementById('link-admin').style.display='flex';
+  }catch(_){ }
+  try{
+    const { count } = await supabase.from('notification_inbox').select('id',{count:'exact',head:true}).eq('user_id',session.user.id).eq('leida',false);
+    const dot=document.getElementById('notif-dot'); if(dot) dot.style.display=Number(count||0)>0?'block':'none';
+  }catch(_){ }
 }
-
-loadHeaderProfile();
+async function countAlerts(){
+  try{
+    const { count } = await supabase.from('alertas').select('id',{count:'exact',head:true}).in('estado',['reportada','verificada','en_revision']);
+    document.getElementById('nb-alertas').textContent=Number(count||0);
+    document.getElementById('sr-alertas').textContent=Number(count||0);
+  }catch(_){ }
+}
+loadShell(); countAlerts();
 </script>
 <script type="module" src="./js/mizona-core.js"></script>
 </body>

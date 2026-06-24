@@ -1,70 +1,116 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>Zona Ofertas — MiZona.pe</title>
-<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet"/>
-<link href="css/mizona.css" rel="stylesheet"/>
-<link href="css/mizona-unified.css" rel="stylesheet"/>
-<link href="css/mizona-phase2.css" rel="stylesheet"/>
-<link href="css/mizona-master-shell.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="Ofertas verificadas de negocios cercanos en MiZona.pe">
+  <meta name="theme-color" content="#185FA5">
+  <title>Zona Ofertas — MiZona.pe</title>
+<link href="manifest.json" rel="manifest"/>
+  <link rel="icon" type="image/png" href="assets/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/mizona.css">
+  <link rel="stylesheet" href="css/mizona-unified.css">
+  <link rel="stylesheet" href="css/mizona-master-shell.css">
+  <link rel="stylesheet" href="css/mizona-logo.css">
+  <link rel="stylesheet" href="css/negocios-ofertas.css">
+</head>
 <body>
-<div class="mz-layout-2col">
-<aside class="mz-sidebar">
-<div class="mz-logo"><img alt="MiZona.pe" class="mz-logo-img" src="assets/mizona-logo-blanco.svg"/></div>
-<div class="mz-nav-sec">Principal</div>
-<a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
-<a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
-<a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
-<a class="mz-nav-item active" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
-<div class="mz-sidebar-spacer"></div>
-<a class="mz-sidebar-btn" href="negocio.html" style="text-decoration:none">🏪 Panel de mi negocio</a>
-</aside>
 <main class="mz-feed">
-<div class="mz-topbar">
-<div class="mz-search"><i class="ti ti-search"></i><span>Buscar ofertas...</span></div>
-<div class="mz-dist-tag"><i class="ti ti-map-pin"></i> Tu zona</div>
-</div>
-<div class="mz-feed-body">
-<span class="mz-zona am">Zona Ofertas</span>
-<div style="background:linear-gradient(135deg,#1e3a5f,#0f2a47);border-radius:12px;padding:14px;margin-bottom:4px">
-<div style="font-size:8px;font-weight:800;background:#185FA5;color:#fff;border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:5px">🎁 OFERTAS PARA VECINOS DE TU ZONA</div>
-<div style="font-size:14px;font-weight:700;color:#f1f5f9;margin-bottom:3px">Beneficios exclusivos</div>
-<div style="font-size:9px;color:#93c5fd">Solo para usuarios MiZona de tu distrito</div>
-</div>
-<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)">
-<div style="background:linear-gradient(135deg,#5B21B6,#722ED1);padding:14px;display:flex;align-items:center;justify-content:space-between">
-<div><div style="font-size:9px;color:rgba(255,255,255,.8)">Oferta de demostración</div><div style="font-size:14px;font-weight:800;color:#fff">Beneficio próximo</div></div>
-<div style="font-size:20px;font-weight:800;color:#fff">💜</div>
-</div>
-<div style="padding:10px 12px">
-<div style="font-size:10px;font-weight:700;color:#1e293b;margin-bottom:3px">Promociones verificadas para vecinos</div>
-<div style="font-size:9px;color:#475569">Las promociones reales deberán ser publicadas por negocios verificados y mostrar condiciones, vigencia y stock.</div>
-<button onclick="localStorage.setItem('mizona_interes_ofertas','1');window.mzToast('Listo. Te avisaremos cuando existan ofertas verificadas en tu zona.')" style="width:100%;background:#722ED1;color:#fff;border:none;border-radius:8px;padding:10px;font-size:12px;font-weight:700;margin-top:8px;cursor:pointer" type="button">Avisarme cuando esté disponible</button>
-</div>
-</div>
-<div style="text-align:center;padding:20px;color:#94a3b8;font-size:11px">
-<div style="font-size:30px;margin-bottom:8px">🏪</div>
-<div style="font-weight:700;color:#475569;margin-bottom:4px">¿Tienes un negocio?</div>
-<div style="margin-bottom:12px">Publica tus ofertas gratis y llega a los vecinos de tu zona</div>
-<a href="negocio.html" style="background:#185FA5;color:#fff;border-radius:8px;padding:9px 20px;font-size:11px;font-weight:700;display:inline-block">Ir a mi panel de negocio →</a>
-</div>
-</div>
+  <div class="mz-feed-body">
+    <section class="bo-page">
+      <header class="bo-page-head">
+        <div class="bo-page-title">
+          <div class="bo-title-icon"><i class="ti ti-tag"></i></div>
+          <div>
+            <h1>Zona Ofertas</h1>
+            <p>Promociones verificadas y descuentos cerca de ti.</p>
+          </div>
+        </div>
+        <a class="bo-primary-btn" href="negocio.html"><i class="ti ti-speakerphone"></i> Publicar una oferta</a>
+      </header>
+
+      <div class="bo-catalog-layout">
+        <div>
+          <section class="bo-featured bo-hidden" id="featuredOffer" aria-label="Oferta destacada"></section>
+
+          <section class="bo-card bo-filter-card">
+            <div class="bo-filter-row">
+              <div class="bo-search-wrap">
+                <i class="ti ti-search"></i>
+                <input class="bo-input" id="offerSearch" type="search" placeholder="Buscar ofertas, productos o negocios">
+              </div>
+              <select class="bo-select" id="offerSort" aria-label="Ordenar ofertas">
+                <option value="recent">Más recientes</option>
+                <option value="discount">Mayor descuento</option>
+                <option value="price">Menor precio</option>
+                <option value="ending">Próximas a vencer</option>
+              </select>
+              <select class="bo-select" id="offerDistrict" aria-label="Distrito">
+                <option value="">Todos los distritos</option>
+              </select>
+            </div>
+          </section>
+
+          <div class="bo-categories" id="offerCategories" aria-label="Categorías">
+            <button class="bo-category active" data-category=""><i class="ti ti-apps"></i> Todas</button>
+            <button class="bo-category" data-category="comida"><i class="ti ti-tools-kitchen-2"></i> Comida</button>
+            <button class="bo-category" data-category="hogar"><i class="ti ti-home"></i> Hogar</button>
+            <button class="bo-category" data-category="ferreteria"><i class="ti ti-hammer"></i> Ferretería</button>
+            <button class="bo-category" data-category="salud"><i class="ti ti-medical-cross"></i> Salud</button>
+            <button class="bo-category" data-category="belleza"><i class="ti ti-brush"></i> Belleza</button>
+            <button class="bo-category" data-category="servicios"><i class="ti ti-tool"></i> Servicios</button>
+            <button class="bo-category" data-category="mascotas"><i class="ti ti-paw"></i> Mascotas</button>
+            <button class="bo-category" data-category="otros"><i class="ti ti-dots"></i> Otros</button>
+          </div>
+
+          <div class="bo-status" id="catalogStatus"></div>
+          <section class="bo-offer-grid" id="offerGrid" aria-live="polite">
+            <div class="bo-card bo-loading">Cargando ofertas verificadas…</div>
+          </section>
+          <div class="bo-form-actions" style="justify-content:center;margin-top:18px">
+            <button class="bo-secondary-btn bo-hidden" id="loadMoreOffers" type="button"><i class="ti ti-chevron-down"></i> Cargar más ofertas</button>
+          </div>
+        </div>
+
+        <aside class="bo-side-stack">
+          <section class="bo-card bo-side-card">
+            <h3>Tu zona hoy</h3>
+            <div class="bo-side-stat"><i class="ti ti-tag"></i><div><strong id="activeOfferCount">0</strong><span>Ofertas activas</span></div></div>
+            <div class="bo-side-stat"><i class="ti ti-ticket"></i><div><strong id="savedCouponCount">0</strong><span>Cupones obtenidos</span></div></div>
+            <div class="bo-side-stat"><i class="ti ti-percentage"></i><div><strong id="averageDiscount">0%</strong><span>Descuento promedio</span></div></div>
+          </section>
+
+          <section class="bo-card bo-side-card">
+            <div class="bo-section-head"><h3>Negocios destacados</h3><a href="explorar.html?q=negocios">Ver todos</a></div>
+            <div id="featuredBusinesses"><div class="bo-loading" style="padding:15px">Cargando…</div></div>
+          </section>
+
+          <section class="bo-card bo-owner-cta">
+            <h3>¿Eres dueño de un negocio?</h3>
+            <p>Crea tu página comercial, publica servicios y ofrece promociones verificadas a vecinos de tu zona.</p>
+            <a class="bo-secondary-btn" href="negocio.html"><i class="ti ti-building-store"></i> Registrar mi negocio</a>
+          </section>
+
+          <section class="bo-card bo-side-card">
+            <div class="bo-trust-item"><i class="ti ti-shield-check"></i><div><strong>Ofertas verificadas</strong><span>Solo se publican promociones aprobadas por MiZona.</span></div></div>
+          </section>
+        </aside>
+      </div>
+    </section>
+  </div>
 </main>
+
+<div class="bo-modal-backdrop" id="couponModal">
+  <section class="bo-modal" role="dialog" aria-modal="true" aria-labelledby="couponTitle">
+    <div class="bo-modal-head"><h2 id="couponTitle">Tu cupón MiZona</h2><button class="bo-icon-btn" type="button" data-close-modal><i class="ti ti-x"></i></button></div>
+    <div id="couponContent"></div>
+  </section>
 </div>
-<nav class="mz-bottom-nav">
-<div class="mz-bn-inner">
-<div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
-<div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
-<div class="mz-bn-item"><div class="mz-bn-center" onclick="location.href='index.html#publicar'"><i class="ti ti-plus"></i></div></div>
-<div class="mz-bn-item active" onclick="location.href='ofertas.html'"><i class="ti ti-tag"></i><span>Ofertas</span></div>
-<div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
-</div>
-</nav>
-<script src="./js/mizona-core.js" type="module"></script>
-<script src="./js/mizona-master-shell.js" type="module"></script>
+
+<script type="module" src="js/ofertas-zona.js"></script>
+<script type="module" src="js/mizona-core.js"></script>
+<script type="module" src="js/mizona-master-shell.js"></script>
 </body>
 </html>

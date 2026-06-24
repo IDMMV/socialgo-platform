@@ -141,3 +141,7 @@ Después de subir esta versión, ejecuta en Supabase el archivo:
 `sql/fase2_mensajeria_y_diseno.sql`
 
 Este archivo corrige la recursión de las políticas RLS del chat y habilita el nuevo listado de conversaciones. Consulta `INSTRUCCIONES_FASE2_MIZONA.md` para el orden completo.
+
+## Fase 4 — Negocios y Zona Ofertas
+
+Antes de usar `negocio.html`, `negocio-publico.html`, `oferta.html`, `ofertas.html` y `admin-negocios.html`, ejecuta `sql/fase4_negocios_ofertas.sql` en Supabase. Consulta `INSTRUCCIONES_FASE4_NEGOCIOS_OFERTAS.md`.

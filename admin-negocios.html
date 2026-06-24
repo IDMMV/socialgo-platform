@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Administrar negocios — MiZona.pe</title>
+<link href="manifest.json" rel="manifest"/>
+  <link rel="icon" href="assets/favicon-32.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/mizona.css">
+  <link rel="stylesheet" href="css/mizona-master-shell.css">
+  <link rel="stylesheet" href="css/mizona-logo.css">
+  <link rel="stylesheet" href="css/negocios-ofertas.css">
+</head>
+<body>
+<main class="mz-feed" hidden id="adminBusinessMain">
+  <div class="mz-feed-body"><section class="bo-page">
+    <header class="bo-page-head"><div class="bo-page-title"><div class="bo-title-icon"><i class="ti ti-shield-check"></i></div><div><h1>Negocios y ofertas</h1><p>Aprueba solicitudes y modera promociones antes de publicarlas.</p></div></div><a class="bo-secondary-btn" href="admin.html">Panel general</a></header>
+    <div class="bo-status" id="adminBusinessStatus"></div>
+    <div class="bo-admin-grid"><div class="bo-card bo-stat-card"><span>Solicitudes pendientes</span><strong id="requestCount">0</strong></div><div class="bo-card bo-stat-card"><span>Ofertas pendientes</span><strong id="offerPendingCount">0</strong></div><div class="bo-card bo-stat-card"><span>Negocios aprobados</span><strong id="businessCount">0</strong></div><div class="bo-card bo-stat-card"><span>Ofertas publicadas</span><strong id="offerPublishedCount">0</strong></div></div>
+    <section class="bo-card bo-section"><div class="bo-section-head"><h2>Solicitudes de negocios</h2><button class="bo-secondary-btn" id="refreshAdminBusiness" type="button"><i class="ti ti-refresh"></i> Actualizar</button></div><div class="bo-admin-list" id="businessRequests"><div class="bo-loading">Cargando solicitudes…</div></div></section>
+    <section class="bo-card bo-section" style="margin-top:16px"><div class="bo-section-head"><h2>Ofertas pendientes de revisión</h2></div><div class="bo-admin-list" id="pendingOffers"><div class="bo-loading">Cargando ofertas…</div></div></section>
+  </section></div>
+</main>
+<section class="bo-page" id="adminBusinessGate"><div class="bo-card bo-loading">Verificando acceso administrativo…</div></section>
+<script type="module" src="js/admin-negocios.js"></script>
+<script type="module" src="js/mizona-core.js"></script>
+<script type="module" src="js/mizona-master-shell.js"></script>
+</body></html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="Página pública de negocio en MiZona.pe">
+  <meta name="theme-color" content="#185FA5">
+  <title>Negocio — MiZona.pe</title>
+<link href="manifest.json" rel="manifest"/>
+  <link rel="icon" type="image/png" href="assets/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/mizona.css">
+  <link rel="stylesheet" href="css/mizona-unified.css">
+  <link rel="stylesheet" href="css/mizona-master-shell.css">
+  <link rel="stylesheet" href="css/mizona-logo.css">
+  <link rel="stylesheet" href="css/negocios-ofertas.css">
+</head>
+<body>
+<main class="mz-feed">
+  <div class="mz-feed-body">
+    <section class="bo-page" id="businessPage">
+      <div class="bo-card bo-loading">Cargando página del negocio…</div>
+    </section>
+  </div>
+</main>
+
+<div class="bo-modal-backdrop" id="reviewModal">
+  <section class="bo-modal" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
+    <div class="bo-modal-head"><h2 id="reviewModalTitle">Calificar negocio</h2><button class="bo-icon-btn" type="button" data-close-modal><i class="ti ti-x"></i></button></div>
+    <form id="reviewForm">
+      <div class="bo-field"><label for="reviewScore">Tu puntuación</label><select class="bo-select" id="reviewScore" required><option value="5">5 — Excelente</option><option value="4">4 — Muy bueno</option><option value="3">3 — Bueno</option><option value="2">2 — Regular</option><option value="1">1 — Malo</option></select></div>
+      <div class="bo-field" style="margin-top:12px"><label for="reviewComment">Comentario</label><textarea class="bo-textarea" id="reviewComment" maxlength="500" placeholder="Cuenta brevemente tu experiencia"></textarea></div>
+      <div class="bo-form-actions"><button class="bo-primary-btn" type="submit"><i class="ti ti-star"></i> Guardar opinión</button><button class="bo-ghost-btn" type="button" data-close-modal>Cancelar</button></div>
+    </form>
+  </section>
+</div>
+
+<div class="bo-modal-backdrop" id="couponModal">
+  <section class="bo-modal" role="dialog" aria-modal="true" aria-labelledby="couponPublicTitle">
+    <div class="bo-modal-head"><h2 id="couponPublicTitle">Tu cupón MiZona</h2><button class="bo-icon-btn" type="button" data-close-modal><i class="ti ti-x"></i></button></div>
+    <div id="couponPublicContent"></div>
+  </section>
+</div>
+
+<script type="module" src="js/negocio-publico.js"></script>
+<script type="module" src="js/mizona-core.js"></script>
+<script type="module" src="js/mizona-master-shell.js"></script>
+</body>
+</html>

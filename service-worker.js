@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v3.4.0-seguridad-recuperacion";
+const CACHE_NAME = "mizona-v4.1.0-pwa-install";
 
 const CORE = [
   "./",
@@ -13,6 +13,10 @@ const CORE = [
   "./perfil.html",
   "./clips.html",
   "./negocio.html",
+  "./negocio-publico.html",
+  "./oferta.html",
+  "./admin-negocios.html",
+  "./seguridad.html",
   "./admin.html",
   "./usuario.html",
   "./explorar.html",
@@ -23,7 +27,6 @@ const CORE = [
   "./registro.html",
   "./recuperar.html",
   "./restablecer.html",
-  "./seguridad.html",
   "./manifest.json",
   "./assets/mizona-logo.svg",
   "./assets/mizona-logo-horizontal.svg",
@@ -41,6 +44,7 @@ const CORE = [
   "./css/mizona-master-shell.css",
   "./css/mizona-logo.css",
   "./css/auth-security.css",
+  "./css/negocios-ofertas.css",
   "./js/mizona-core.js",
   "./js/mizona-master-shell.js",
   "./js/mizona-ui-v2.js",
@@ -48,13 +52,19 @@ const CORE = [
   "./js/config.js",
   "./js/env.public.js",
   "./js/supabase.js",
-  "./js/password-ui.js",
-  "./js/auth.js",
   "./js/push-notifications.js",
   "./js/alertas-mizona.js",
   "./js/mapa-mizona.js",
   "./js/servicios-mizona.js",
-  "./js/solicitudes-mizona.js"
+  "./js/solicitudes-mizona.js",
+  "./js/ofertas-zona.js",
+  "./js/negocio-publico.js",
+  "./js/negocio-panel.js",
+  "./js/oferta-detalle.js",
+  "./js/admin-negocios.js",
+  "./js/inicio-ofertas.js",
+  "./js/instalar-pwa.js",
+  "./assets/screenshot-mobile.png"
 ];
 
 self.addEventListener("install", (event) => {

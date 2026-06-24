@@ -13,7 +13,8 @@
 <link href="css/mizona.css" rel="stylesheet"/>
 <link href="css/mizona-unified.css" rel="stylesheet"/>
 <link href="css/mizona-phase2.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/negocios-ofertas.css">
+</head>
 <body class="estado-guest">
 <div class="mz-toast" id="mz-toast"></div>
 <!-- MODAL ALERTA -->
@@ -117,6 +118,9 @@
 <a class="mz-nav-item hide-guest" href="negocio.html"><i class="ti ti-building-store"></i><span>Mi negocio</span></a>
 <a class="mz-nav-item hide-guest" href="admin.html" id="link-admin" style="display:none"><i class="ti ti-shield"></i><span>Admin</span></a>
 <div class="mz-sidebar-spacer"></div>
+<button id="btn-instalar-pwa" onclick="instalarMiZona()">
+  <i class="ti ti-download"></i> Instalar app en mi celular
+</button>
 <button class="mz-sidebar-btn" onclick="abrirPublicar()"><i class="ti ti-plus"></i> Publicar en mi zona</button>
 </aside>
 <!-- FEED CENTRAL -->
@@ -575,6 +579,75 @@ initAuth();
 initMapa();
 cargarServiciosInicio();
 </script>
+<script src="./js/inicio-ofertas.js" type="module"></script>
 <script src="./js/mizona-core.js" type="module"></script>
+
+<!-- INSTALACIÓN PWA -->
+<div id="banner-instalar-pwa">
+  <button class="banner-pwa-close" onclick="cerrarBannerInstalacion()">✕</button>
+  <div class="banner-pwa-icon">MZ</div>
+  <div class="banner-pwa-text">
+    <div class="banner-pwa-title">Instala MiZona en tu celular</div>
+    <div class="banner-pwa-sub">Gratis · Sin Play Store · 2 segundos</div>
+  </div>
+  <button class="banner-pwa-btn" onclick="instalarMiZona()">
+    Instalar
+  </button>
+</div>
+
+<div class="mz-modal-overlay" id="modal-instalar-manual">
+  <div class="mz-modal">
+    <div class="mz-modal-head">
+      <span class="mz-modal-title">
+        <i class="ti ti-device-mobile" style="color:var(--az);margin-right:5px"></i>
+        Instalar MiZona
+      </span>
+      <button class="mz-modal-close"
+        onclick="document.getElementById('modal-instalar-manual').classList.remove('open');document.body.style.overflow=''">✕</button>
+    </div>
+    <div class="mz-modal-body">
+      <p style="font-size:11px;color:var(--txt2);margin-bottom:12px">
+        Sigue estos pasos para instalar MiZona en tu pantalla de inicio:
+      </p>
+      <div class="instalar-steps">
+        <div class="instalar-step">
+          <div class="instalar-step-num">1</div>
+          <div class="instalar-step-text">
+            Abre <strong>mizona.pe</strong> en <strong>Google Chrome</strong>
+          </div>
+        </div>
+        <div class="instalar-step">
+          <div class="instalar-step-num">2</div>
+          <div class="instalar-step-text">
+            Toca los <strong>⋮ tres puntos</strong> en la esquina superior derecha
+          </div>
+        </div>
+        <div class="instalar-step">
+          <div class="instalar-step-num">3</div>
+          <div class="instalar-step-text">
+            Toca <strong>"Añadir a pantalla de inicio"</strong> o <strong>"Instalar app"</strong>
+          </div>
+        </div>
+        <div class="instalar-step">
+          <div class="instalar-step-num">4</div>
+          <div class="instalar-step-text">
+            Confirma y el ícono de <strong>MiZona</strong> aparece en tu pantalla 🎉
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--az-bg);border:1px solid var(--az-bd);border-radius:8px;padding:9px 11px;margin-top:10px;font-size:10px;color:var(--az)">
+        <i class="ti ti-info-circle" style="font-size:12px;margin-right:4px"></i>
+        Para <strong>Redmi/Xiaomi</strong>: abre Chrome → tres puntos → "Añadir a pantalla de inicio"
+      </div>
+    </div>
+    <div class="mz-modal-foot">
+      <button class="mz-btn-cancel"
+        onclick="document.getElementById('modal-instalar-manual').classList.remove('open');document.body.style.overflow=''">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>
+<script src="js/instalar-pwa.js" defer></script>
 </body>
 </html>

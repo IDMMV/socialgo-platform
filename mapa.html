@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
-<meta content="#185FA5" name="theme-color"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#185FA5">
 <title>Mapa de alertas — MiZona.pe</title>
-<link href="manifest.json" rel="manifest"/>
-<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet"/>
-<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
-<link href="css/mizona.css" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="css/mizona.css">
 <style>
 #mapaCompleto{height:calc(100vh - 180px);min-height:500px;width:100%}
 .mz-map-filtros{padding:8px 12px;background:#fff;border-bottom:1px solid var(--bd);display:flex;gap:6px;flex-wrap:wrap}
@@ -54,98 +53,110 @@
   .mz-map-radio-label{font-size:11px}
 }
 </style>
-<link href="css/mizona-unified.css" rel="stylesheet"/>
-<link href="css/mizona-phase2.css" rel="stylesheet"/>
-<link href="css/mizona-master-shell.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
+<link rel="stylesheet" href="css/mizona-unified.css">
+<link rel="stylesheet" href="css/mizona-phase2.css">
+</head>
 <body>
 <div class="mz-layout-2col">
-<!-- SIDEBAR -->
-<aside class="mz-sidebar">
-<div class="mz-logo"><img alt="MiZona.pe" class="mz-logo-img" src="assets/mizona-logo-blanco.svg"/></div>
-<div class="mz-nav-sec">Principal</div>
-<a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
-<a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
-<a class="mz-nav-item active" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
-<a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
-<a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
-<div class="mz-nav-sec">Comunidad</div>
-<a class="mz-nav-item" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
-<a class="mz-nav-item" href="ride.html"><i class="ti ti-car"></i><span>MiZonaRide</span></a>
-<div class="mz-nav-sec">Cuenta</div>
-<a class="mz-nav-item" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
-<a class="mz-nav-item" href="negocio.html"><i class="ti ti-building-store"></i><span>Mi negocio</span></a>
-<div class="mz-sidebar-spacer"></div>
-<a class="mz-sidebar-btn" href="alertas.html#reportar" style="text-decoration:none">
-<i class="ti ti-plus"></i> Reportar alerta
+
+  <!-- SIDEBAR -->
+  <aside class="mz-sidebar">
+    <div class="mz-logo">
+      <div class="mz-logo-mark">MZ</div>
+      <div><div class="mz-logo-name">MiZona</div><div class="mz-logo-domain">mizona.pe</div></div>
+    </div>
+    <div class="mz-nav-sec">Principal</div>
+    <a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
+    <a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
+    <a class="mz-nav-item active" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
+    <a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
+    <a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
+    <div class="mz-nav-sec">Comunidad</div>
+    <a class="mz-nav-item" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
+    <a class="mz-nav-item" href="ride.html"><i class="ti ti-car"></i><span>MiZonaRide</span></a>
+    <div class="mz-nav-sec">Cuenta</div>
+    <a class="mz-nav-item" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
+    <a class="mz-nav-item" href="negocio.html"><i class="ti ti-building-store"></i><span>Mi negocio</span></a>
+    <div class="mz-sidebar-spacer"></div>
+    <a href="alertas.html#reportar" class="mz-sidebar-btn" style="text-decoration:none">
+      <i class="ti ti-plus"></i> Reportar alerta
     </a>
-</aside>
-<!-- MAIN -->
-<main class="mz-feed">
-<div class="mz-topbar">
-<div style="flex:1">
-<div style="font-size:14px;font-weight:700;color:var(--txt)">Mapa de alertas</div>
-<div style="font-size:10px;color:var(--txt3)">Incidentes y avisos en tiempo real</div>
-</div>
-<button onclick="usarUbicacion()" style="background:var(--az);color:#fff;border:none;border-radius:var(--rs);padding:8px 14px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">
-<i class="ti ti-current-location" style="font-size:14px"></i> Usar mi ubicación
+  </aside>
+
+  <!-- MAIN -->
+  <main class="mz-feed">
+    <div class="mz-topbar">
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;color:var(--txt)">Mapa de alertas</div>
+        <div style="font-size:10px;color:var(--txt3)">Incidentes y avisos en tiempo real</div>
+      </div>
+      <button onclick="usarUbicacion()" style="background:var(--az);color:#fff;border:none;border-radius:var(--rs);padding:8px 14px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">
+        <i class="ti ti-current-location" style="font-size:14px"></i> Usar mi ubicación
       </button>
-<div class="mz-dist-tag" id="dist-tag-mapa"><i class="ti ti-map-pin"></i><span id="dist-mapa">Cargando...</span></div>
-</div>
-<div class="mz-card" style="margin:12px;border-radius:var(--r);overflow:hidden">
-<div class="mz-card-head">
-<div class="mz-card-title"><i class="ti ti-map-pin"></i> Alertas en tu zona</div>
-<div style="display:flex;align-items:center;gap:8px">
-<span style="font-size:9px;font-weight:700;color:var(--vd);display:flex;align-items:center;gap:3px">
-<span style="width:6px;height:6px;background:var(--vd);border-radius:50%;animation:blink 1.5s ease-in-out infinite;display:inline-block"></span> En vivo
+      <div class="mz-dist-tag" id="dist-tag-mapa"><i class="ti ti-map-pin"></i><span id="dist-mapa">Cargando...</span></div>
+    </div>
+
+    <div class="mz-card" style="margin:12px;border-radius:var(--r);overflow:hidden">
+      <div class="mz-card-head">
+        <div class="mz-card-title"><i class="ti ti-map-pin"></i> Alertas en tu zona</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:9px;font-weight:700;color:var(--vd);display:flex;align-items:center;gap:3px">
+            <span style="width:6px;height:6px;background:var(--vd);border-radius:50%;animation:blink 1.5s ease-in-out infinite;display:inline-block"></span> En vivo
           </span>
-<span id="mapZoneInfo" style="font-size:9px;font-weight:700;color:var(--az2);background:#EEF2FF;border:1px solid #D8E1FF;padding:4px 8px;border-radius:999px;display:none">Radio: 1.5 km</span>
-<span id="mapCount" style="font-size:10px;font-weight:700;color:var(--txt2)">0 alertas</span>
+          <span id="mapZoneInfo" style="font-size:9px;font-weight:700;color:var(--az2);background:#EEF2FF;border:1px solid #D8E1FF;padding:4px 8px;border-radius:999px;display:none">Radio: 1.5 km</span>
+          <span id="mapCount" style="font-size:10px;font-weight:700;color:var(--txt2)">0 alertas</span>
+        </div>
+      </div>
+
+      <div class="mz-map-filtros">
+        <button class="mz-map-filtro active" onclick="filtrar('todas',this)">Todas</button>
+        <button class="mz-map-filtro" onclick="filtrar('robo',this)">🔴 Robos</button>
+        <button class="mz-map-filtro" onclick="filtrar('accidente',this)">🟠 Accidentes</button>
+        <button class="mz-map-filtro" onclick="filtrar('agua',this)">💧 Agua/Luz</button>
+        <button class="mz-map-filtro" onclick="filtrar('mascota',this)">🐾 Mascotas</button>
+        <button class="mz-map-filtro" onclick="filtrar('persona',this)">👤 Personas</button>
+        <button class="mz-map-filtro" onclick="filtrar('incendio',this)">🔥 Incendios</button>
+      </div>
+
+      <div class="mz-map-radio-bar" aria-label="Seleccionar radio de búsqueda">
+        <span class="mz-map-radio-label"><i class="ti ti-radar"></i> Radio:</span>
+        <button type="button" class="mz-radio-btn" data-radio="500" onclick="cambiarRadio(500,this)">500 m</button>
+        <button type="button" class="mz-radio-btn" data-radio="1000" onclick="cambiarRadio(1000,this)">1 km</button>
+        <button type="button" class="mz-radio-btn active" data-radio="1500" onclick="cambiarRadio(1500,this)">1.5 km</button>
+        <button type="button" class="mz-radio-btn" data-radio="2000" onclick="cambiarRadio(2000,this)">2 km</button>
+        <button type="button" class="mz-radio-btn" data-radio="5000" onclick="cambiarRadio(5000,this)">5 km</button>
+        <button type="button" class="mz-radio-btn" data-radio="0" onclick="cambiarRadio(0,this)">Toda la zona</button>
+        <span class="mz-map-radio-help" id="radioHelp">Mostrando alertas a 1.5 km de tu ubicación</span>
+      </div>
+
+      <div id="mapaCompleto"></div>
+
+      <div class="mz-map-leyenda">
+        <div class="mz-ley-item"><div class="mz-ley-dot" style="background:#E24B4A"></div>Robo/Delito</div>
+        <div class="mz-ley-item"><div class="mz-ley-dot" style="background:#f59e0b"></div>Accidente</div>
+        <div class="mz-ley-item"><div class="mz-ley-dot" style="background:#185FA5"></div>Agua/Luz</div>
+        <div class="mz-ley-item"><div class="mz-ley-dot" style="background:#d97706"></div>Mascota</div>
+        <div class="mz-ley-item"><div class="mz-ley-dot" style="background:#9b5cf6"></div>Persona</div>
+        <div class="mz-ley-item"><div class="mz-ley-dot" style="background:#1D9E75"></div>Verificada</div>
+        <span style="margin-left:auto;font-size:9px;color:var(--txt3)">© OpenStreetMap — Gratis</span>
+      </div>
+    </div>
+  </main>
 </div>
-</div>
-<div class="mz-map-filtros">
-<button class="mz-map-filtro active" onclick="filtrar('todas',this)">Todas</button>
-<button class="mz-map-filtro" onclick="filtrar('robo',this)">🔴 Robos</button>
-<button class="mz-map-filtro" onclick="filtrar('accidente',this)">🟠 Accidentes</button>
-<button class="mz-map-filtro" onclick="filtrar('agua',this)">💧 Agua/Luz</button>
-<button class="mz-map-filtro" onclick="filtrar('mascota',this)">🐾 Mascotas</button>
-<button class="mz-map-filtro" onclick="filtrar('persona',this)">👤 Personas</button>
-<button class="mz-map-filtro" onclick="filtrar('incendio',this)">🔥 Incendios</button>
-</div>
-<div aria-label="Seleccionar radio de búsqueda" class="mz-map-radio-bar">
-<span class="mz-map-radio-label"><i class="ti ti-radar"></i> Radio:</span>
-<button class="mz-radio-btn" data-radio="500" onclick="cambiarRadio(500,this)" type="button">500 m</button>
-<button class="mz-radio-btn" data-radio="1000" onclick="cambiarRadio(1000,this)" type="button">1 km</button>
-<button class="mz-radio-btn active" data-radio="1500" onclick="cambiarRadio(1500,this)" type="button">1.5 km</button>
-<button class="mz-radio-btn" data-radio="2000" onclick="cambiarRadio(2000,this)" type="button">2 km</button>
-<button class="mz-radio-btn" data-radio="5000" onclick="cambiarRadio(5000,this)" type="button">5 km</button>
-<button class="mz-radio-btn" data-radio="0" onclick="cambiarRadio(0,this)" type="button">Toda la zona</button>
-<span class="mz-map-radio-help" id="radioHelp">Mostrando alertas a 1.5 km de tu ubicación</span>
-</div>
-<div id="mapaCompleto"></div>
-<div class="mz-map-leyenda">
-<div class="mz-ley-item"><div class="mz-ley-dot" style="background:#E24B4A"></div>Robo/Delito</div>
-<div class="mz-ley-item"><div class="mz-ley-dot" style="background:#f59e0b"></div>Accidente</div>
-<div class="mz-ley-item"><div class="mz-ley-dot" style="background:#185FA5"></div>Agua/Luz</div>
-<div class="mz-ley-item"><div class="mz-ley-dot" style="background:#d97706"></div>Mascota</div>
-<div class="mz-ley-item"><div class="mz-ley-dot" style="background:#9b5cf6"></div>Persona</div>
-<div class="mz-ley-item"><div class="mz-ley-dot" style="background:#1D9E75"></div>Verificada</div>
-<span style="margin-left:auto;font-size:9px;color:var(--txt3)">© OpenStreetMap — Gratis</span>
-</div>
-</div>
-</main>
-</div>
-<div aria-live="polite" class="mz-live-toast" id="mzLiveToast" role="status"></div>
+
+<div id="mzLiveToast" class="mz-live-toast" role="status" aria-live="polite"></div>
+
 <!-- BOTTOM NAV MOBILE -->
 <nav class="mz-bottom-nav">
-<div class="mz-bn-inner">
-<div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
-<div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
-<div class="mz-bn-item active"><i class="ti ti-map"></i><span>Mapa</span></div>
-<div class="mz-bn-item" onclick="location.href='servicios.html'"><i class="ti ti-tool"></i><span>Servicios</span></div>
-<div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
-</div>
+  <div class="mz-bn-inner">
+    <div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
+    <div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
+    <div class="mz-bn-item active"><i class="ti ti-map"></i><span>Mapa</span></div>
+    <div class="mz-bn-item" onclick="location.href='servicios.html'"><i class="ti ti-tool"></i><span>Servicios</span></div>
+    <div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
+  </div>
 </nav>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script type="module">
@@ -552,7 +563,6 @@ window.addEventListener('beforeunload', () => {
 
 initMapa();
 </script>
-<script src="./js/mizona-core.js" type="module"></script>
-<script src="./js/mizona-master-shell.js" type="module"></script>
+<script type="module" src="./js/mizona-core.js"></script>
 </body>
 </html>

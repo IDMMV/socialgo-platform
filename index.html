@@ -331,6 +331,23 @@ import { PUBLIC_ENV } from './js/env.public.js';
 
 const sb = supabase.createClient(PUBLIC_ENV.SUPABASE_URL, PUBLIC_ENV.SUPABASE_PUBLISHABLE_KEY);
 
+
+async function actualizarIndicadorNotificaciones(userId) {
+  const dot = document.getElementById('notif-dot');
+  if (!dot || !userId) return;
+  let total = 0;
+  try {
+    const { count } = await sb.from('notification_inbox').select('id', { count:'exact', head:true }).eq('user_id', userId).eq('leida', false);
+    total += Number(count || 0);
+  } catch (_) {}
+  try {
+    const { count } = await sb.from('notificaciones').select('id', { count:'exact', head:true }).eq('usuario_id', userId).eq('leida', false);
+    total += Number(count || 0);
+  } catch (_) {}
+  dot.style.display = total > 0 ? 'block' : 'none';
+  dot.title = total ? `${total} notificaciones sin leer` : '';
+}
+
 // ===== AUTH =====
 async function initAuth() {
   const { data: { session } } = await sb.auth.getSession();
@@ -351,7 +368,11 @@ async function initAuth() {
         if (p.is_admin) document.getElementById('link-admin').style.display = 'flex';
       }
     } catch(e) {}
-    document.getElementById('notif-dot').style.display = 'block';
+    await actualizarIndicadorNotificaciones(session.user.id);
+    sb.channel(`home-notif-${session.user.id}`)
+      .on('postgres_changes',{event:'*',schema:'public',table:'notification_inbox',filter:`user_id=eq.${session.user.id}`},()=>actualizarIndicadorNotificaciones(session.user.id))
+      .on('postgres_changes',{event:'*',schema:'public',table:'notificaciones',filter:`usuario_id=eq.${session.user.id}`},()=>actualizarIndicadorNotificaciones(session.user.id))
+      .subscribe();
   }
 }
 

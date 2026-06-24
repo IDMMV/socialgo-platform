@@ -1,4 +1,5 @@
 import { applyBrand, loadBrand } from "./brand.js";
+import { bootstrapPushNotifications } from "./push-notifications.js";
 
 applyBrand();
 loadBrand().catch(() => applyBrand());
@@ -47,3 +48,8 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
     });
   });
 }
+
+
+bootstrapPushNotifications().catch((error) => {
+  console.info("MiZona Push no se inició:", error?.message || error);
+});

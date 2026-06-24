@@ -26,6 +26,7 @@ const NAV_GROUPS = [
   ["Cuenta", [
     ["mensajes.html", "ti-message", "Mensajes"],
     ["amistades.html", "ti-users", "Amigos"],
+    ["notificaciones.html", "ti-bell", "Notificaciones"],
     ["perfil.html", "ti-user", "Mi perfil"],
     ["negocio.html", "ti-building-store", "Mi negocio"],
   ]],

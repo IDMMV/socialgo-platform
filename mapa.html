@@ -12,11 +12,46 @@
 <style>
 #mapaCompleto{height:calc(100vh - 180px);min-height:500px;width:100%}
 .mz-map-filtros{padding:8px 12px;background:#fff;border-bottom:1px solid var(--bd);display:flex;gap:6px;flex-wrap:wrap}
-.mz-map-filtro{padding:4px 12px;border-radius:20px;font-size:9px;font-weight:700;border:1px solid var(--bd);background:var(--bg);color:var(--txt2);cursor:pointer;transition:all .15s}
+.mz-map-filtro{padding:4px 12px;border-radius:20px;font-size:9px;font-weight:700;border:1px solid var(--bd);background:var(--bg);color:var(--txt2);cursor:pointer;transition:all .15s;flex:0 0 auto}
 .mz-map-filtro.active{background:var(--az);color:#fff;border-color:var(--az)}
+.mz-map-radio-bar{padding:8px 12px;background:#fff;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.mz-map-radio-label{font-size:10px;font-weight:800;color:var(--txt);margin-right:2px;flex:0 0 auto}
+.mz-radio-btn{padding:5px 10px;border-radius:999px;border:1px solid var(--bd);background:var(--bg);color:var(--txt2);font-size:9px;font-weight:800;cursor:pointer;transition:.15s;flex:0 0 auto}
+.mz-radio-btn:hover{border-color:#9b5cf6;color:#6d28d9}
+.mz-radio-btn.active{background:#7c3aed;color:#fff;border-color:#7c3aed;box-shadow:0 3px 10px rgba(124,58,237,.22)}
+.mz-map-radio-help{font-size:9px;color:var(--txt3);margin-left:auto;flex:0 0 auto}
 .mz-map-leyenda{padding:8px 12px;background:var(--bg);border-top:1px solid var(--bd);display:flex;gap:12px;flex-wrap:wrap;font-size:9px;color:var(--txt2)}
 .mz-ley-item{display:flex;align-items:center;gap:4px}
 .mz-ley-dot{width:10px;height:10px;border-radius:50%}
+.mz-live-toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(16px);z-index:5000;background:#0f172a;color:#fff;padding:10px 14px;border-radius:12px;font-size:12px;font-weight:700;box-shadow:0 12px 35px rgba(15,23,42,.28);opacity:0;pointer-events:none;transition:.2s;max-width:calc(100vw - 32px);text-align:center}
+.mz-live-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.mz-live-toast.error{background:#991b1b}
+
+@media (max-width: 768px){
+  body{overflow-x:hidden}
+  .mz-feed{padding-bottom:calc(82px + env(safe-area-inset-bottom))}
+  .mz-topbar{position:sticky;top:0;z-index:1200;background:#fff;display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;border-bottom:1px solid var(--bd)}
+  .mz-topbar > div:first-child{min-width:100%;flex:1 0 100%}
+  .mz-topbar button{order:2}
+  .mz-topbar .mz-dist-tag{order:3}
+  .mz-card{margin:8px !important;border-radius:14px !important;overflow:hidden}
+  .mz-map-filtros{position:sticky;top:74px;z-index:1190;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-ms-overflow-style:none}
+  .mz-map-filtros::-webkit-scrollbar,.mz-map-radio-bar::-webkit-scrollbar{display:none}
+  .mz-map-radio-bar{position:sticky;top:120px;z-index:1180;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap}
+  .mz-map-radio-help{display:none}
+  #mapaCompleto{height:calc(100dvh - 310px - env(safe-area-inset-bottom));min-height:300px}
+  .mz-map-leyenda{position:sticky;bottom:calc(66px + env(safe-area-inset-bottom));z-index:1170;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;padding-right:18px}
+  .leaflet-control-container .leaflet-top{top:4px}
+  .leaflet-control-container .leaflet-bottom{bottom:8px}
+  .leaflet-pane,.leaflet-control,.leaflet-top,.leaflet-bottom{z-index:500}
+  .mz-bottom-nav{z-index:3000}
+}
+
+@media (max-width: 480px){
+  #mapaCompleto{height:calc(100dvh - 328px - env(safe-area-inset-bottom));min-height:260px}
+  .mz-map-filtro,.mz-radio-btn{font-size:11px;padding:7px 12px}
+  .mz-map-radio-label{font-size:11px}
+}
 </style>
 <link rel="stylesheet" href="css/mizona-unified.css">
 <link rel="stylesheet" href="css/mizona-phase2.css">
@@ -68,6 +103,7 @@
           <span style="font-size:9px;font-weight:700;color:var(--vd);display:flex;align-items:center;gap:3px">
             <span style="width:6px;height:6px;background:var(--vd);border-radius:50%;animation:blink 1.5s ease-in-out infinite;display:inline-block"></span> En vivo
           </span>
+          <span id="mapZoneInfo" style="font-size:9px;font-weight:700;color:var(--az2);background:#EEF2FF;border:1px solid #D8E1FF;padding:4px 8px;border-radius:999px;display:none">Radio: 1.5 km</span>
           <span id="mapCount" style="font-size:10px;font-weight:700;color:var(--txt2)">0 alertas</span>
         </div>
       </div>
@@ -80,6 +116,17 @@
         <button class="mz-map-filtro" onclick="filtrar('mascota',this)">🐾 Mascotas</button>
         <button class="mz-map-filtro" onclick="filtrar('persona',this)">👤 Personas</button>
         <button class="mz-map-filtro" onclick="filtrar('incendio',this)">🔥 Incendios</button>
+      </div>
+
+      <div class="mz-map-radio-bar" aria-label="Seleccionar radio de búsqueda">
+        <span class="mz-map-radio-label"><i class="ti ti-radar"></i> Radio:</span>
+        <button type="button" class="mz-radio-btn" data-radio="500" onclick="cambiarRadio(500,this)">500 m</button>
+        <button type="button" class="mz-radio-btn" data-radio="1000" onclick="cambiarRadio(1000,this)">1 km</button>
+        <button type="button" class="mz-radio-btn active" data-radio="1500" onclick="cambiarRadio(1500,this)">1.5 km</button>
+        <button type="button" class="mz-radio-btn" data-radio="2000" onclick="cambiarRadio(2000,this)">2 km</button>
+        <button type="button" class="mz-radio-btn" data-radio="5000" onclick="cambiarRadio(5000,this)">5 km</button>
+        <button type="button" class="mz-radio-btn" data-radio="0" onclick="cambiarRadio(0,this)">Toda la zona</button>
+        <span class="mz-map-radio-help" id="radioHelp">Mostrando alertas a 1.5 km de tu ubicación</span>
       </div>
 
       <div id="mapaCompleto"></div>
@@ -96,6 +143,8 @@
     </div>
   </main>
 </div>
+
+<div id="mzLiveToast" class="mz-live-toast" role="status" aria-live="polite"></div>
 
 <!-- BOTTOM NAV MOBILE -->
 <nav class="mz-bottom-nav">
@@ -115,7 +164,149 @@ import { PUBLIC_ENV } from './js/env.public.js';
 const sb = supabase.createClient(PUBLIC_ENV.SUPABASE_URL, PUBLIC_ENV.SUPABASE_PUBLISHABLE_KEY);
 
 const colores = {robo:'#E24B4A',accidente:'#f59e0b',agua:'#185FA5',luz:'#185FA5',mascota:'#d97706',incendio:'#ef4444',persona:'#9b5cf6',otro:'#8b5cf6'};
-let mapaInst = null, todosMarkers = [], miPos = null;
+const RADIO_PREDETERMINADO = 1500;
+let radioZonaMetros = RADIO_PREDETERMINADO;
+let mapaInst = null, todosMarkers = [], miPos = null, alertasCache = [], filtroActual = 'todas';
+let confirmacionesPropias = new Set();
+let usuarioActualId = null;
+let realtimeCanal = null;
+let sincronizacionTimer = null;
+let toastTimer = null;
+
+function normalizarTipo(valor) {
+  const t = String(valor || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  if (!t) return 'otro';
+  if (['robo','robos','hurto','hurtos','delito','delitos','asalto','asaltos'].includes(t)) return 'robo';
+  if (['accidente','accidentes','choque','choques','atropello','siniestro'].includes(t)) return 'accidente';
+  if (['agua','luz','agua/luz','agua-luz','corte de agua','corte de luz','servicios basicos'].includes(t)) return 'agua';
+  if (['mascota','mascotas','animal','animales'].includes(t)) return 'mascota';
+  if (['persona','personas','desaparecido','desaparecidos'].includes(t)) return 'persona';
+  if (['incendio','incendios','fuego'].includes(t)) return 'incendio';
+  return t;
+}
+
+function coincideConFiltro(tipo, filtro) {
+  if (filtro === 'todas') return true;
+  return normalizarTipo(tipo) === filtro;
+}
+
+
+function textoConfirmaciones(n) {
+  const total = Number(n || 0);
+  if (total === 1) return '1 persona lo confirmó';
+  return `${total} personas lo confirmaron`;
+}
+
+function escaparTexto(valor) {
+  return String(valor ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function mostrarAviso(mensaje, tipo='ok') {
+  const box = document.getElementById('mzLiveToast');
+  if (!box) return;
+  clearTimeout(toastTimer);
+  box.textContent = mensaje;
+  box.classList.toggle('error', tipo === 'error');
+  box.classList.add('show');
+  toastTimer = setTimeout(() => box.classList.remove('show'), 2800);
+}
+
+async function cargarConfirmacionesPropias() {
+  try {
+    const { data:authData } = await sb.auth.getUser();
+    const user = authData?.user;
+    if (!user) {
+      usuarioActualId = null;
+      confirmacionesPropias = new Set();
+      return;
+    }
+    usuarioActualId = String(user.id);
+    const { data, error } = await sb
+      .from('alerta_confirmaciones')
+      .select('alerta_id')
+      .eq('usuario_id', user.id);
+    if (error) throw error;
+    confirmacionesPropias = new Set((data || []).map(x => String(x.alerta_id)));
+  } catch (_) {
+    // La cuenta seguirá viendo los totales públicos aunque no pueda leer sus filas.
+  }
+}
+
+window.compartirAlertaMapa = async function(textoCodificado){
+  const texto = decodeURIComponent(textoCodificado || '');
+  const payload = { title:'MiZona', text:texto, url:location.href };
+  try {
+    if (navigator.share) await navigator.share(payload);
+    else if (navigator.clipboard) {
+      await navigator.clipboard.writeText(location.href);
+      mostrarAviso('Enlace copiado');
+    }
+  } catch(_) {}
+};
+
+window.confirmarAlertaMapa = async function(alertaId, button) {
+  if (!alertaId) {
+    mostrarAviso('Esta es una alerta de demostración.', 'error');
+    return;
+  }
+
+  const { data:authData } = await sb.auth.getUser();
+  const user = authData?.user;
+  if (!user) {
+    location.href = `login.html?next=${encodeURIComponent(location.pathname + location.search)}`;
+    return;
+  }
+
+  const alerta = alertasCache.find(a => String(a.id) === String(alertaId));
+  if (alerta && String(alerta.autor_id || '') === String(user.id)) {
+    mostrarAviso('No puedes confirmar una alerta que tú mismo reportaste.', 'error');
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = 'Guardando...';
+
+  try {
+    const coords = await new Promise(resolve => {
+      if (!navigator.geolocation) return resolve(null);
+      navigator.geolocation.getCurrentPosition(
+        pos => resolve({ lat:pos.coords.latitude, lng:pos.coords.longitude }),
+        () => resolve(null),
+        { enableHighAccuracy:false, timeout:5000, maximumAge:300000 }
+      );
+    });
+
+    const { data, error } = await sb.rpc('confirmar_alerta', {
+      p_alerta_id: alertaId,
+      p_latitud: coords?.lat ?? null,
+      p_longitud: coords?.lng ?? null
+    });
+    if (error) throw error;
+
+    const nuevoTotal = Number(data?.total || 0);
+    confirmacionesPropias.add(String(alertaId));
+    alertasCache = alertasCache.map(a => String(a.id) === String(alertaId)
+      ? { ...a, conf:nuevoTotal, total_confirmaciones:nuevoTotal }
+      : a);
+
+    button.textContent = '✓ Ya confirmado';
+    button.style.background = '#1D9E75';
+    button.disabled = true;
+
+    const badge = document.getElementById(`badge-${alertaId}`);
+    const info = document.getElementById(`confirmaciones-${alertaId}`);
+    if (badge) badge.textContent = `Sin verificar · ${textoConfirmaciones(nuevoTotal)}`;
+    if (info) info.textContent = `👥 ${textoConfirmaciones(nuevoTotal)}`;
+
+    mostrarAviso(data?.mensaje || 'Confirmación registrada');
+    await sincronizarConteos(true);
+  } catch (error) {
+    const mensaje = error?.message || 'No se pudo guardar la confirmación';
+    mostrarAviso(mensaje, 'error');
+    button.disabled = false;
+    button.textContent = '✓ También lo vi';
+  }
+};
 
 function crearIcono(tipo, verificada) {
   const color = verificada ? '#1D9E75' : (colores[tipo] || '#8b5cf6');
@@ -125,25 +316,81 @@ function crearIcono(tipo, verificada) {
   });
 }
 
-function initMapa() {
+async function initMapa() {
   mapaInst = L.map('mapaCompleto',{zoomControl:true,scrollWheelZoom:true}).setView([-12.046,-77.043],13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mapaInst);
   usarUbicacion();
-  cargarAlertas();
+  await cargarConfirmacionesPropias();
+  await cargarAlertas();
+  iniciarSincronizacion();
 }
+
+function etiquetaRadio(metros) {
+  if (!metros) return 'Toda la zona';
+  if (metros < 1000) return `${metros} m`;
+  return `${(metros / 1000).toLocaleString('es-PE',{maximumFractionDigits:1})} km`;
+}
+
+function actualizarCirculoZona(ajustarVista = false) {
+  if (!mapaInst || !miPos) return;
+  if (window._miZonaCircle) {
+    mapaInst.removeLayer(window._miZonaCircle);
+    window._miZonaCircle = null;
+  }
+
+  const info = document.getElementById('mapZoneInfo');
+  const help = document.getElementById('radioHelp');
+
+  if (!radioZonaMetros) {
+    info.style.display = 'inline-flex';
+    info.textContent = 'Toda la zona';
+    help.textContent = 'Mostrando todas las alertas disponibles';
+    return;
+  }
+
+  window._miZonaCircle = L.circle(miPos, {
+    radius: radioZonaMetros,
+    color: '#7c3aed',
+    weight: 2,
+    opacity: 0.95,
+    fillColor: '#7c3aed',
+    fillOpacity: 0.08,
+    dashArray: '8 6'
+  }).addTo(mapaInst).bindPopup(`<b>Zona mostrada</b><br>Mostrando alertas en un radio de ${etiquetaRadio(radioZonaMetros)}.`);
+
+  info.style.display = 'inline-flex';
+  info.textContent = `Radio: ${etiquetaRadio(radioZonaMetros)}`;
+  help.textContent = `Mostrando alertas a ${etiquetaRadio(radioZonaMetros)} de tu ubicación`;
+
+  if (ajustarVista) mapaInst.fitBounds(window._miZonaCircle.getBounds(), {padding:[24,24], maxZoom:16});
+}
+
+window.cambiarRadio = function(metros, btn) {
+  radioZonaMetros = Number(metros) || 0;
+  document.querySelectorAll('.mz-radio-btn').forEach(b=>b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  actualizarCirculoZona(true);
+  renderAlertas();
+};
 
 window.usarUbicacion = function() {
   if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(pos => {
     const {latitude:lat, longitude:lng} = pos.coords;
     miPos = [lat,lng];
-    mapaInst.setView([lat,lng],16);
+    mapaInst.setView([lat,lng],15);
+
     if (window._miPosMarker) mapaInst.removeLayer(window._miPosMarker);
+
     const ico = L.divIcon({
       html:`<div style="width:16px;height:16px;background:#E24B4A;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 5px rgba(220,38,38,.25)"></div>`,
       iconSize:[16,16],iconAnchor:[8,8],className:''
     });
-    window._miPosMarker = L.marker([lat,lng],{icon:ico}).addTo(mapaInst).bindPopup('<b>📍 Tú estás aquí</b>');
+
+    window._miPosMarker = L.marker([lat,lng],{icon:ico}).addTo(mapaInst).bindPopup(`<b>📍 Tú estás aquí</b><br><span style="font-size:12px;color:#64748b">Radio mostrado: ${etiquetaRadio(radioZonaMetros)}</span>`);
+    actualizarCirculoZona(true);
+    renderAlertas();
+
     // Actualizar distrito aproximado
     fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es`)
       .then(r=>r.json())
@@ -156,22 +403,114 @@ window.usarUbicacion = function() {
   });
 };
 
-async function cargarAlertas() {
+async function cargarAlertas({silencioso=false} = {}) {
   try {
-    const {data} = await sb.from('alertas').select('*').in('estado',['reportada','verificada','en_revision']).not('latitud','is',null).order('created_at',{ascending:false}).limit(100);
-    if (data?.length) {
-      cargarEnMapa(data.map(a=>({lat:parseFloat(a.latitud),lng:parseFloat(a.longitud),tipo:a.categoria,titulo:a.titulo,meta:`${a.zona_referencia||a.distrito||''} · ${timeAgo(a.created_at)}`,verificada:a.estado==='verificada',conf:a.total_confirmaciones||0,id:a.id})));
-      return;
+    const {data,error} = await sb
+      .from('alertas')
+      .select('id,categoria,titulo,distrito,zona_referencia,estado,latitud,longitud,created_at,total_confirmaciones,autor_id')
+      .in('estado',['reportada','verificada','en_revision'])
+      .not('latitud','is',null)
+      .order('created_at',{ascending:false})
+      .limit(100);
+
+    if (error) throw error;
+
+    alertasCache = (data || []).map(a => ({
+      lat:parseFloat(a.latitud),
+      lng:parseFloat(a.longitud),
+      tipo:normalizarTipo(a.categoria),
+      titulo:a.titulo,
+      meta:`${a.zona_referencia || a.distrito || ''} · ${timeAgo(a.created_at)}`,
+      verificada:a.estado === 'verificada',
+      conf:Number(a.total_confirmaciones || 0),
+      id:a.id,
+      autor_id:a.autor_id || null
+    }));
+    renderAlertas();
+  } catch (error) {
+    if (!silencioso) mostrarAviso(`No se pudieron cargar las alertas: ${error.message}`, 'error');
+    if (!alertasCache.length) {
+      alertasCache = [];
+      renderAlertas();
     }
-  } catch(e){}
-  // Demo si no hay datos reales
-  cargarEnMapa([
-    {lat:-12.046,lng:-77.043,tipo:'robo',titulo:'Robo de celular',meta:'Jr. Las Palmeras · Hace 12 min',verificada:false,conf:3},
-    {lat:-12.042,lng:-77.039,tipo:'agua',titulo:'Corte de agua — Sedapal',meta:'Av. Universitaria · Hoy',verificada:true,conf:0},
-    {lat:-12.05,lng:-77.047,tipo:'mascota',titulo:'Mascota perdida — Max',meta:'Parque · Hace 2h',verificada:false,conf:1},
-    {lat:-12.048,lng:-77.041,tipo:'robo',titulo:'Moto robada',meta:'Av. Naranjal · Hace 45 min',verificada:true,conf:6},
-    {lat:-12.044,lng:-77.045,tipo:'accidente',titulo:'Accidente de tránsito',meta:'Cruce · Hace 30 min',verificada:false,conf:2},
-  ]);
+  }
+}
+
+async function sincronizarConteos(forzarRender=false) {
+  try {
+    const {data,error} = await sb
+      .from('alertas')
+      .select('id,total_confirmaciones,estado')
+      .in('estado',['reportada','verificada','en_revision']);
+    if (error) throw error;
+
+    let cambio = false;
+    const porId = new Map((data || []).map(x => [String(x.id), x]));
+    alertasCache = alertasCache.map(a => {
+      const nuevo = porId.get(String(a.id));
+      if (!nuevo) return a;
+      const total = Number(nuevo.total_confirmaciones || 0);
+      const verificada = nuevo.estado === 'verificada';
+      if (total !== Number(a.conf || 0) || verificada !== a.verificada) cambio = true;
+      return { ...a, conf:total, verificada };
+    });
+
+    if (cambio || forzarRender) renderAlertas();
+  } catch (_) {}
+}
+
+function aplicarCambioRealtime(registro) {
+  if (!registro?.id) return;
+  let encontrado = false;
+  alertasCache = alertasCache.map(a => {
+    if (String(a.id) !== String(registro.id)) return a;
+    encontrado = true;
+    return {
+      ...a,
+      conf:Number(registro.total_confirmaciones || 0),
+      verificada:registro.estado === 'verificada'
+    };
+  });
+  if (encontrado) renderAlertas();
+  else cargarAlertas({silencioso:true});
+}
+
+function iniciarSincronizacion() {
+  if (realtimeCanal) sb.removeChannel(realtimeCanal);
+  realtimeCanal = sb
+    .channel('mapa-alertas-tiempo-real')
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:'alertas'}, () => cargarAlertas({silencioso:true}))
+    .on('postgres_changes', {event:'UPDATE', schema:'public', table:'alertas'}, payload => aplicarCambioRealtime(payload.new))
+    .on('postgres_changes', {event:'DELETE', schema:'public', table:'alertas'}, () => cargarAlertas({silencioso:true}))
+    .subscribe();
+
+  clearInterval(sincronizacionTimer);
+  sincronizacionTimer = setInterval(() => {
+    if (!document.hidden) sincronizarConteos();
+  }, 12000);
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      cargarConfirmacionesPropias().then(() => sincronizarConteos(true));
+    }
+  });
+  window.addEventListener('online', () => sincronizarConteos(true));
+}
+
+function filtrarPorZona(alertas) {
+  if (!miPos || !mapaInst) return alertas;
+  return alertas.filter(a => {
+    const distancia = mapaInst.distance(miPos, [a.lat, a.lng]);
+    a._dist = distancia;
+    return !radioZonaMetros || distancia <= radioZonaMetros;
+  });
+}
+
+function renderAlertas() {
+  let alertas = Array.isArray(alertasCache) ? [...alertasCache] : [];
+  alertas = filtrarPorZona(alertas);
+  if (filtroActual !== 'todas') alertas = alertas.filter(a => coincideConFiltro(a.tipo, filtroActual));
+  cargarEnMapa(alertas);
 }
 
 function cargarEnMapa(alertas) {
@@ -179,24 +518,36 @@ function cargarEnMapa(alertas) {
   alertas.forEach(a=>{
     if(!a.lat||!a.lng) return;
     const m = L.marker([a.lat,a.lng],{icon:crearIcono(a.tipo,a.verificada)}).addTo(mapaInst);
-    m.bindPopup(`<div style="min-width:200px;font-family:inherit">
-      <div style="font-size:8px;font-weight:700;background:${a.verificada?'#f0fdf4':'#fef2f2'};color:${a.verificada?'#14532d':'#991b1b'};border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:5px">${a.verificada?'✓ Verificada':'Sin verificar · '+a.conf+' confirmaron'}</div>
-      <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:3px">${a.titulo}</div>
-      <div style="font-size:10px;color:#94a3b8;margin-bottom:8px">${a.meta}</div>
-      <button onclick="this.textContent='✓ Confirmado';this.style.background='#1D9E75'" style="width:100%;background:#185FA5;color:#fff;border:none;border-radius:6px;padding:6px;font-size:10px;font-weight:700;cursor:pointer;margin-bottom:5px">✓ También lo vi</button>
-      <button onclick="if(navigator.share){navigator.share({title:'MiZona',text:'${a.titulo}',url:location.href})}" style="width:100%;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:6px;padding:5px;font-size:10px;cursor:pointer">📱 Compartir</button>
+    const shareText = encodeURIComponent(String(a.titulo || 'Alerta MiZona'));
+    const alertaId = a.id ? String(a.id) : '';
+    const yaConfirmada = alertaId && confirmacionesPropias.has(alertaId);
+    const esAutor = Boolean(usuarioActualId && a.autor_id && String(a.autor_id) === String(usuarioActualId));
+    m.bindPopup(`<div style="min-width:240px;font-family:inherit">
+      <div id="badge-${alertaId}" style="font-size:8px;font-weight:700;background:${a.verificada?'#f0fdf4':'#fef2f2'};color:${a.verificada?'#14532d':'#991b1b'};border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:5px">${a.verificada?'✓ Verificada':'Sin verificar · ' + textoConfirmaciones(a.conf)}</div>
+      <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:3px">${escaparTexto(a.titulo)}</div>
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:4px">${escaparTexto(a.meta)}</div>
+      ${Number.isFinite(a._dist) ? `<div style="font-size:9px;color:#7c3aed;font-weight:700;margin-bottom:6px">📍 A ${a._dist >= 1000 ? (a._dist/1000).toFixed(1)+' km' : Math.round(a._dist)+' m'} de tu ubicación</div>` : ''}
+      <div id="confirmaciones-${alertaId}" style="font-size:10px;color:#475569;font-weight:700;margin-bottom:8px">👥 ${textoConfirmaciones(a.conf)}</div>
+      ${esAutor
+        ? `<div style="width:100%;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;border-radius:6px;padding:7px 8px;font-size:10px;font-weight:700;text-align:center;margin-bottom:5px">📝 Tú reportaste esta alerta</div>`
+        : `<button onclick="confirmarAlertaMapa('${alertaId}', this)" ${(alertaId && !yaConfirmada) ? '' : 'disabled'} style="width:100%;background:${yaConfirmada ? '#1D9E75' : (alertaId ? '#185FA5' : '#94a3b8')};color:#fff;border:none;border-radius:6px;padding:6px;font-size:10px;font-weight:700;cursor:${(alertaId && !yaConfirmada) ? 'pointer' : 'not-allowed'};margin-bottom:5px">${yaConfirmada ? '✓ Ya confirmado' : '✓ También lo vi'}</button>`}
+      <button onclick="compartirAlertaMapa('${shareText}')" style="width:100%;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:6px;padding:5px;font-size:10px;cursor:pointer">📱 Compartir</button>
     </div>`);
-    m._tipo = a.tipo; todosMarkers.push(m);
+    m._tipo = normalizarTipo(a.tipo); todosMarkers.push(m);
   });
-  document.getElementById('mapCount').textContent = `${alertas.length} alertas activas`;
+  const tieneUbicacion = !!miPos;
+  const filtroTxt = filtroActual === 'todas' ? 'eventos' : filtroActual + (filtroActual.endsWith('s') ? '' : 's');
+  document.getElementById('mapCount').textContent = tieneUbicacion && radioZonaMetros
+    ? `${alertas.length} ${filtroTxt} en ${etiquetaRadio(radioZonaMetros)}`
+    : `${alertas.length} ${filtroTxt}`;
 }
 
+
 window.filtrar = function(tipo, btn) {
+  filtroActual = tipo;
   document.querySelectorAll('.mz-map-filtro').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.color='';b.style.borderColor='';});
   btn.classList.add('active');
-  todosMarkers.forEach(m=>{tipo==='todas'||m._tipo===tipo?mapaInst.addLayer(m):mapaInst.removeLayer(m);});
-  const vis = tipo==='todas'?todosMarkers.length:todosMarkers.filter(m=>m._tipo===tipo).length;
-  document.getElementById('mapCount').textContent = `${vis} alertas`;
+  renderAlertas();
 };
 
 function timeAgo(s){const d=(Date.now()-new Date(s))/60000;if(d<60)return`Hace ${Math.floor(d)} min`;if(d<1440)return`Hace ${Math.floor(d/60)} h`;return`Hace ${Math.floor(d/1440)} días`;}
@@ -204,6 +555,11 @@ function timeAgo(s){const d=(Date.now()-new Date(s))/60000;if(d<60)return`Hace $
 const st=document.createElement('style');
 st.textContent='@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}';
 document.head.appendChild(st);
+
+window.addEventListener('beforeunload', () => {
+  clearInterval(sincronizacionTimer);
+  if (realtimeCanal) sb.removeChannel(realtimeCanal);
+});
 
 initMapa();
 </script>

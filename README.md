@@ -6,7 +6,7 @@ Proyecto web estático conectado a Supabase y desplegable desde GitHub hacia Ver
 
 ## Versión incluida
 
-Esta carpeta corresponde a la **Fase 1 de estabilización y unificación visual**.
+Esta carpeta corresponde a la **Fase 3 de notificaciones push**, e incluye las correcciones acumuladas de las fases anteriores.
 
 Se corrigieron:
 
@@ -21,6 +21,21 @@ Se corrigieron:
 
 Consulta `CAMBIOS_FASE1.md` para conocer los detalles y las pruebas recomendadas.
 
+
+## FASE 3 — NOTIFICACIONES PUSH
+
+Esta versión agrega registro de dispositivos, preferencias, radio geográfico, horario silencioso, bandeja interna, OneSignal y una Edge Function segura de Supabase.
+
+La instalación requiere ejecutar:
+
+`sql/fase3_notificaciones_push.sql`
+
+y seguir:
+
+`INSTRUCCIONES_FASE3_NOTIFICACIONES.md`
+
+Las notificaciones no se activarán hasta colocar el App ID público de OneSignal y guardar la App API Key privada en los secretos de la Edge Function.
+
 ## Configuración de Supabase
 
 La configuración pública está en:
@@ -33,7 +48,7 @@ La clave pública de Supabase puede estar en el navegador. Nunca coloques allí 
 
 ### Base de datos ya existente
 
-Esta actualización no agrega tablas nuevas. Utiliza las tablas y funciones existentes del proyecto, especialmente:
+Esta actualización agrega tablas nuevas para dispositivos y entregas push, además de utilizar las tablas existentes, especialmente:
 
 - `perfiles`
 - `alertas`
@@ -53,10 +68,11 @@ Para una instalación nueva, revisa los scripts de la carpeta `sql` en el orden 
 1. Conserva una copia de seguridad del repositorio actual.
 2. Reemplaza los archivos del repositorio por los de esta carpeta.
 3. Confirma que también subiste los archivos nuevos:
-   - `css/mizona-unified.css`
-   - `js/mizona-core.js`
-   - `js/servicios-mizona.js`
-   - `js/solicitudes-mizona.js`
+   - `js/push-notifications.js`
+   - `push/onesignal/OneSignalSDKWorker.js`
+   - `sql/fase3_notificaciones_push.sql`
+   - `supabase/functions/send-push/index.ts`
+   - `INSTRUCCIONES_FASE3_NOTIFICACIONES.md`
 4. Haz commit y push.
 5. Espera el despliegue de Vercel.
 6. En el celular, actualiza la página. Si siguiera apareciendo la versión anterior, elimina los datos del sitio o desinstala y vuelve a instalar la PWA para limpiar la caché antigua.

@@ -48,6 +48,18 @@
           <strong id="tasksCount">—</strong>
           <small>Proyecto y proveedores</small>
         </article>
+
+        <article class="admin-card">
+          📱 Dispositivos push
+          <strong id="pushDevicesCount">—</strong>
+          <small>Celulares y navegadores activos</small>
+        </article>
+
+        <article class="admin-card">
+          🔔 Eventos push
+          <strong id="pushEventsCount">—</strong>
+          <small>Enviados o pendientes</small>
+        </article>
       </div>
     </section>
 
@@ -81,6 +93,21 @@
           <button class="secondary" type="button" data-logout>Cerrar sesión</button>
         </div>
       </form>
+    </section>
+
+    <section class="page-card" style="margin-top:18px">
+      <h2>Centro de notificaciones push</h2>
+      <p class="notice">Envía avisos generales a los dispositivos registrados. La App API Key permanece en la Edge Function.</p>
+      <form id="pushBroadcastForm">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <label class="field">Título<input id="pushBroadcastTitle" maxlength="100" required placeholder="Ejemplo: Aviso importante de MiZona"></label>
+          <label class="field">Prioridad<select id="pushBroadcastPriority"><option value="normal">Normal</option><option value="high">Alta</option><option value="critical">Crítica</option></select></label>
+        </div>
+        <label class="field">Mensaje<textarea id="pushBroadcastBody" maxlength="220" required placeholder="Escribe un mensaje breve y claro"></textarea></label>
+        <label class="field">Página que se abrirá<input id="pushBroadcastUrl" value="notificaciones.html" placeholder="notificaciones.html"></label>
+        <div class="modal-actions"><button class="primary" type="submit">Enviar a dispositivos activos</button><button class="secondary" type="button" id="refreshPushAdmin">Actualizar historial</button></div>
+      </form>
+      <div id="pushEventsList" class="admin-table-wrap" style="margin-top:16px">Cargando eventos push…</div>
     </section>
 
     <section class="page-card" style="margin-top:18px">
@@ -122,6 +149,11 @@
     const tasksList = document.querySelector("#tasksList");
     const reportsList = document.querySelector("#reportsList");
     const blocksList = document.querySelector("#blocksList");
+
+    const pushDevicesCount = document.querySelector("#pushDevicesCount");
+    const pushEventsCount = document.querySelector("#pushEventsCount");
+    const pushBroadcastForm = document.querySelector("#pushBroadcastForm");
+    const pushEventsList = document.querySelector("#pushEventsList");
 
     const brandForm = document.querySelector("#brandForm");
     const brandName = document.querySelector("#brandName");
@@ -200,8 +232,63 @@
       }
 
   
+    await loadPushAdmin();
     await loadReports();
     await loadBlocks();
+
+    async function loadPushAdmin() {
+      const [devicesResult, eventsResult] = await Promise.all([
+        supabase.from("push_devices").select("id", { count: "exact", head: true }).eq("activo", true),
+        supabase.from("notification_events").select("*", { count: "exact" }).order("created_at", { ascending: false }).limit(30)
+      ]);
+
+      pushDevicesCount.textContent = devicesResult.error ? "—" : (devicesResult.count ?? 0);
+      pushEventsCount.textContent = eventsResult.error ? "—" : (eventsResult.count ?? 0);
+
+      if (eventsResult.error) {
+        pushEventsList.innerHTML = `<p class="notice">${escapeHtml(eventsResult.error.message)}</p>`;
+        return;
+      }
+
+      const events = eventsResult.data || [];
+      pushEventsList.innerHTML = events.length ? `
+        <table class="admin-table">
+          <thead><tr><th>Fecha</th><th>Tipo</th><th>Título</th><th>Prioridad</th><th>Estado</th><th>Error</th></tr></thead>
+          <tbody>${events.map(item => `<tr>
+            <td>${new Date(item.created_at).toLocaleString("es-PE")}</td>
+            <td>${escapeHtml(item.event_type)}</td>
+            <td>${escapeHtml(item.titulo)}</td>
+            <td>${escapeHtml(item.prioridad)}</td>
+            <td>${escapeHtml(item.estado)}</td>
+            <td>${escapeHtml(item.error || "")}</td>
+          </tr>`).join("")}</tbody>
+        </table>` : `<p>No hay eventos push registrados.</p>`;
+    }
+
+    pushBroadcastForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = pushBroadcastForm.querySelector('[type="submit"]');
+      button.disabled = true;
+      try {
+        const { data, error } = await supabase.rpc("mizona_admin_broadcast", {
+          p_titulo: document.querySelector("#pushBroadcastTitle").value.trim(),
+          p_cuerpo: document.querySelector("#pushBroadcastBody").value.trim(),
+          p_url: document.querySelector("#pushBroadcastUrl").value.trim() || "notificaciones.html",
+          p_prioridad: document.querySelector("#pushBroadcastPriority").value
+        });
+        if (error) throw error;
+        alert(`Aviso encolado correctamente. Evento #${data}`);
+        pushBroadcastForm.reset();
+        document.querySelector("#pushBroadcastUrl").value = "notificaciones.html";
+        await loadPushAdmin();
+      } catch (error) {
+        alert(error.message || "No se pudo enviar el aviso.");
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    document.querySelector("#refreshPushAdmin").addEventListener("click", loadPushAdmin);
 
     async function loadReports() {
       const { data, error } = await supabase

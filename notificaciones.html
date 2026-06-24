@@ -1,123 +1,262 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Notificaciones · MiZona.pe</title>
-  <link rel="stylesheet" href="css/global.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#185FA5">
+<title>Notificaciones — MiZona.pe</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="css/mizona.css">
 <link rel="stylesheet" href="css/mizona-unified.css">
 <link rel="stylesheet" href="css/mizona-phase2.css">
+<style>
+.push-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:14px;padding:14px}
+.push-card{background:#fff;border:1px solid var(--bd);border-radius:16px;overflow:hidden;box-shadow:0 8px 28px rgba(15,23,42,.04)}
+.push-head{padding:15px 17px;border-bottom:1px solid var(--bd2);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.push-head h2{font-size:14px;margin:0;color:var(--txt)}
+.push-body{padding:16px}
+.push-status{display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;background:linear-gradient(135deg,#f3f0ff,#eef7ff);border:1px solid #ddd6fe}
+.push-status-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#7c3aed;color:#fff;font-size:24px;flex:0 0 auto}
+.push-status-title{font-size:13px;font-weight:800;color:#1e293b}
+.push-status-text{font-size:10px;color:#64748b;margin-top:3px;line-height:1.45}
+.push-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.push-btn{border:none;border-radius:10px;padding:9px 13px;font-size:10px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.push-btn.primary{background:#7c3aed;color:#fff}.push-btn.secondary{background:#eef2f7;color:#334155;border:1px solid #dbe3ed}.push-btn.danger{background:#fff1f2;color:#be123c;border:1px solid #fecdd3}.push-btn:disabled{opacity:.55;cursor:not-allowed}
+.push-config-warning{padding:12px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:10px;line-height:1.5;margin-top:12px}
+.pref-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pref-field{display:flex;flex-direction:column;gap:6px}.pref-field label{font-size:10px;font-weight:800;color:#334155}.pref-field select,.pref-field input[type=time]{height:38px;border:1px solid #dbe3ed;border-radius:10px;padding:0 10px;background:#fff;color:#1e293b;font:inherit;font-size:11px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #eef2f7}.toggle-copy strong{display:block;font-size:11px;color:#1e293b}.toggle-copy small{font-size:9px;color:#94a3b8}.switch{position:relative;width:42px;height:24px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#cbd5e1;border-radius:999px;cursor:pointer;transition:.2s}.slider:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;box-shadow:0 1px 4px rgba(15,23,42,.25);transition:.2s}.switch input:checked+.slider{background:#7c3aed}.switch input:checked+.slider:before{transform:translateX(18px)}
+.category-box{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.category-box label{display:flex;align-items:center;gap:5px;padding:7px 9px;border:1px solid #dbe3ed;border-radius:999px;font-size:9px;font-weight:700;background:#f8fafc;color:#475569;cursor:pointer}.category-box label:has(input:checked){background:#ede9fe;border-color:#8b5cf6;color:#5b21b6}.category-box input{accent-color:#7c3aed}
+.device-item,.inbox-item{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #eef2f7}.device-item:last-child,.inbox-item:last-child{border-bottom:none}.device-icon,.inbox-icon{width:38px;height:38px;border-radius:12px;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto}.device-main,.inbox-main{min-width:0;flex:1}.device-main strong,.inbox-main strong{display:block;font-size:11px;color:#1e293b}.device-main small,.inbox-main small{display:block;font-size:9px;color:#94a3b8;margin-top:2px;line-height:1.4}.device-badge{font-size:8px;font-weight:800;padding:4px 7px;border-radius:999px;background:#dcfce7;color:#166534}.device-badge.off{background:#f1f5f9;color:#64748b}.inbox-item.unread{background:#faf8ff;margin:0 -10px;padding:12px 10px;border-radius:12px}.inbox-item button{border:none;background:transparent;color:#7c3aed;cursor:pointer;font-size:16px}.empty-state{padding:24px;text-align:center;color:#94a3b8;font-size:10px}.section-tabs{display:flex;gap:6px;padding:10px 16px;border-bottom:1px solid #eef2f7;overflow-x:auto}.section-tab{border:none;background:#f1f5f9;color:#64748b;border-radius:999px;padding:7px 11px;font-size:9px;font-weight:800;cursor:pointer;white-space:nowrap}.section-tab.active{background:#7c3aed;color:#fff}.ios-help{display:none;margin-top:12px;padding:12px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:10px;line-height:1.5}
+@media(max-width:900px){.push-grid{grid-template-columns:1fr;padding:10px;padding-bottom:90px}.pref-grid{grid-template-columns:1fr}.mz-topbar{position:sticky;top:0;z-index:50}.push-card{border-radius:14px}}
+</style>
 </head>
 <body>
-  <main class="page-shell">
-    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
-      <a class="brand" href="index.html">
-        <span class="brand-mark">MZ</span>
-        <span data-brand-name>MiZona.pe</span>
-      </a>
-      <a class="secondary" href="index.html">← Volver</a>
-    </header>
+<div class="mz-layout-2col">
+  <aside class="mz-sidebar">
+    <div class="mz-logo"><div class="mz-logo-mark">MZ</div><div><div class="mz-logo-name">MiZona</div><div class="mz-logo-domain">mizona.pe</div></div></div>
+    <div class="mz-nav-sec">Principal</div>
+    <a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
+    <a class="mz-nav-item" href="alertas.html"><i class="ti ti-bell-ringing"></i><span>Alertas</span></a>
+    <a class="mz-nav-item" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
+    <a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
+    <a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
+    <div class="mz-nav-sec">Comunidad</div>
+    <a class="mz-nav-item" href="mensajes.html"><i class="ti ti-messages"></i><span>Mensajes</span></a>
+    <a class="mz-nav-item" href="amistades.html"><i class="ti ti-users"></i><span>Amigos</span></a>
+    <a class="mz-nav-item active" href="notificaciones.html"><i class="ti ti-bell"></i><span>Notificaciones</span></a>
+    <div class="mz-nav-sec">Cuenta</div>
+    <a class="mz-nav-item" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
+    <div class="mz-sidebar-spacer"></div>
+  </aside>
 
-    <section class="page-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-        <div>
-          <h1>Notificaciones</h1>
-          <p>Me gusta, comentarios y avisos importantes.</p>
-        </div>
-        <button id="markAllRead" class="secondary" type="button">Marcar todas como leídas</button>
-      </div>
+  <main class="mz-feed">
+    <div class="mz-topbar">
+      <div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--txt)">Centro de notificaciones</div><div style="font-size:10px;color:var(--txt3)">Alertas, mensajes y avisos importantes en tus dispositivos</div></div>
+      <button id="markAllRead" class="push-btn secondary"><i class="ti ti-checks"></i> Marcar todo como leído</button>
+    </div>
 
-      <div id="notificationsList" class="notifications-list">
-        <p class="notice">Cargando notificaciones…</p>
-      </div>
-    </section>
-  </main>
-
-  <script type="module">
-    import { applyBrand } from "./js/brand.js";
-    import { supabase, getCurrentUser } from "./js/supabase.js";
-
-    applyBrand();
-
-    const list = document.querySelector("#notificationsList");
-    const markAllButton = document.querySelector("#markAllRead");
-    const user = await getCurrentUser();
-
-    if (!user) {
-      window.location.replace("login.html?next=notificaciones.html");
-    } else {
-      await loadNotifications();
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;")
-        .replaceAll(">","&gt;").replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    function notificationText(item) {
-      const actor = item.actor_username ? `@${item.actor_username}` : "Un usuario";
-
-      if (item.tipo === "like") return `${actor} indicó que le gusta tu publicación.`;
-      if (item.tipo === "comentario") return `${actor} comentó tu publicación.`;
-      if (item.tipo === "seguimiento") return `${actor} comenzó a seguirte.`;
-      if (item.tipo === "solicitud_amistad") return `${actor} te envió una solicitud de amistad.`;
-      if (item.tipo === "amistad_aceptada") return `${actor} aceptó tu solicitud de amistad.`;
-      if (item.tipo === "mensaje") return `${actor} te envió un mensaje.`;
-      return item.mensaje || "Tienes una nueva notificación.";
-    }
-
-    async function loadNotifications() {
-      const { data, error } = await supabase
-        .from("notificaciones_detalle")
-        .select("*")
-        .order("creado_en", { ascending: false })
-        .limit(100);
-
-      if (error) {
-        list.innerHTML = `<p class="notice">${escapeHtml(error.message)}</p>`;
-        return;
-      }
-
-      list.innerHTML = data?.length
-        ? data.map(item => `
-          <article class="notification-item ${item.leida ? "" : "unread"}" data-notification-id="${item.id}">
-            <span class="avatar">${item.tipo === "like" ? "♥" : item.tipo === "comentario" ? "💬" : "🔔"}</span>
-            <div>
-              <strong>${escapeHtml(notificationText(item))}</strong>
-              <small>${new Date(item.creado_en).toLocaleString("es-PE")}</small>
+    <div class="push-grid">
+      <section>
+        <article class="push-card">
+          <div class="push-head"><h2>Notificaciones en este dispositivo</h2><span id="pushBadge" class="device-badge off">Comprobando</span></div>
+          <div class="push-body">
+            <div class="push-status">
+              <div class="push-status-icon"><i class="ti ti-bell-ringing"></i></div>
+              <div><div id="pushStatusTitle" class="push-status-title">Comprobando compatibilidad…</div><div id="pushStatusText" class="push-status-text">MiZona verificará el navegador y el permiso de este dispositivo.</div></div>
             </div>
-            ${item.leida ? "" : `<button data-read="${item.id}" title="Marcar como leída">✓</button>`}
-          </article>`).join("")
-        : `<p class="notice">No tienes notificaciones.</p>`;
+            <div class="push-actions">
+              <button id="enablePush" class="push-btn primary"><i class="ti ti-bell-plus"></i> Activar en este dispositivo</button>
+              <button id="disablePush" class="push-btn danger" hidden><i class="ti ti-bell-off"></i> Desactivar aquí</button>
+              <button id="refreshLocation" class="push-btn secondary"><i class="ti ti-current-location"></i> Actualizar mi zona</button>
+              <button id="testPush" class="push-btn secondary" hidden><i class="ti ti-send"></i> Enviar prueba</button>
+            </div>
+            <div id="configWarning" class="push-config-warning" hidden></div>
+            <div id="iosHelp" class="ios-help"><strong>iPhone/iPad:</strong> abre el menú Compartir, selecciona <em>Agregar a pantalla de inicio</em>, abre MiZona desde su icono y vuelve a activar las notificaciones.</div>
+          </div>
+        </article>
 
-      document.querySelectorAll("[data-read]").forEach(button => {
-        button.addEventListener("click", async () => {
-          const { error: updateError } = await supabase
-            .from("notificaciones")
-            .update({ leida: true })
-            .eq("id", button.dataset.read)
-            .eq("usuario_id", user.id);
+        <article class="push-card" style="margin-top:14px">
+          <div class="push-head"><h2>Qué deseas recibir</h2><button id="savePreferences" class="push-btn primary"><i class="ti ti-device-floppy"></i> Guardar</button></div>
+          <div class="push-body">
+            <div class="toggle-row"><div class="toggle-copy"><strong>Alertas cercanas</strong><small>Robos, accidentes, incendios y avisos en el radio elegido.</small></div><label class="switch"><input id="prefAlertas" type="checkbox"><span class="slider"></span></label></div>
+            <div id="alertPreferences">
+              <div class="category-box">
+                <label><input type="checkbox" name="category" value="robo"> Robos</label>
+                <label><input type="checkbox" name="category" value="accidente"> Accidentes</label>
+                <label><input type="checkbox" name="category" value="agua"> Agua</label>
+                <label><input type="checkbox" name="category" value="luz"> Luz</label>
+                <label><input type="checkbox" name="category" value="mascota"> Mascotas</label>
+                <label><input type="checkbox" name="category" value="persona"> Personas</label>
+                <label><input type="checkbox" name="category" value="incendio"> Incendios</label>
+              </div>
+              <div class="pref-grid" style="margin-top:12px">
+                <div class="pref-field"><label for="prefRadius">Radio de alertas</label><select id="prefRadius"><option value="500">500 m</option><option value="1000">1 km</option><option value="1500">1.5 km</option><option value="2000">2 km</option><option value="5000">5 km</option><option value="10000">10 km</option><option value="20000">20 km</option></select></div>
+                <div class="pref-field"><label for="prefFrequency">Frecuencia</label><select id="prefFrequency"><option value="inmediato">Inmediatamente</option><option value="solo_emergencias">Solo emergencias</option><option value="desactivado">Desactivado</option></select></div>
+              </div>
+            </div>
+            <div class="toggle-row"><div class="toggle-copy"><strong>Confirmaciones de mis alertas</strong><small>Cuando otro vecino confirme un evento que reportaste.</small></div><label class="switch"><input id="prefConfirmations" type="checkbox"><span class="slider"></span></label></div>
+            <div class="toggle-row"><div class="toggle-copy"><strong>Mensajes privados</strong><small>Avisos inmediatos cuando alguien te escriba.</small></div><label class="switch"><input id="prefMessages" type="checkbox"><span class="slider"></span></label></div>
+            <div class="toggle-row"><div class="toggle-copy"><strong>Amistades</strong><small>Solicitudes nuevas y respuestas.</small></div><label class="switch"><input id="prefFriends" type="checkbox"><span class="slider"></span></label></div>
+            <div class="toggle-row"><div class="toggle-copy"><strong>Mi negocio</strong><small>Aprobaciones, rechazos y consultas empresariales.</small></div><label class="switch"><input id="prefBusiness" type="checkbox"><span class="slider"></span></label></div>
+            <div class="toggle-row"><div class="toggle-copy"><strong>Ofertas cercanas</strong><small>Promociones relevantes; desactivadas inicialmente para evitar saturación.</small></div><label class="switch"><input id="prefOffers" type="checkbox"><span class="slider"></span></label></div>
+            <div class="pref-grid" style="margin-top:13px">
+              <div class="pref-field"><label for="quietStart">No molestar desde</label><input id="quietStart" type="time"></div>
+              <div class="pref-field"><label for="quietEnd">No molestar hasta</label><input id="quietEnd" type="time"></div>
+            </div>
+            <div class="toggle-row"><div class="toggle-copy"><strong>Permitir emergencias en horario silencioso</strong><small>Solo incidentes clasificados como críticos.</small></div><label class="switch"><input id="prefEmergencyQuiet" type="checkbox"><span class="slider"></span></label></div>
+          </div>
+        </article>
+      </section>
 
-          if (updateError) alert(updateError.message);
-          else loadNotifications();
-        });
-      });
+      <aside>
+        <article class="push-card">
+          <div class="push-head"><h2>Dispositivos registrados</h2><button id="reloadDevices" class="push-btn secondary" title="Actualizar"><i class="ti ti-refresh"></i></button></div>
+          <div id="deviceList" class="push-body"><div class="empty-state">Cargando dispositivos…</div></div>
+        </article>
+
+        <article class="push-card" style="margin-top:14px">
+          <div class="push-head"><h2>Avisos recientes</h2><span id="unreadCount" class="device-badge off">0 nuevos</span></div>
+          <div class="section-tabs"><button class="section-tab active" data-tab="push">MiZona</button><button class="section-tab" data-tab="social">Actividad social</button></div>
+          <div id="pushInbox" class="push-body"><div class="empty-state">Cargando avisos…</div></div>
+          <div id="socialInbox" class="push-body" hidden><div class="empty-state">Cargando actividad…</div></div>
+        </article>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<nav class="mz-bottom-nav"><div class="mz-bn-inner">
+  <div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
+  <div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell-ringing"></i><span>Alertas</span></div>
+  <div class="mz-bn-item" onclick="location.href='mapa.html'"><i class="ti ti-map"></i><span>Mapa</span></div>
+  <div class="mz-bn-item active"><i class="ti ti-bell"></i><span>Avisos</span></div>
+  <div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
+</div></nav>
+
+<script type="module">
+import { supabase, getCurrentUser } from './js/supabase.js';
+import {
+  isOneSignalConfigured,
+  bootstrapPushNotifications,
+  requestPushPermission,
+  disablePushOnThisDevice,
+  getPushStatus,
+  getNotificationPreferences,
+  saveNotificationPreferences,
+  listPushDevices,
+  removePushDevice,
+  refreshNotificationLocation
+} from './js/push-notifications.js';
+
+const user = await getCurrentUser();
+if (!user) location.replace('login.html?next=notificaciones.html');
+
+const $ = (selector) => document.querySelector(selector);
+const toast = (message, type='ok') => window.mzToast ? window.mzToast(message,type) : alert(message);
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const formatDate = (value) => new Date(value).toLocaleString('es-PE',{dateStyle:'short',timeStyle:'short'});
+
+function setBusy(button, busy, text='Procesando…'){
+  if (!button) return;
+  if (busy){button.dataset.original=button.innerHTML;button.disabled=true;button.textContent=text;}
+  else{button.disabled=false;if(button.dataset.original)button.innerHTML=button.dataset.original;}
+}
+
+async function renderStatus(){
+  const badge=$('#pushBadge'), title=$('#pushStatusTitle'), text=$('#pushStatusText');
+  if(!isOneSignalConfigured()){
+    badge.textContent='Falta configurar'; badge.className='device-badge off';
+    title.textContent='Integración preparada';
+    text.textContent='Falta pegar el App ID de OneSignal para activar el registro real de celulares.';
+    $('#configWarning').hidden=false;
+    $('#configWarning').innerHTML='Abre <strong>js/env.public.js</strong> y coloca el <strong>ONESIGNAL_APP_ID</strong>. La API key privada se guarda únicamente en los secretos de Supabase.';
+    $('#enablePush').disabled=true; $('#disablePush').hidden=true;
+    return;
+  }
+
+  try{
+    const status=await getPushStatus();
+    if(status.ios && !status.standalone) $('#iosHelp').style.display='block';
+    if(!status.supported){
+      badge.textContent='No compatible';badge.className='device-badge off';title.textContent='Este navegador no admite Web Push';text.textContent='Prueba con Chrome, Edge, Firefox o instala MiZona en la pantalla de inicio de tu iPhone.';$('#enablePush').disabled=true;return;
     }
+    if(status.permission && status.optedIn){
+      badge.textContent='Activo';badge.className='device-badge';title.textContent='Notificaciones activas';text.textContent='Este dispositivo puede recibir alertas aun cuando MiZona no esté abierta.';$('#enablePush').hidden=true;$('#disablePush').hidden=false;$('#testPush').hidden=false;
+    }else{
+      badge.textContent=status.browserPermission==='denied'?'Bloqueado':'Inactivo';badge.className='device-badge off';title.textContent=status.browserPermission==='denied'?'Permiso bloqueado en el navegador':'Activa los avisos de MiZona';text.textContent=status.browserPermission==='denied'?'Debes habilitar las notificaciones desde la configuración del navegador.':'Recibe alertas cercanas, mensajes y confirmaciones en este dispositivo.';$('#enablePush').hidden=false;$('#disablePush').hidden=true;$('#testPush').hidden=true;
+    }
+  }catch(error){
+    badge.textContent='Error';badge.className='device-badge off';title.textContent='No se pudo comprobar OneSignal';text.textContent=error.message;$('#configWarning').hidden=false;$('#configWarning').textContent=error.message;
+  }
+}
 
-    markAllButton.addEventListener("click", async () => {
-      const { error } = await supabase
-        .from("notificaciones")
-        .update({ leida: true })
-        .eq("usuario_id", user.id)
-        .eq("leida", false);
+async function loadPreferences(){
+  try{
+    const p=await getNotificationPreferences();
+    $('#prefAlertas').checked=p.alertas_activas;
+    document.querySelectorAll('[name=category]').forEach(input=>input.checked=(p.categorias_alerta||[]).includes(input.value));
+    $('#prefRadius').value=String(p.radio_metros||1500);
+    $('#prefFrequency').value=p.resumen_frecuencia||'inmediato';
+    $('#prefConfirmations').checked=p.confirmaciones_alerta;
+    $('#prefMessages').checked=p.mensajes;
+    $('#prefFriends').checked=p.amistades;
+    $('#prefBusiness').checked=p.negocios;
+    $('#prefOffers').checked=p.ofertas;
+    $('#quietStart').value=(p.horario_silencioso_inicio||'22:00').slice(0,5);
+    $('#quietEnd').value=(p.horario_silencioso_fin||'07:00').slice(0,5);
+    $('#prefEmergencyQuiet').checked=p.emergencias_en_silencio;
+  }catch(error){toast(error.message,'error');}
+}
 
-      if (error) alert(error.message);
-      else loadNotifications();
-    });
-  </script>
+async function loadDevices(){
+  const box=$('#deviceList');
+  try{
+    const [devices,status]=await Promise.all([listPushDevices(),isOneSignalConfigured()?getPushStatus().catch(()=>null):Promise.resolve(null)]);
+    const currentSubscription=status?.subscriptionId||null;
+    box.innerHTML=devices.length?devices.map(device=>{const current=device.subscription_id===currentSubscription;return `<div class="device-item">
+      <div class="device-icon"><i class="ti ${device.tipo_dispositivo==='celular'?'ti-device-mobile':'ti-device-desktop'}"></i></div>
+      <div class="device-main"><strong>${escapeHtml(device.etiqueta||'Dispositivo')}${current?' · Este dispositivo':''}</strong><small>${escapeHtml(device.sistema_operativo||'')} · Último acceso ${formatDate(device.ultimo_acceso)}</small></div>
+      <span class="device-badge ${device.activo?'':'off'}">${device.activo?'Activo':'Inactivo'}</span>
+      ${current?'':`<button class="push-btn danger" data-remove-device="${device.id}" title="Dejar de enviar a este dispositivo"><i class="ti ti-trash"></i></button>`}
+    </div>`}).join(''):'<div class="empty-state">Todavía no registraste ningún celular o navegador.</div>';
+    box.querySelectorAll('[data-remove-device]').forEach(btn=>btn.addEventListener('click',async()=>{if(!confirm('¿Eliminar este dispositivo de tu cuenta?'))return;await removePushDevice(btn.dataset.removeDevice);toast('Dispositivo eliminado.');loadDevices();}));
+  }catch(error){box.innerHTML=`<div class="empty-state">${escapeHtml(error.message)}</div>`;}
+}
+
+async function loadPushInbox(){
+  const box=$('#pushInbox');
+  const {data,error}=await supabase.from('notification_inbox').select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(60);
+  if(error){box.innerHTML=`<div class="empty-state">${escapeHtml(error.message)}</div>`;return;}
+  const unread=(data||[]).filter(item=>!item.leida).length;$('#unreadCount').textContent=`${unread} nuevos`;$('#unreadCount').className=`device-badge ${unread?'':'off'}`;
+  box.innerHTML=data?.length?data.map(item=>`<article class="inbox-item ${item.leida?'':'unread'}" data-inbox-id="${item.id}" data-url="${escapeHtml(item.url)}">
+    <div class="inbox-icon"><i class="ti ${item.prioridad==='critical'?'ti-alert-triangle':'ti-bell'}"></i></div><div class="inbox-main"><strong>${escapeHtml(item.titulo)}</strong><small>${escapeHtml(item.cuerpo)}</small><small>${formatDate(item.created_at)}</small></div>${item.leida?'':`<button data-read-push="${item.id}" title="Marcar como leído"><i class="ti ti-check"></i></button>`}
+  </article>`).join(''):'<div class="empty-state">No tienes avisos de MiZona.</div>';
+  box.querySelectorAll('[data-read-push]').forEach(btn=>btn.addEventListener('click',async(event)=>{event.stopPropagation();await supabase.from('notification_inbox').update({leida:true,leida_en:new Date().toISOString()}).eq('id',btn.dataset.readPush).eq('user_id',user.id);loadPushInbox();}));
+  box.querySelectorAll('[data-inbox-id]').forEach(item=>item.addEventListener('click',async()=>{await supabase.from('notification_inbox').update({leida:true,leida_en:new Date().toISOString()}).eq('id',item.dataset.inboxId).eq('user_id',user.id);location.href=item.dataset.url||'notificaciones.html';}));
+}
+
+function socialText(item){const actor=item.actor_username?`@${item.actor_username}`:'Un usuario';if(item.tipo==='like')return`${actor} reaccionó a tu publicación.`;if(item.tipo==='comentario')return`${actor} comentó tu publicación.`;if(item.tipo==='seguimiento')return`${actor} comenzó a seguirte.`;if(item.tipo==='solicitud_amistad')return`${actor} te envió una solicitud.`;if(item.tipo==='amistad_aceptada')return`${actor} aceptó tu solicitud.`;if(item.tipo==='mensaje')return`${actor} te envió un mensaje.`;return item.mensaje||'Nueva actividad.';}
+async function loadSocialInbox(){
+  const box=$('#socialInbox');const {data,error}=await supabase.from('notificaciones_detalle').select('*').order('creado_en',{ascending:false}).limit(60);if(error){box.innerHTML=`<div class="empty-state">${escapeHtml(error.message)}</div>`;return;}
+  box.innerHTML=data?.length?data.map(item=>`<article class="inbox-item ${item.leida?'':'unread'}"><div class="inbox-icon"><i class="ti ti-users"></i></div><div class="inbox-main"><strong>${escapeHtml(socialText(item))}</strong><small>${formatDate(item.creado_en)}</small></div>${item.leida?'':`<button data-read-social="${item.id}"><i class="ti ti-check"></i></button>`}</article>`).join(''):'<div class="empty-state">No tienes actividad social.</div>';
+  box.querySelectorAll('[data-read-social]').forEach(btn=>btn.addEventListener('click',async()=>{await supabase.from('notificaciones').update({leida:true}).eq('id',btn.dataset.readSocial).eq('usuario_id',user.id);loadSocialInbox();}));
+}
+
+$('#enablePush').addEventListener('click',async()=>{const btn=$('#enablePush');setBusy(btn,true,'Activando…');try{await requestPushPermission({saveLocation:true});toast('Notificaciones activadas en este dispositivo.');await Promise.all([renderStatus(),loadDevices()]);}catch(error){if(error.code==='ios_install_required')$('#iosHelp').style.display='block';toast(error.message,'error');}finally{setBusy(btn,false);}});
+$('#disablePush').addEventListener('click',async()=>{const btn=$('#disablePush');setBusy(btn,true,'Desactivando…');try{await disablePushOnThisDevice();toast('Notificaciones desactivadas en este dispositivo.');await Promise.all([renderStatus(),loadDevices()]);}catch(error){toast(error.message,'error');}finally{setBusy(btn,false);}});
+$('#refreshLocation').addEventListener('click',async()=>{const btn=$('#refreshLocation');setBusy(btn,true,'Ubicando…');try{await refreshNotificationLocation();toast('Tu zona de notificaciones fue actualizada.');}catch(error){toast(error.message,'error');}finally{setBusy(btn,false);}});
+$('#savePreferences').addEventListener('click',async()=>{const btn=$('#savePreferences');setBusy(btn,true,'Guardando…');try{await saveNotificationPreferences({alertas_activas:$('#prefAlertas').checked,categorias_alerta:[...document.querySelectorAll('[name=category]:checked')].map(input=>input.value),radio_metros:Number($('#prefRadius').value),resumen_frecuencia:$('#prefFrequency').value,confirmaciones_alerta:$('#prefConfirmations').checked,mensajes:$('#prefMessages').checked,amistades:$('#prefFriends').checked,negocios:$('#prefBusiness').checked,ofertas:$('#prefOffers').checked,horario_silencioso_inicio:$('#quietStart').value,horario_silencioso_fin:$('#quietEnd').value,emergencias_en_silencio:$('#prefEmergencyQuiet').checked,zona_horaria:'America/Lima'});toast('Preferencias guardadas.');}catch(error){toast(error.message,'error');}finally{setBusy(btn,false);}});
+
+$('#testPush').addEventListener('click',async()=>{const btn=$('#testPush');setBusy(btn,true,'Enviando…');try{const {error}=await supabase.rpc('mizona_test_push');if(error)throw error;toast('Prueba enviada. Debe llegar en unos segundos.');}catch(error){toast(error.message,'error');}finally{setBusy(btn,false);}});
+$('#reloadDevices').addEventListener('click',loadDevices);
+$('#markAllRead').addEventListener('click',async()=>{await Promise.all([supabase.from('notification_inbox').update({leida:true,leida_en:new Date().toISOString()}).eq('user_id',user.id).eq('leida',false),supabase.from('notificaciones').update({leida:true}).eq('usuario_id',user.id).eq('leida',false)]);toast('Todo marcado como leído.');loadPushInbox();loadSocialInbox();});
+document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b===btn));$('#pushInbox').hidden=btn.dataset.tab!=='push';$('#socialInbox').hidden=btn.dataset.tab!=='social';}));
+
+if(isOneSignalConfigured()) bootstrapPushNotifications().catch(()=>{});
+await Promise.all([renderStatus(),loadPreferences(),loadDevices(),loadPushInbox(),loadSocialInbox()]);
+supabase.channel(`push-inbox-${user.id}`).on('postgres_changes',{event:'*',schema:'public',table:'notification_inbox',filter:`user_id=eq.${user.id}`},()=>loadPushInbox()).subscribe();
+</script>
 <script type="module" src="./js/mizona-core.js"></script>
-<script type="module" src="./js/mizona-shell-v2.js"></script>
 </body>
 </html>

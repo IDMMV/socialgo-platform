@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v2.1.0-fase2";
+const CACHE_NAME = "mizona-v3.1.0-dominio";
 
 const CORE = [
   "./",
@@ -39,6 +39,7 @@ const CORE = [
   "./js/config.js",
   "./js/env.public.js",
   "./js/supabase.js",
+  "./js/push-notifications.js",
   "./js/alertas-mizona.js",
   "./js/mapa-mizona.js",
   "./js/servicios-mizona.js",

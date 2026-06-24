@@ -1,0 +1,12 @@
+Corrección de login MiZona.pe
+
+1. Copia login.html en la raíz de tu repositorio.
+2. Acepta reemplazar el login.html actual.
+3. Haz Commit to main y Push origin.
+4. Espera Vercel y abre https://mizona.pe/login.html
+
+Cambios:
+- Login vuelve a apuntar directamente a Supabase.
+- Se corrigió el botón de ojo para ver/ocultar contraseña.
+- Ya no depende de js/auth.js ni js/password-ui.js para ingresar.
+- Después de ingresar redirige a index.html o al parámetro ?next= si existe.

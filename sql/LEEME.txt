@@ -1,0 +1,4 @@
+1. Ejecuta reparar_error_digest_fase5.sql.
+2. Abre una consulta nueva.
+3. Ejecuta fase5_alertas_inteligentes_corregido_v2.sql completo.
+4. Debe finalizar con: Fase 5 y notificaciones ajustadas correctamente.

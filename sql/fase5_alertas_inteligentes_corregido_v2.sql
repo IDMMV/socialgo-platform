@@ -181,7 +181,10 @@ begin
     v_radio := 450;
   end if;
 
-  v_hash := digest(coalesce(p_semilla,'mizona'),'sha256');
+  -- Solo necesitamos una semilla determinística para desplazar el punto.
+  -- Se usa md5() + decode(), funciones nativas de PostgreSQL, para evitar
+  -- depender del esquema donde Supabase instaló pgcrypto.
+  v_hash := decode(md5(coalesce(p_semilla,'mizona')), 'hex');
   v_angulo := (get_byte(v_hash,0)::numeric / 255) * 2 * pi();
   v_factor := 0.65 + (get_byte(v_hash,1)::numeric / 255) * 0.35;
   v_lat_delta := (v_radio * v_factor / 111320) * sin(v_angulo);

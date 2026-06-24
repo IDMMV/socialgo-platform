@@ -2,60 +2,279 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Iniciar sesión · MiZona.pe</title>
-<link href="manifest.json" rel="manifest"/>
-<link href="css/global.css" rel="stylesheet"/>
-<link href="css/mizona-unified.css" rel="stylesheet"/>
-<link href="css/mizona-phase2.css" rel="stylesheet"/>
-<link href="css/auth-security.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/>
-<link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/>
-<link href="css/mizona-logo.css" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" type="image/png" href="assets/favicon-32.png"/>
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png"/>
+<link rel="stylesheet" href="css/global.css"/>
+<link rel="stylesheet" href="css/mizona-unified.css"/>
+<link rel="stylesheet" href="css/mizona-phase2.css"/>
+<link rel="stylesheet" href="css/auth-security.css"/>
+<link rel="stylesheet" href="css/mizona-logo.css"/>
+<style>
+  :root{
+    --mz-blue:#185FA5;
+    --mz-green:#1D9E75;
+    --mz-text:#172033;
+    --mz-muted:#64748b;
+    --mz-border:#d8e1ec;
+    --mz-bg:#eef4f8;
+  }
+  *{box-sizing:border-box}
+  body.auth-page{
+    min-height:100vh;
+    margin:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px 14px;
+    background:linear-gradient(135deg,#eef4f8,#f8fafc);
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    color:var(--mz-text);
+    overflow:auto;
+  }
+  .auth-card{
+    width:min(100%,520px);
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:22px;
+    padding:34px 32px 30px;
+    box-shadow:0 20px 70px rgba(15,23,42,.10);
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:28px;
+    text-decoration:none;
+  }
+  .brand img{max-width:230px;height:auto;display:block}
+  .brand-fallback{font-size:28px;font-weight:900;color:var(--mz-blue);letter-spacing:.2px}
+  .brand-fallback span{color:var(--mz-green)}
+  h1{
+    margin:0 0 24px;
+    text-align:center;
+    font-size:32px;
+    line-height:1.15;
+    font-weight:900;
+    color:#172033;
+  }
+  label{
+    display:block;
+    color:#526176;
+    font-weight:600;
+    font-size:15px;
+    margin:0 0 16px;
+  }
+  input{
+    width:100%;
+    min-height:58px;
+    border:1px solid var(--mz-border);
+    border-radius:12px;
+    padding:0 16px;
+    margin-top:8px;
+    font-size:16px;
+    background:#f8fbff;
+    color:#0f172a;
+    outline:none;
+    transition:.15s ease;
+  }
+  input:focus{
+    border-color:var(--mz-blue);
+    box-shadow:0 0 0 4px rgba(24,95,165,.13);
+    background:#fff;
+  }
+  .password-wrap{position:relative;margin-top:8px}
+  .password-wrap input{padding-right:56px;margin-top:0}
+  .password-eye{
+    position:absolute;
+    right:10px;
+    top:50%;
+    transform:translateY(-50%);
+    width:42px;
+    height:42px;
+    border:0;
+    background:transparent;
+    color:#64748b;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    border-radius:10px;
+  }
+  .password-eye:hover{background:#edf4fb;color:var(--mz-blue)}
+  .password-eye svg{width:22px;height:22px;stroke:currentColor}
+  .primary{
+    width:100%;
+    min-height:58px;
+    border:0;
+    border-radius:12px;
+    background:linear-gradient(135deg,var(--mz-blue),#2076c2);
+    color:#fff;
+    font-size:17px;
+    font-weight:900;
+    cursor:pointer;
+    box-shadow:0 14px 30px rgba(24,95,165,.22);
+    margin-top:10px;
+  }
+  .primary:disabled{opacity:.7;cursor:not-allowed}
+  .auth-links{
+    text-align:center;
+    margin-top:18px;
+    color:#64748b;
+    font-size:15px;
+  }
+  .auth-links p{margin:12px 0 0}
+  .auth-links a{color:#185FA5;text-decoration:none;font-weight:800}
+  .auth-links a:hover{text-decoration:underline}
+  .notice{
+    margin:0 0 18px;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid #bfdbfe;
+    background:#eff6ff;
+    color:#1e40af;
+    font-size:14px;
+    line-height:1.45;
+  }
+  .notice.error{border-color:#fecaca;background:#fef2f2;color:#991b1b}
+  .notice.success{border-color:#bbf7d0;background:#f0fdf4;color:#166534}
+  .back-home{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    color:#64748b;
+    font-weight:800;
+    text-decoration:none;
+    font-size:13px;
+    margin-bottom:16px;
+  }
+  .back-home:hover{color:#185FA5}
+  @media(max-width:560px){
+    body.auth-page{align-items:flex-start;padding:16px 12px 28px}
+    .auth-card{border-radius:18px;padding:24px 18px 24px}
+    h1{font-size:28px}
+    .brand img{max-width:190px}
+  }
+</style>
 </head>
 <body class="auth-page">
 <main class="auth-card">
-  <a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a>
+  <a class="back-home" href="index.html">← Volver al inicio</a>
+  <a class="brand mz-official-brand" href="index.html" aria-label="MiZona.pe">
+    <img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg" onerror="this.style.display='none';document.getElementById('brandFallback').style.display='block'"/>
+    <span id="brandFallback" class="brand-fallback" style="display:none">Mi<span>Zona</span>.pe</span>
+  </a>
+
   <h1>Iniciar sesión</h1>
   <div class="notice" hidden id="msg"></div>
-  <form id="form">
-    <label>Correo
-      <input autocomplete="email" id="email" required type="email"/>
+
+  <form id="loginForm" autocomplete="on">
+    <label for="email">Correo
+      <input autocomplete="email" id="email" name="email" required type="email"/>
     </label>
-    <label>Contraseña
-      <span class="password-field">
-        <input autocomplete="current-password" id="password" minlength="8" required type="password"/>
-        <button class="password-toggle" data-password-toggle="password" type="button"></button>
+
+    <label for="password">Contraseña
+      <span class="password-wrap">
+        <input autocomplete="current-password" id="password" name="password" minlength="6" required type="password"/>
+        <button class="password-eye" id="btnEye" type="button" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+          <svg id="eyeOpen" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          <svg id="eyeClosed" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+            <path d="M3 3l18 18"></path>
+            <path d="M10.6 10.6A3 3 0 0 0 13.4 13.4"></path>
+            <path d="M9.9 4.2A10.4 10.4 0 0 1 12 4c6.5 0 10 8 10 8a18.4 18.4 0 0 1-4.1 5.1"></path>
+            <path d="M6.1 6.1C3.5 7.9 2 12 2 12s3.5 8 10 8a10.8 10.8 0 0 0 5.9-1.9"></path>
+          </svg>
+        </button>
       </span>
     </label>
-    <button class="primary wide" type="submit">Ingresar</button>
+
+    <button class="primary" id="btnLogin" type="submit">Ingresar</button>
   </form>
-  <p><a href="recuperar.html">¿Olvidaste tu contraseña?</a></p>
-  <p>¿No tienes cuenta? <a href="registro.html">Regístrate</a></p>
+
+  <div class="auth-links">
+    <p><a href="recuperar.html">¿Olvidaste tu contraseña?</a></p>
+    <p>¿No tienes cuenta? <a href="registro.html">Regístrate</a></p>
+  </div>
 </main>
-<script type="module">
-import { loginUser, getRecoveryQuestionStatus } from './js/auth.js';
-import { getCurrentUser } from './js/supabase.js';
-import { initPasswordToggles } from './js/password-ui.js';
-initPasswordToggles();
-if (await getCurrentUser()) location.href='index.html';
-form.onsubmit=async e=>{
-  e.preventDefault();
-  msg.hidden=true;
-  try{
-    await loginUser(email.value,password.value);
-    const next=new URLSearchParams(location.search).get('next');
-    if(next&&!next.includes('://')){ location.href=next; return; }
-    try{
-      const status=await getRecoveryQuestionStatus();
-      if(!status?.configurada){ location.href='seguridad.html?setup=1'; return; }
-    }catch{}
-    location.href='index.html';
-  }catch(x){
-    msg.hidden=false;msg.className='notice error';msg.textContent=x.message;
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  const SUPABASE_URL = 'https://fhqdxethubaycijtbzry.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_0wSXACcq0lqcKsjqUf9xVQ_7a3c72oH';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce'
+    }
+  });
+
+  const form = document.getElementById('loginForm');
+  const email = document.getElementById('email');
+  const password = document.getElementById('password');
+  const btnLogin = document.getElementById('btnLogin');
+  const msg = document.getElementById('msg');
+  const btnEye = document.getElementById('btnEye');
+  const eyeOpen = document.getElementById('eyeOpen');
+  const eyeClosed = document.getElementById('eyeClosed');
+
+  function showMessage(text, type){
+    msg.hidden = false;
+    msg.className = 'notice ' + (type || '');
+    msg.textContent = text;
   }
-};
+
+  function safeNext(){
+    const params = new URLSearchParams(location.search);
+    const next = params.get('next');
+    if(next && !next.includes('://') && !next.startsWith('//')) return next;
+    return 'index.html';
+  }
+
+  btnEye.addEventListener('click', function(){
+    const visible = password.type === 'text';
+    password.type = visible ? 'password' : 'text';
+    btnEye.setAttribute('aria-label', visible ? 'Mostrar contraseña' : 'Ocultar contraseña');
+    btnEye.setAttribute('title', visible ? 'Mostrar contraseña' : 'Ocultar contraseña');
+    eyeOpen.style.display = visible ? 'block' : 'none';
+    eyeClosed.style.display = visible ? 'none' : 'block';
+    password.focus();
+  });
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    msg.hidden = true;
+    btnLogin.disabled = true;
+    btnLogin.textContent = 'Ingresando...';
+
+    try{
+      const { data, error } = await sb.auth.signInWithPassword({
+        email: email.value.trim(),
+        password: password.value
+      });
+      if(error) throw error;
+      if(!data || !data.user) throw new Error('No se pudo iniciar sesión. Inténtalo nuevamente.');
+
+      showMessage('Ingreso correcto. Redirigiendo...', 'success');
+      setTimeout(function(){ location.href = safeNext(); }, 450);
+    }catch(err){
+      const txt = String(err && err.message ? err.message : err);
+      let friendly = txt;
+      if(/invalid login credentials/i.test(txt)) friendly = 'Correo o contraseña incorrectos. Verifica los datos e intenta nuevamente.';
+      if(/email not confirmed/i.test(txt)) friendly = 'Tu correo todavía no está confirmado. Revisa tu bandeja de entrada.';
+      showMessage(friendly, 'error');
+      btnLogin.disabled = false;
+      btnLogin.textContent = 'Ingresar';
+    }
+  });
+})();
 </script>
-<script src="./js/mizona-core.js" type="module"></script>
 </body>
 </html>

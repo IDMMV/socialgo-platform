@@ -1,197 +1,177 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Recuperar contraseña · MiZona.pe</title>
-<link href="manifest.json" rel="manifest"/>
-<link href="css/global.css" rel="stylesheet"/>
-<link href="css/mizona-unified.css" rel="stylesheet"/>
-<link href="css/mizona-phase2.css" rel="stylesheet"/>
-<link href="css/auth-security.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/>
-<link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/>
-<link href="css/mizona-logo.css" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="css/mizona-sidebar.css">
 <style>
-.auth-card{position:relative}
-.auth-back{
-  display:inline-flex;align-items:center;gap:7px;margin-bottom:14px;padding:9px 12px;
-  border:1px solid var(--border);border-radius:11px;background:#fff;color:#334155;
-  font-size:13px;font-weight:800;text-decoration:none
-}
-.auth-back:hover{border-color:#185fa5;color:#185fa5;background:#f8fbff}
-.legacy-box{margin-top:14px;padding:14px;border:1px solid #dbe7f7;border-radius:14px;background:#f8fbff}
-.legacy-box h2{font-size:15px;margin:0 0 5px;color:#0f172a}
-.legacy-box p{font-size:12px;line-height:1.45;color:#64748b;margin:0 0 10px}
-.login-return{margin:18px 0 0;text-align:center;font-size:13px}
-.login-return a{font-weight:800;color:#185fa5;text-decoration:none}
-.login-return a:hover{text-decoration:underline}
-/* La página debe desplazarse completa; nunca ocultar las opciones inferiores */
-html{min-height:100%;overflow-y:auto}
-body.auth-page{
-  display:block!important;
-  min-height:100vh!important;
-  min-height:100dvh!important;
-  overflow-x:hidden!important;
-  overflow-y:auto!important;
-  padding:18px 12px 28px!important;
-}
-body.auth-page .auth-card{
-  width:min(480px,100%)!important;
-  max-height:none!important;
-  overflow:visible!important;
-  margin:0 auto!important;
-}
+body{min-height:100vh;background:linear-gradient(135deg,#0a1628,#111827);display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:#fff;border-radius:16px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.card-header{background:linear-gradient(135deg,#185FA5,#1D9E75);padding:28px 28px 24px;text-align:center}
+.logo{display:inline-flex;align-items:center;gap:9px;margin-bottom:16px;text-decoration:none}
+.logo-mark{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;backdrop-filter:blur(8px)}
+.logo-name{font-size:18px;font-weight:700;color:#fff}
+.card-header h1{font-size:20px;font-weight:700;color:#fff;margin-bottom:6px}
+.card-header p{font-size:12px;color:rgba(255,255,255,.8);line-height:1.5}
+.card-body{padding:24px 28px}
+.field{margin-bottom:14px}
+.field label{font-size:11px;font-weight:600;color:#475569;display:block;margin-bottom:5px}
+.field input{width:100%;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;color:#1e293b;transition:border-color .15s;outline:none}
+.field input:focus{border-color:#185FA5;background:#fff}
 
-/* En pantallas de poca altura reduce espacios sin reducir el zoom */
-@media (min-width:700px) and (max-height:850px){
-  body.auth-page{padding:10px 12px 20px!important}
-  body.auth-page .auth-card{padding:18px 24px!important}
-  .auth-back{margin-bottom:8px;padding:7px 10px}
-  .auth-card .brand{margin-bottom:10px!important}
-  .auth-card .mz-brand-horizontal{max-height:48px}
-  .auth-card h1{font-size:24px!important;margin-bottom:8px!important}
-  .auth-card .auth-subtitle{margin-bottom:10px!important;line-height:1.4}
-  .auth-card label{margin:9px 0!important;gap:5px!important}
-  .auth-card input,.auth-card select{padding:10px 12px!important}
-  .auth-card .primary.wide{padding:11px 14px!important}
-  .legacy-box{margin-top:10px;padding:11px}
-  .legacy-box p{margin-bottom:7px}
-  .auth-card .security-note{margin:10px 0!important;padding:10px 12px!important}
-  .login-return{margin-top:10px}
-}
+/* MENSAJE DE ESTADO */
+.msg{display:none;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12px;line-height:1.5;text-align:center}
+.msg.ok{background:#f0fdf4;border:1px solid #86efac;color:#14532d;display:block}
+.msg.error{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;display:block}
+.msg.info{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;display:block}
+.msg-icon{font-size:24px;display:block;margin-bottom:6px}
 
-@media(max-width:560px){
-  body.auth-page{padding:10px 8px calc(24px + env(safe-area-inset-bottom))!important}
-  body.auth-page .auth-card{padding:18px 14px!important;border-radius:16px!important}
-  .auth-back{position:sticky;top:6px;z-index:5;box-shadow:0 4px 14px rgba(15,23,42,.08);margin-bottom:10px}
-  .auth-card .brand{margin-bottom:14px!important}
-  .auth-card h1{font-size:25px!important}
-  .auth-card label{margin:11px 0!important}
-  .legacy-box{padding:12px}
-  .login-return{padding-bottom:4px}
-}
+/* BOTONES */
+.btn-primary{width:100%;background:#185FA5;color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;margin-bottom:10px}
+.btn-primary:hover:not(:disabled){background:#378ADD}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.btn-secondary{width:100%;background:#f8fafc;color:#185FA5;border:1.5px solid #185FA5;border-radius:10px;padding:11px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;margin-bottom:14px}
+.btn-secondary:hover:not(:disabled){background:#eff6ff}
+.btn-secondary:disabled{opacity:.6;cursor:not-allowed}
+.btn-success{background:#1D9E75!important;border-color:#1D9E75!important;color:#fff!important}
+
+.divider{border:none;border-top:1px solid #f1f5f9;margin:14px 0}
+.nota{background:#f8fafc;border-radius:8px;padding:10px 12px;font-size:11px;color:#64748b;line-height:1.5;margin-bottom:14px}
+.nota strong{color:#475569}
+.back-link{text-align:center;font-size:12px;color:#94a3b8}
+.back-link a{color:#185FA5;font-weight:600;text-decoration:none}
+.back-link a:hover{text-decoration:underline}
 </style>
 </head>
-<body class="auth-page">
-<main class="auth-card">
-  <a class="auth-back" href="login.html" aria-label="Volver a iniciar sesión">← Volver a iniciar sesión</a>
-  <a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a>
-  <h1>Recuperar contraseña</h1>
-  <p class="auth-subtitle">Valida tu pregunta de recuperación. Después recibirás un enlace seguro para crear una contraseña nueva.</p>
-  <div class="notice" hidden id="msg"></div>
+<body>
 
-  <form id="form" novalidate>
-    <label>Correo de la cuenta<input autocomplete="email" id="email" inputmode="email" type="email"/></label>
-    <label>Pregunta de recuperación
-      <select id="question">
-        <option value="">Selecciona tu pregunta</option>
-      </select>
-    </label>
-    <label>Respuesta
-      <span class="password-field">
-        <input autocomplete="off" id="answer" minlength="4" type="password"/>
-        <button class="password-toggle" data-password-toggle="answer" type="button" aria-label="Mostrar u ocultar respuesta"></button>
-      </span>
-    </label>
-    <button class="primary wide" id="submitBtn" type="submit">Validar y enviar enlace</button>
-  </form>
-
-  <div class="legacy-box">
-    <h2>¿Tu cuenta fue creada antes de tener pregunta de recuperación?</h2>
-    <p>Escribe tu correo arriba y usa esta opción. El enlace solo llegará al correo registrado en tu cuenta.</p>
-    <button class="secondary-wide" id="fallbackBtn" type="button">Enviar enlace solo por correo</button>
+<div class="card">
+  <div class="card-header">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">MZ</div>
+      <div class="logo-name">MiZona</div>
+    </a>
+    <h1>Recuperar contraseña</h1>
+    <p>Te enviaremos un enlace seguro para crear una nueva contraseña</p>
   </div>
 
-  <div class="security-note"><strong>Importante:</strong> la pregunta es una verificación adicional. La contraseña solo se cambia desde el enlace seguro enviado a tu correo.</div>
-  <p class="login-return">¿Recordaste tu contraseña? <a href="login.html">Iniciar sesión</a></p>
-</main>
+  <div class="card-body">
+
+    <!-- MENSAJE DE ESTADO -->
+    <div class="msg" id="msg">
+      <span class="msg-icon" id="msg-icon"></span>
+      <span id="msg-text"></span>
+    </div>
+
+    <!-- CAMPO CORREO -->
+    <div class="field">
+      <label for="email"><i class="ti ti-mail" style="font-size:12px"></i> Correo de tu cuenta</label>
+      <input type="email" id="email" placeholder="tucorreo@gmail.com" autocomplete="email" inputmode="email">
+    </div>
+
+    <!-- BOTÓN PRINCIPAL -->
+    <button class="btn-primary" id="btn-enviar" onclick="enviarEnlace()">
+      <i class="ti ti-send" style="font-size:16px"></i>
+      Enviar enlace de recuperación
+    </button>
+
+    <div class="nota">
+      <strong>¿Cómo funciona?</strong><br>
+      Escribe tu correo y toca el botón. Recibirás un mensaje de MiZona con un enlace para crear tu nueva contraseña. Revisa también la carpeta de <strong>spam</strong>.
+    </div>
+
+    <hr class="divider">
+
+    <div class="back-link">
+      ¿Recordaste tu contraseña? <a href="login.html">Iniciar sesión</a>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script type="module">
-import {RECOVERY_QUESTIONS,verifyRecoveryQuestion,requestPasswordReset} from './js/auth.js';
-import {initPasswordToggles} from './js/password-ui.js';
-initPasswordToggles();
+import { PUBLIC_ENV } from './js/env.public.js';
 
-const form = document.getElementById('form');
-const email = document.getElementById('email');
-const question = document.getElementById('question');
-const answer = document.getElementById('answer');
-const msg = document.getElementById('msg');
-const submitBtn = document.getElementById('submitBtn');
-const fallbackBtn = document.getElementById('fallbackBtn');
+const sb = supabase.createClient(PUBLIC_ENV.SUPABASE_URL, PUBLIC_ENV.SUPABASE_PUBLISHABLE_KEY);
 
-question.innerHTML='<option value="">Selecciona tu pregunta</option>'+RECOVERY_QUESTIONS.map(q=>`<option value="${q.id}">${q.label}</option>`).join('');
-
-function show(text,type='info'){
-  msg.hidden=false;
-  msg.className=`notice ${type}`;
-  msg.textContent=text;
-  msg.scrollIntoView({behavior:'smooth',block:'nearest'});
+function mostrarMsg(texto, tipo) {
+  const msg = document.getElementById('msg');
+  const icon = document.getElementById('msg-icon');
+  const text = document.getElementById('msg-text');
+  const iconos = { ok: '✅', error: '❌', info: '⏳' };
+  icon.textContent = iconos[tipo] || 'ℹ️';
+  text.textContent = texto;
+  msg.className = 'msg ' + tipo;
+  msg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function validEmail(){
-  const value=email.value.trim();
-  if(!value){show('Escribe el correo de tu cuenta.','error');email.focus();return false}
-  if(!email.checkValidity()){show('Escribe un correo válido.','error');email.focus();return false}
-  return true;
-}
+window.enviarEnlace = async function() {
+  const email = document.getElementById('email').value.trim();
+  const btn = document.getElementById('btn-enviar');
 
-async function sendReset(){
-  await requestPasswordReset(email.value);
-  show('Si el correo corresponde a una cuenta, recibirás un mensaje de MiZona para crear una nueva contraseña. Revisa también spam o correo no deseado.','ok');
-}
+  // Validar email
+  if (!email) {
+    mostrarMsg('Por favor escribe tu correo electrónico.', 'error');
+    document.getElementById('email').focus();
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    mostrarMsg('Escribe un correo válido. Ejemplo: tucorreo@gmail.com', 'error');
+    document.getElementById('email').focus();
+    return;
+  }
 
-form.addEventListener('submit',async e=>{
-  e.preventDefault();
-  if(!validEmail()) return;
-  if(!question.value){show('Selecciona tu pregunta de recuperación. Si tu cuenta es antigua, usa el botón “Enviar enlace solo por correo”.','error');question.focus();return}
-  if(answer.value.trim().length<4){show('Escribe la respuesta de recuperación.','error');answer.focus();return}
+  // Estado cargando
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader-2" style="font-size:16px;animation:spin 1s linear infinite"></i> Enviando...';
+  mostrarMsg('Enviando enlace de recuperación...', 'info');
 
-  submitBtn.disabled=true;
-  show('Validando datos…','info');
-  try{
-    const result=await verifyRecoveryQuestion(email.value,question.value,answer.value);
-    if(result?.sin_configurar){
-      show('Esta cuenta no tiene una pregunta configurada. Usa “Enviar enlace solo por correo”.','info');
-      fallbackBtn.focus();
-      return;
-    }
-    if(result?.bloqueada){show('Demasiados intentos. Espera unos minutos antes de volver a probar.','error');return}
-    if(!result?.valida){show('No pudimos validar los datos. Revisa la pregunta y la respuesta.','error');return}
-    await sendReset();
-    form.reset();
-  }catch(x){show(x.message||'No se pudo iniciar la recuperación.','error')}
-  finally{submitBtn.disabled=false}
+  try {
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: PUBLIC_ENV.SITE_URL + '/restablecer.html'
+    });
+
+    if (error) throw error;
+
+    // ÉXITO
+    mostrarMsg(
+      `¡Listo! Enviamos un enlace de recuperación a ${email}. Revisa tu bandeja de entrada y también la carpeta de spam o correo no deseado. El enlace expira en 1 hora.`,
+      'ok'
+    );
+    btn.innerHTML = '<i class="ti ti-check" style="font-size:16px"></i> ¡Enlace enviado!';
+    btn.classList.add('btn-success');
+    btn.disabled = false;
+
+    // Después de 8 segundos volver al estado normal
+    setTimeout(() => {
+      btn.innerHTML = '<i class="ti ti-send" style="font-size:16px"></i> Enviar enlace de recuperación';
+      btn.classList.remove('btn-success');
+    }, 8000);
+
+  } catch(err) {
+    console.error('Error reset:', err);
+    mostrarMsg(
+      'No se pudo enviar el enlace. Verifica que el correo sea correcto e intenta de nuevo en un momento.',
+      'error'
+    );
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-send" style="font-size:16px"></i> Enviar enlace de recuperación';
+  }
+};
+
+// Permitir Enter en el campo de email
+document.getElementById('email').addEventListener('keydown', e => {
+  if (e.key === 'Enter') enviarEnlace();
 });
 
-fallbackBtn.addEventListener('click',async()=>{
-  if(!validEmail()) return;
-  fallbackBtn.disabled=true;
-  fallbackBtn.textContent='⏳ Enviando enlace…';
-  fallbackBtn.style.opacity='0.7';
-  try{
-    await sendReset();
-    // Mensaje de éxito claro
-    show(`✅ ¡Listo! Enviamos un enlace de recuperación a ${email.value.trim()}. Revisa tu bandeja de entrada y también la carpeta de spam o correo no deseado. El enlace expira en 1 hora.`,'ok');
-    fallbackBtn.textContent='✅ Enlace enviado';
-    fallbackBtn.style.background='#1D9E75';
-    fallbackBtn.style.color='#fff';
-    fallbackBtn.style.opacity='1';
-    // Después de 5 segundos volver al estado normal
-    setTimeout(()=>{
-      fallbackBtn.disabled=false;
-      fallbackBtn.textContent='Enviar enlace solo por correo';
-      fallbackBtn.style.background='';
-      fallbackBtn.style.color='';
-    },5000);
-  }
-  catch(x){
-    show(x.message||'No se pudo enviar el enlace. Intenta de nuevo en un momento.','error');
-    fallbackBtn.disabled=false;
-    fallbackBtn.textContent='Enviar enlace solo por correo';
-    fallbackBtn.style.opacity='1';
-  }
-});
+// CSS animación spinner
+const st = document.createElement('style');
+st.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+document.head.appendChild(st);
 </script>
-<script src="./js/mizona-core.js" type="module"></script>
+
 </body>
 </html>

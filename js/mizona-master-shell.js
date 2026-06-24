@@ -1,5 +1,6 @@
 const PAGE_INFO = {
   'alertas.html':['Alertas de tu zona','Reporta, confirma y sigue eventos cercanos'],
+  'alerta.html':['Seguimiento de alerta','Información, confirmaciones y actualizaciones'],
   'mapa.html':['Mapa de alertas','Incidentes y avisos en tiempo real'],
   'servicios.html':['Servicios cerca de ti','Profesionales y negocios de tu zona'],
   'solicitudes.html':['Solicitudes vecinales','Publica lo que necesitas y recibe ayuda'],
@@ -14,6 +15,8 @@ const PAGE_INFO = {
   'negocio-publico.html':['Negocio local','Servicios, ofertas y opiniones'],
   'oferta.html':['Detalle de oferta','Promoción verificada en MiZona'],
   'admin-negocios.html':['Negocios y ofertas','Moderación administrativa'],
+  'admin-alertas.html':['Alertas y sugerencias','Moderación y participación vecinal'],
+  'sugerencias.html':['Sugerencias','Ayúdanos a mejorar MiZona'],
   'explorar.html':['Explorar','Personas, negocios y contenido'],
   'admin.html':['Administración','Control general de MiZona'],
   'usuario.html':['Perfil público','Información y publicaciones'],
@@ -32,6 +35,7 @@ const NAV = [
     ['ride.html','ti-car','MiZonaRide'],
     ['empleos.html','ti-briefcase','Empleos'],
     ['explorar.html','ti-compass','Explorar'],
+    ['sugerencias.html','ti-bulb','Sugerencias'],
   ]],
   ['Cuenta',[
     ['mensajes.html','ti-message','Mensajes'],
@@ -56,7 +60,7 @@ function navHtml(page){
 function mobileHtml(page){
   const items=[['index.html','ti-home','Inicio'],['alertas.html','ti-bell','Alertas'],['__plus__','ti-plus',''],['mapa.html','ti-map','Mapa'],['perfil.html','ti-user','Perfil']];
   return items.map(([href,icon,label])=> href==='__plus__'
-    ? `<a class="mz3-mobile-plus" href="index.html?publicar=1" aria-label="Publicar"><i class="ti ${icon}"></i></a>`
+    ? `<a class="mz3-mobile-plus" href="alertas.html#reportar" aria-label="Publicar"><i class="ti ${icon}"></i></a>`
     : `<a href="${href}" class="${page===href?'active':''}"><i class="ti ${icon}"></i><span>${label}</span></a>`).join('');
 }
 
@@ -106,7 +110,7 @@ function buildShell(page,main){
         <button class="mz3-menu" id="mz3Menu" type="button" aria-label="Abrir menú"><i class="ti ti-menu-2"></i></button>
         <button class="mz3-location" id="mz3Location" type="button"><i class="ti ti-map-pin-filled"></i><span id="mz3Zone">Mi zona</span></button>
         <label class="mz3-search"><i class="ti ti-search"></i><input id="mz3Search" type="search" placeholder="Buscar en MiZona..."></label>
-        <a class="mz3-add-btn" href="index.html?publicar=1" aria-label="Publicar"><i class="ti ti-plus"></i></a>
+        <a class="mz3-add-btn" href="alertas.html#reportar" aria-label="Publicar"><i class="ti ti-plus"></i></a>
         <a class="mz3-icon-btn" href="notificaciones.html" aria-label="Notificaciones"><i class="ti ti-bell"></i><span class="mz3-icon-dot" id="mz3NotifDot" hidden></span></a>
         <a class="mz3-profile-btn" id="mz3TopProfile" href="perfil.html"><span class="mz3-top-avatar" id="mz3TopAvatar">U</span><span class="mz3-profile-copy"><strong id="mz3TopName">Perfil</strong><small>Ver cuenta</small></span></a>
       </header>
@@ -161,7 +165,7 @@ function init(){
   menu?.addEventListener('click',()=>document.body.classList.toggle('mz3-drawer-open'));
   backdrop?.addEventListener('click',close);
   shell.querySelectorAll('.mz3-sidebar a').forEach(a=>a.addEventListener('click',close));
-  shell.querySelector('#mz3Publish')?.addEventListener('click',()=>location.href='index.html?publicar=1');
+  shell.querySelector('#mz3Publish')?.addEventListener('click',()=>location.href='alertas.html#reportar');
   shell.querySelector('#mz3Location')?.addEventListener('click',()=>location.href='mapa.html');
   const search=shell.querySelector('#mz3Search');
   search?.addEventListener('keydown',e=>{ if(e.key==='Enter'){ const q=search.value.trim(); location.href=q?`explorar.html?q=${encodeURIComponent(q)}`:'explorar.html'; }});

@@ -145,3 +145,7 @@ Este archivo corrige la recursión de las políticas RLS del chat y habilita el 
 ## Fase 4 — Negocios y Zona Ofertas
 
 Antes de usar `negocio.html`, `negocio-publico.html`, `oferta.html`, `ofertas.html` y `admin-negocios.html`, ejecuta `sql/fase4_negocios_ofertas.sql` en Supabase. Consulta `INSTRUCCIONES_FASE4_NEGOCIOS_OFERTAS.md`.
+
+## Fase 5 — Alertas inteligentes
+
+Consulta `INSTRUCCIONES_FASE5_ALERTAS_INTELIGENTES.md` y ejecuta `sql/fase5_alertas_inteligentes.sql` para habilitar selección en mapa, privacidad de ubicación, detección de duplicados, seguimiento, resolución comunitaria, moderación y sugerencias.

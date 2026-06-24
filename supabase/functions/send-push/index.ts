@@ -149,8 +149,33 @@ async function fetchEvent(body: Record<string, unknown>): Promise<NotificationEv
   return data as NotificationEvent;
 }
 
+
+async function applyNotificationPreferences(userIds: string[], event: NotificationEvent): Promise<string[]> {
+  if (!userIds.length) return [];
+  const { data, error } = await supabase
+    .from("notification_preferences")
+    .select("user_id,solo_verificadas,alertas_seguidas,cambios_estado_alerta,confirmaciones_alerta")
+    .in("user_id", userIds);
+  if (error) return userIds;
+  const byUser = new Map((data || []).map((row: any) => [String(row.user_id), row]));
+  return userIds.filter((id) => {
+    const pref: any = byUser.get(String(id));
+    if (!pref) return true;
+    if (event.event_type === "alerta_nueva" && pref.solo_verificadas === true) return false;
+    if (event.event_type === "alerta_confirmada" && pref.confirmaciones_alerta === false) return false;
+    if (["alerta_verificada","alerta_resuelta","alerta_falsa","alerta_ocultada"].includes(event.event_type) && pref.cambios_estado_alerta === false) return false;
+    if (event.event_type === "alerta_seguida_actualizada" && pref.alertas_seguidas === false) return false;
+    return true;
+  });
+}
+
 async function recipientsForEvent(event: NotificationEvent): Promise<string[]> {
-  if (event.recipient_id) return [event.recipient_id];
+  if (event.recipient_id) return applyNotificationPreferences([event.recipient_id], event);
+
+  const directTargetUsers = event.payload?.target_user_ids;
+  if (Array.isArray(directTargetUsers)) {
+    return applyNotificationPreferences(Array.from(new Set<string>(directTargetUsers.map(String))), event);
+  }
 
   if (event.event_type.startsWith("alerta_") && event.latitud != null && event.longitud != null && event.categoria) {
     const maxRadius = event.event_type === "alerta_nueva"
@@ -167,7 +192,7 @@ async function recipientsForEvent(event: NotificationEvent): Promise<string[]> {
     });
     if (error) throw error;
     const ids = ((data || []) as Array<{ user_id: string }>).map((row) => row.user_id).filter(Boolean);
-    return Array.from(new Set<string>(ids));
+    return applyNotificationPreferences(Array.from(new Set<string>(ids)), event);
   }
 
   if (event.payload?.target_all === true) {
@@ -180,8 +205,6 @@ async function recipientsForEvent(event: NotificationEvent): Promise<string[]> {
     return Array.from(new Set<string>((data || []).map((row: { user_id: string }) => row.user_id)));
   }
 
-  const targetUsers = event.payload?.target_user_ids;
-  if (Array.isArray(targetUsers)) return Array.from(new Set<string>(targetUsers.map(String)));
   return [];
 }
 

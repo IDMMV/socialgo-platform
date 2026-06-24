@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#185FA5">
+<meta name="description" content="Detalle y actualizaciones de una alerta de MiZona.pe">
+<title>Detalle de alerta — MiZona.pe</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/favicon-32.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="css/mizona.css">
+<link rel="stylesheet" href="css/mizona-unified.css">
+<link rel="stylesheet" href="css/mizona-phase2.css">
+<link rel="stylesheet" href="css/mizona-logo.css">
+<link rel="stylesheet" href="css/alertas-inteligentes.css">
+</head>
+<body class="estado-guest">
+<div id="mz-toast" class="mz-toast"></div>
+<div class="mz-layout-2col">
+  <aside class="mz-sidebar">
+    <div class="mz-logo"><img alt="MiZona.pe" class="mz-logo-img" src="assets/mizona-logo-blanco.svg"></div>
+    <div class="mz-nav-sec">Principal</div>
+    <a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Inicio</span></a>
+    <a class="mz-nav-item active" href="alertas.html"><i class="ti ti-bell"></i><span>Alertas</span></a>
+    <a class="mz-nav-item" href="mapa.html"><i class="ti ti-map"></i><span>Mapa</span></a>
+    <a class="mz-nav-item" href="servicios.html"><i class="ti ti-tool"></i><span>Servicios</span></a>
+    <a class="mz-nav-item" href="solicitudes.html"><i class="ti ti-clipboard-list"></i><span>Solicitudes</span></a>
+    <div class="mz-nav-sec">Comunidad</div>
+    <a class="mz-nav-item" href="ofertas.html"><i class="ti ti-tag"></i><span>Zona Ofertas</span></a>
+    <a class="mz-nav-item" href="ride.html"><i class="ti ti-car"></i><span>MiZonaRide</span></a>
+    <a class="mz-nav-item" href="sugerencias.html"><i class="ti ti-bulb"></i><span>Sugerencias</span></a>
+    <div class="mz-nav-sec">Cuenta</div>
+    <a class="mz-nav-item" href="notificaciones.html"><i class="ti ti-bell-ringing"></i><span>Notificaciones</span></a>
+    <a class="mz-nav-item" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
+    <div class="mz-sidebar-spacer"></div>
+    <a class="mz-sidebar-btn" href="alertas.html#reportar"><i class="ti ti-plus"></i> Reportar alerta</a>
+  </aside>
+  <main class="mz-feed">
+    <div class="mz-topbar">
+      <a class="mz-btn ghost" href="alertas.html"><i class="ti ti-arrow-left"></i> Volver a alertas</a>
+      <div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--txt)">Seguimiento de alerta</div><div style="font-size:10px;color:var(--txt3)">Información, confirmaciones y actualizaciones</div></div>
+      <button class="mz-btn ghost" id="shareAlert"><i class="ti ti-share"></i> Compartir</button>
+    </div>
+    <div class="mz-detail-shell">
+      <section style="display:grid;gap:14px">
+        <article class="mz-detail-card" id="alertMain"><div class="mz-loader">Cargando alerta...</div></article>
+        <article class="mz-detail-card">
+          <div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-map-pin"></i> Ubicación pública</div><span id="privacyBadge" class="mz-tag reportada">Aproximada</span></div>
+          <div id="mzAlertDetailMap"></div>
+          <div class="mz-detail-pad" style="padding-top:10px;font-size:9px;color:var(--txt3)"><i class="ti ti-shield-lock"></i> MiZona puede desplazar el marcador en eventos sensibles para proteger domicilios.</div>
+        </article>
+        <article class="mz-detail-card">
+          <div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-history"></i> Historial y actualizaciones</div></div>
+          <div class="mz-detail-pad"><div class="mz-timeline" id="alertTimeline"><div class="mz-loader">Cargando historial...</div></div></div>
+        </article>
+      </section>
+      <aside style="display:grid;gap:14px;align-content:start">
+        <article class="mz-detail-card"><div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-users"></i> Participación</div></div><div class="mz-detail-pad" id="alertParticipation"></div></article>
+        <article class="mz-detail-card" id="resolutionCard"><div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-circle-check"></i> Resolución</div></div><div class="mz-detail-pad" id="resolutionContent"><div class="mz-loader">Comprobando...</div></div></article>
+        <article class="mz-detail-card" id="authorTools" hidden><div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-edit"></i> Herramientas del autor</div></div><div class="mz-detail-pad" id="authorToolsContent"></div></article>
+      </aside>
+    </div>
+  </main>
+</div>
+<nav class="mz-bottom-nav"><div class="mz-bn-inner"><div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div><div class="mz-bn-item active" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div><div class="mz-bn-item" onclick="location.href='mapa.html'"><i class="ti ti-map"></i><span>Mapa</span></div><div class="mz-bn-item" onclick="location.href='notificaciones.html'"><i class="ti ti-bell-ringing"></i><span>Avisos</span></div><div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div></div></nav>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module" src="js/alerta-detalle.js"></script>
+<script type="module" src="js/mizona-core.js"></script>
+</body>
+</html>

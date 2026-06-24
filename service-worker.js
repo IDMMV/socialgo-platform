@@ -1,9 +1,12 @@
-const CACHE_NAME = "mizona-v4.1.0-pwa-install";
+const CACHE_NAME = "mizona-v5.0-alertas-inteligentes";
 
 const CORE = [
   "./",
   "./index.html",
   "./alertas.html",
+  "./alerta.html",
+  "./sugerencias.html",
+  "./admin-alertas.html",
   "./mapa.html",
   "./servicios.html",
   "./solicitudes.html",
@@ -45,6 +48,7 @@ const CORE = [
   "./css/mizona-logo.css",
   "./css/auth-security.css",
   "./css/negocios-ofertas.css",
+  "./css/alertas-inteligentes.css",
   "./js/mizona-core.js",
   "./js/mizona-master-shell.js",
   "./js/mizona-ui-v2.js",
@@ -54,6 +58,10 @@ const CORE = [
   "./js/supabase.js",
   "./js/push-notifications.js",
   "./js/alertas-mizona.js",
+  "./js/alert-location-picker.js",
+  "./js/alerta-detalle.js",
+  "./js/admin-alertas.js",
+  "./js/sugerencias.js",
   "./js/mapa-mizona.js",
   "./js/servicios-mizona.js",
   "./js/solicitudes-mizona.js",

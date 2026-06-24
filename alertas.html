@@ -8,9 +8,11 @@
 <title>Alertas — MiZona.pe</title>
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="css/mizona.css">
 <link rel="stylesheet" href="css/mizona-unified.css">
 <link rel="stylesheet" href="css/mizona-phase2.css">
+<link rel="stylesheet" href="css/alertas-inteligentes.css">
 <style>
 /* Alertas con el mismo sistema visual de Inicio */
 .mz-alerts-hero{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,var(--az-bg),#fff);border:1px solid var(--az-bd);border-radius:var(--r);padding:14px 16px}
@@ -105,6 +107,7 @@
     <a class="mz-nav-item" href="mensajes.html"><i class="ti ti-message"></i><span>Mensajes</span></a>
     <a class="mz-nav-item hide-guest" href="perfil.html"><i class="ti ti-user"></i><span>Mi perfil</span></a>
     <a class="mz-nav-item hide-guest" href="negocio.html"><i class="ti ti-building-store"></i><span>Mi negocio</span></a>
+    <a class="mz-nav-item" href="sugerencias.html"><i class="ti ti-bulb"></i><span>Sugerencias</span></a>
     <a class="mz-nav-item hide-guest" href="admin.html" id="link-admin" style="display:none"><i class="ti ti-shield"></i><span>Admin</span></a>
     <div class="mz-sidebar-spacer"></div>
     <a class="mz-sidebar-btn" href="#reportar"><i class="ti ti-plus"></i> Reportar alerta</a>
@@ -136,18 +139,35 @@
           <div class="mz-card-pad">
             <form id="alertaForm" class="mz-form">
               <label class="mz-field"><span>Categoría</span>
-                <select name="categoria" required>
+                <select name="categoria" id="alertCategory" required>
                   <option value="robo">Robo o asalto</option><option value="accidente">Accidente</option><option value="agua">Corte o fuga de agua</option><option value="luz">Corte de luz</option><option value="persona">Persona desaparecida</option><option value="mascota">Mascota perdida</option><option value="incendio">Incendio</option><option value="otro">Otro</option>
                 </select>
               </label>
               <label class="mz-field"><span>Distrito</span><input name="distrito" id="form-distrito" value="Ventanilla" required></label>
               <label class="mz-field full"><span>Título</span><input name="titulo" maxlength="120" required placeholder="Describe brevemente lo ocurrido"></label>
               <label class="mz-field full"><span>Descripción</span><textarea name="descripcion" rows="5" maxlength="1200" required placeholder="Incluye hora, referencia y detalles útiles. No publiques acusaciones ni datos sensibles."></textarea></label>
-              <label class="mz-field full"><span>Zona o referencia</span><input name="zona_referencia" placeholder="Ej.: Av. Las Palmeras, cerca del mercado"></label>
-              <input name="latitud" type="hidden"><input name="longitud" type="hidden">
+              <label class="mz-field full"><span>Zona o referencia</span><input name="zona_referencia" id="alertReference" placeholder="Ej.: Av. Las Palmeras, cerca del mercado"></label>
+              <label class="mz-field full"><span>Privacidad de la ubicación</span>
+                <select name="precision_ubicacion" id="alertPrivacy">
+                  <option value="aprox_50m">Aproximada a 50 m</option>
+                  <option value="exacta">Punto preciso</option>
+                  <option value="aprox_150m">Aproximada a 150 m</option>
+                  <option value="solo_zona">Solo zona aproximada</option>
+                </select>
+                <small class="mz-privacy-help" id="privacyHelp">En robos y reportes sensibles, MiZona desplaza públicamente el marcador para proteger domicilios.</small>
+              </label>
+              <input name="latitud" id="alertLatitude" type="hidden"><input name="longitud" id="alertLongitude" type="hidden">
+              <div class="mz-field full">
+                <span>Ubicación del evento</span>
+                <div class="mz-location-summary" id="locationSummary"></div>
+                <div class="mz-location-tools" style="margin-top:8px">
+                  <button type="button" class="mz-btn ghost" data-use-location><i class="ti ti-current-location"></i> Usar mi ubicación</button>
+                  <button type="button" class="mz-btn ghost" data-pick-location><i class="ti ti-map-pin"></i> Elegir en el mapa</button>
+                </div>
+              </div>
               <div class="mz-field full mz-form-actions">
-                <button type="button" class="mz-btn ghost" data-use-location><i class="ti ti-current-location"></i> Usar ubicación</button>
-                <button type="submit" class="mz-btn danger"><i class="ti ti-send"></i> Enviar alerta</button>
+                <a class="mz-btn ghost" href="mapa.html"><i class="ti ti-map-search"></i> Revisar alertas cercanas</a>
+                <button type="submit" class="mz-btn danger"><i class="ti ti-send"></i> Revisar y publicar</button>
               </div>
             </form>
             <div id="alertaStatus" hidden></div>
@@ -174,6 +194,37 @@
   </aside>
 </div>
 
+<!-- Selector de ubicación -->
+<div class="mz-smart-modal" id="modal-location-picker" aria-hidden="true">
+  <div class="mz-smart-dialog">
+    <div class="mz-smart-head"><div><h2>Selecciona dónde ocurrió</h2><div style="font-size:9px;color:var(--txt3);margin-top:2px">En computadora haz clic. En celular mantén presionado el punto.</div></div><button class="mz-smart-close" type="button" data-close-location>✕</button></div>
+    <div class="mz-smart-body">
+      <div class="mz-map-instruction"><i class="ti ti-hand-click"></i> Puedes acercar, mover el mapa y arrastrar el marcador. La dirección escrita es opcional; las coordenadas son el dato principal.</div>
+      <div id="mzLocationMap"></div>
+      <div class="mz-map-selected"><div id="locationSelectedText">Aún no elegiste un punto.</div><button type="button" class="mz-btn ghost" id="locationGpsButton"><i class="ti ti-current-location"></i> Mi ubicación</button></div>
+    </div>
+    <div class="mz-smart-foot"><button class="mz-btn ghost" type="button" data-close-location>Cancelar</button><button class="mz-btn danger" type="button" id="confirmLocationButton" disabled><i class="ti ti-map-pin-check"></i> Confirmar ubicación</button></div>
+  </div>
+</div>
+
+<!-- Alertas similares -->
+<div class="mz-smart-modal" id="modal-duplicates" aria-hidden="true">
+  <div class="mz-smart-dialog" style="max-width:620px">
+    <div class="mz-smart-head"><div><h2>Encontramos reportes parecidos</h2><div style="font-size:9px;color:var(--txt3);margin-top:2px">Confirma uno existente para evitar alertas duplicadas.</div></div><button class="mz-smart-close" type="button" data-close-duplicates>✕</button></div>
+    <div class="mz-smart-body"><div class="mz-duplicate-list" id="duplicateList"></div></div>
+    <div class="mz-smart-foot"><button class="mz-btn ghost" type="button" data-close-duplicates>Volver a corregir</button><button class="mz-btn danger" type="button" id="continueDuplicateButton">No es el mismo evento, continuar</button></div>
+  </div>
+</div>
+
+<!-- Confirmación final -->
+<div class="mz-smart-modal" id="modal-publish-confirm" aria-hidden="true">
+  <div class="mz-smart-dialog" style="max-width:620px">
+    <div class="mz-smart-head"><div><h2>Confirma la alerta</h2><div style="font-size:9px;color:var(--txt3);margin-top:2px">Comprueba los datos antes de avisar a otros vecinos.</div></div><button class="mz-smart-close" type="button" data-close-publish>✕</button></div>
+    <div class="mz-smart-body"><div class="mz-confirm-grid" id="publishSummary"></div><div class="mz-form-note" style="margin-top:12px"><i class="ti ti-shield-check"></i> La ubicación pública respetará el nivel de privacidad elegido. MiZona conservará el punto exacto de forma privada para moderación y detección de duplicados.</div></div>
+    <div class="mz-smart-foot"><button class="mz-btn ghost" type="button" data-close-publish>Corregir</button><button class="mz-btn danger" type="button" id="finalPublishButton"><i class="ti ti-send"></i> Sí, publicar alerta</button></div>
+  </div>
+</div>
+
 <nav class="mz-bottom-nav">
   <div class="mz-bn-inner">
     <div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
@@ -184,6 +235,7 @@
   </div>
 </nav>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module" src="js/alertas-mizona.js"></script>
 <script type="module">
 import { supabase } from './js/supabase.js';

@@ -1,0 +1,75 @@
+/* ============================================================
+   MiZona.pe — Shell maestro compartido
+   Unifica navegación, cabecera, perfil y barra móvil.
+   ============================================================ */
+:root{
+  --mz3-primary:#185FA5;
+  --mz3-primary-2:#2477B8;
+  --mz3-accent:#1D9E75;
+  --mz3-danger:#E24B4A;
+  --mz3-sidebar:#0F1B2D;
+  --mz3-sidebar-2:#12243A;
+  --mz3-bg:#F4F7FB;
+  --mz3-card:#FFFFFF;
+  --mz3-text:#172033;
+  --mz3-muted:#64748B;
+  --mz3-border:#DDE5EF;
+  --mz3-shadow:0 12px 32px rgba(15,31,53,.08);
+  --mz3-radius:16px;
+  --mz3-sidebar-width:238px;
+  --mz3-topbar-height:70px;
+}
+html{background:var(--mz3-bg)}
+body.mz-master-shell-active{margin:0!important;min-height:100vh;background:var(--mz3-bg)!important;color:var(--mz3-text);overflow-x:hidden}
+body.mz-master-shell-active>*:not(.mz3-shell):not(dialog):not(script):not(style):not(link){ }
+.mz3-shell{display:grid;grid-template-columns:var(--mz3-sidebar-width) minmax(0,1fr);min-height:100vh;background:var(--mz3-bg)}
+.mz3-sidebar{position:sticky;top:0;height:100vh;z-index:1500;display:flex;flex-direction:column;padding:0;background:var(--mz3-sidebar);color:#fff;border-right:1px solid rgba(255,255,255,.05);overflow-y:auto;scrollbar-width:thin}
+.mz3-brand{display:flex;align-items:center;gap:9px;padding:16px 14px 12px;border-bottom:1px solid rgba(255,255,255,.07);color:#fff;text-decoration:none}
+.mz3-brand-mark{width:34px;height:34px;display:grid;place-items:center;flex:0 0 auto;border-radius:9px;background:linear-gradient(135deg,var(--mz3-primary),var(--mz3-accent));font-size:13px;font-weight:900}
+.mz3-brand-text{display:grid;min-width:0;line-height:1.05}.mz3-brand-text strong{font-size:16px;letter-spacing:-.02em}.mz3-brand-text small{margin-top:4px;color:#60A5FA;font-size:8px}
+.mz3-account{display:flex;align-items:center;gap:8px;margin:0;padding:10px 14px;border:0;border-bottom:1px solid rgba(255,255,255,.06);border-radius:0;background:transparent;text-decoration:none;color:#fff}
+.mz3-account:hover{background:rgba(255,255,255,.07)}
+.mz3-account-avatar{width:36px;height:36px;display:grid;place-items:center;flex:0 0 auto;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#2563EB);font-size:11px;font-weight:900;overflow:hidden}.mz3-account-avatar img{width:100%;height:100%;object-fit:cover}
+.mz3-account-copy{display:grid;min-width:0}.mz3-account-copy strong,.mz3-account-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mz3-account-copy strong{font-size:12px}.mz3-account-copy small{margin-top:2px;color:#8FA2BA;font-size:10px}
+.mz3-guest{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0 4px 12px}.mz3-guest a{padding:8px 6px;border-radius:9px;text-align:center;text-decoration:none;font-size:10px;font-weight:800}.mz3-guest a:first-child{background:var(--mz3-primary);color:#fff}.mz3-guest a:last-child{border:1px solid rgba(255,255,255,.12);color:#C7D3E1}
+.mz3-nav-label{padding:10px 14px 3px;color:#44546A;font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.mz3-nav{display:grid;gap:0}.mz3-nav a{position:relative;display:flex;align-items:center;gap:9px;min-height:38px;padding:8px 14px;border-left:2px solid transparent;border-radius:0;color:#64748B;text-decoration:none;font-size:10px;font-weight:600}.mz3-nav a i{width:19px;font-size:17px;text-align:center;color:#475569}.mz3-nav a:hover{background:rgba(255,255,255,.04);color:#CBD5E1}.mz3-nav a.active{background:rgba(24,95,165,.2);border-left-color:#60A5FA;color:#E2E8F0;box-shadow:none}.mz3-nav a.active i{color:#60A5FA}
+.mz3-nav-badge{margin-left:auto;min-width:18px;height:18px;display:grid;place-items:center;padding:0 5px;border-radius:999px;background:#EF4444;color:#fff;font-size:9px;font-weight:900}
+.mz3-sidebar-spacer{flex:1}.mz3-publish{display:flex;align-items:center;justify-content:center;gap:7px;min-height:40px;margin:10px 14px 14px;border:0;border-radius:8px;background:var(--mz3-primary);color:#fff;font-size:10px;font-weight:800;cursor:pointer;box-shadow:none}
+.mz3-workspace{min-width:0;display:flex;flex-direction:column}.mz3-topbar{position:sticky;top:0;z-index:1400;min-height:var(--mz3-topbar-height);display:flex;align-items:center;gap:10px;padding:10px 18px;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--mz3-border)}
+.mz3-menu{display:none}.mz3-location,.mz3-icon-btn,.mz3-profile-btn,.mz3-add-btn{height:42px;border:1px solid var(--mz3-border);border-radius:12px;background:#fff;color:var(--mz3-text);cursor:pointer;text-decoration:none}
+.mz3-location{display:flex;align-items:center;gap:7px;max-width:230px;padding:0 13px;font-size:11px;font-weight:800}.mz3-location span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mz3-location i{color:var(--mz3-danger);font-size:17px}
+.mz3-search{position:relative;display:flex;align-items:center;flex:1;min-width:180px;height:42px}.mz3-search i{position:absolute;left:14px;color:#94A3B8;font-size:17px}.mz3-search input{width:100%;height:100%;padding:0 15px 0 41px;border:1px solid var(--mz3-border);border-radius:13px;background:#F8FAFC;color:var(--mz3-text);outline:none;font-size:12px}.mz3-search input:focus{border-color:#9FC4E2;box-shadow:0 0 0 3px rgba(24,95,165,.08)}
+.mz3-add-btn{width:42px;display:grid;place-items:center;background:linear-gradient(135deg,#EF4444,#DC2626);border-color:transparent;color:#fff;font-size:23px;box-shadow:0 8px 18px rgba(220,38,38,.2)}
+.mz3-icon-btn{position:relative;width:42px;display:grid;place-items:center;font-size:19px}.mz3-icon-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;border:2px solid #fff;border-radius:50%;background:#EF4444}
+.mz3-profile-btn{display:flex;align-items:center;gap:8px;padding:0 10px 0 6px;min-width:42px}.mz3-top-avatar{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:linear-gradient(135deg,var(--mz3-primary),var(--mz3-accent));color:#fff;font-size:10px;font-weight:900;overflow:hidden}.mz3-top-avatar img{width:100%;height:100%;object-fit:cover}.mz3-profile-copy{display:grid;min-width:0}.mz3-profile-copy strong{font-size:11px}.mz3-profile-copy small{color:var(--mz3-muted);font-size:9px}
+.mz3-content{min-width:0;flex:1;background:var(--mz3-bg)}
+.mz3-content>.mz-main,.mz3-content>.mz-feed,.mz3-content>.main,.mz3-content>.page-shell,.mz3-content>.content{width:100%!important;max-width:none!important;min-height:auto!important;margin:0!important;background:transparent!important}
+.mz3-content>.mz-main>.mz-topbar,.mz3-content>.mz-feed>.mz-topbar,.mz3-content>.main>.topbar,.mz3-content>.page-shell>header:first-child{display:none!important}
+.mz3-content .mz-content,.mz3-content .mz-feed-body,.mz3-content>.page-shell,.mz3-content>.main>.body,.mz3-content>.main>.content{width:min(1180px,100%)!important;max-width:1180px!important;margin:0 auto!important;padding:22px!important;box-sizing:border-box}
+.mz3-content .mz-page-title{margin-top:0!important}.mz3-content h1,.mz3-content h2,.mz3-content h3{color:var(--mz3-text)}
+.mz3-content .mz-card,.mz3-content .page-card,.mz3-content .panel,.mz3-content .admin-card{border-color:var(--mz3-border)!important;border-radius:var(--mz3-radius)!important;background:#fff!important;box-shadow:var(--mz3-shadow)!important}
+body.mz-master-shell-active>.mz-mobile-bottom,body.mz-master-shell-active>.mz-bottom-nav,body.mz-master-shell-active>.bottom-nav{display:none!important}
+.mz3-mobile-nav{display:none}
+.mz3-drawer-backdrop{display:none}
+
+/* Ajustes para páginas específicas sin alterar su funcionalidad */
+.mz3-content .push-grid{max-width:1180px;margin:0 auto;padding:22px!important}
+.mz3-content .chat-layout{max-width:1180px;margin:22px auto!important}
+.mz3-content #mapaCompleto{border-radius:0}
+.mz3-content .mz-map-filtros,.mz3-content .mz-map-radio-bar{background:#fff}
+.mz3-content .profile-page,.mz3-content .profile-shell{max-width:1180px;margin:0 auto}
+.mz3-content .main{padding:0!important}
+
+@media(max-width:1100px){.mz3-profile-copy{display:none}.mz3-profile-btn{padding-right:6px}}
+@media(max-width:900px){
+  :root{--mz3-topbar-height:64px}
+  .mz3-shell{display:block}.mz3-sidebar{position:fixed;left:0;top:0;bottom:0;width:min(84vw,300px);height:100dvh;transform:translateX(-105%);transition:transform .22s ease;box-shadow:24px 0 55px rgba(0,0,0,.3)}
+  body.mz3-drawer-open .mz3-sidebar{transform:translateX(0)}
+  .mz3-drawer-backdrop{position:fixed;inset:0;z-index:1450;background:rgba(5,15,28,.5);backdrop-filter:blur(2px)}body.mz3-drawer-open .mz3-drawer-backdrop{display:block}
+  .mz3-topbar{padding:8px 10px;gap:8px}.mz3-menu{width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--mz3-border);border-radius:12px;background:#fff;color:var(--mz3-text);font-size:21px}.mz3-search{display:none}.mz3-location{flex:1;max-width:none;min-width:0}.mz3-add-btn,.mz3-icon-btn,.mz3-profile-btn{flex:0 0 42px}.mz3-profile-copy{display:none}
+  .mz3-content{padding-bottom:calc(74px + env(safe-area-inset-bottom))}.mz3-content .mz-content,.mz3-content .mz-feed-body,.mz3-content>.page-shell,.mz3-content>.main>.body,.mz3-content>.main>.content{padding:14px 12px 18px!important}
+  .mz3-mobile-nav{position:fixed;left:0;right:0;bottom:0;z-index:1600;height:66px;padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(5,1fr);background:rgba(255,255,255,.98);border-top:1px solid var(--mz3-border);box-shadow:0 -10px 28px rgba(15,31,53,.1)}.mz3-mobile-nav a{position:relative;display:grid;place-items:center;align-content:center;gap:2px;color:#8A99AB;text-decoration:none;font-size:9px;font-weight:700}.mz3-mobile-nav a i{font-size:20px}.mz3-mobile-nav a.active{color:var(--mz3-primary)}.mz3-mobile-nav .mz3-mobile-plus{width:54px;height:54px;align-self:start;justify-self:center;margin-top:-18px;border:5px solid #fff;border-radius:50%;background:linear-gradient(135deg,#2F80ED,#145BC4);color:#fff;box-shadow:0 8px 20px rgba(20,91,196,.28)}.mz3-mobile-nav .mz3-mobile-plus i{font-size:23px}
+  .mz3-content .push-grid{padding:12px!important}.mz3-content .chat-layout{margin:12px!important;height:calc(100dvh - 154px)!important}.mz3-content .mz-map-filtros{top:64px!important}.mz3-content .mz-map-radio-bar{top:108px!important}.mz3-content .mz-map-leyenda{bottom:66px!important}
+}
+@media(max-width:520px){.mz3-location{font-size:10px;padding:0 10px}.mz3-add-btn,.mz3-icon-btn,.mz3-profile-btn,.mz3-menu{width:40px;height:40px;flex-basis:40px}.mz3-topbar{gap:6px;padding-inline:8px}.mz3-content .mz-content,.mz3-content .mz-feed-body,.mz3-content>.page-shell,.mz3-content>.main>.body,.mz3-content>.main>.content{padding:12px 9px 16px!important}}

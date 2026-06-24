@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v3.1.0-dominio";
+const CACHE_NAME = "mizona-v3.2.0-diseno-unificado";
 
 const CORE = [
   "./",
@@ -32,8 +32,9 @@ const CORE = [
   "./css/global.css",
   "./css/mizona-unified.css",
   "./css/mizona-phase2.css",
+  "./css/mizona-master-shell.css",
   "./js/mizona-core.js",
-  "./js/mizona-shell-v2.js",
+  "./js/mizona-master-shell.js",
   "./js/mizona-ui-v2.js",
   "./js/brand.js",
   "./js/config.js",

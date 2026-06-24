@@ -11,7 +11,7 @@ export const PUBLIC_ENV = Object.freeze({
   // Copia este valor desde OneSignal → Settings → Keys & IDs.
   // Mientras quede vacío, MiZona mostrará el panel preparado pero
   // no solicitará permisos ni registrará dispositivos.
-  ONESIGNAL_APP_ID: "",
+  ONESIGNAL_APP_ID: "be30489b-6d66-433c-8d00-647b2495e55f",
 
   // Dominio público definitivo de MiZona.
   SITE_URL: "https://mizona.pe"

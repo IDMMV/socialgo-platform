@@ -1,5 +1,70 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Nueva contraseña</title><link href="css/global.css" rel="stylesheet"/><link href="css/mizona-unified.css" rel="stylesheet"/>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Crear nueva contraseña · MiZona.pe</title>
+<link href="css/global.css" rel="stylesheet"/>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
 <link href="css/mizona-phase2.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head><body class="auth-page"><main class="auth-card"><h1>Nueva contraseña</h1><div class="notice" hidden="" id="msg"></div><form id="form"><label>Nueva contraseña<input id="password" minlength="8" required="" type="password"/></label><label>Repetir contraseña<input id="password2" minlength="8" required="" type="password"/></label><button class="primary wide">Guardar</button></form></main><script type="module">import{updatePassword}from'./js/auth.js';form.onsubmit=async e=>{e.preventDefault();if(password.value!==password2.value){msg.hidden=false;msg.textContent='Las contraseñas no coinciden.';return}try{await updatePassword(password.value);msg.hidden=false;msg.textContent='Contraseña actualizada.';setTimeout(()=>location.href='index.html',900)}catch(x){msg.hidden=false;msg.textContent=x.message}};</script><script src="./js/mizona-core.js" type="module"></script>
-</body></html>
+<link href="css/auth-security.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/>
+<link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/>
+<link href="css/mizona-logo.css" rel="stylesheet"/>
+</head>
+<body class="auth-page">
+<main class="auth-card">
+  <a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a>
+  <h1>Crear nueva contraseña</h1>
+  <p class="auth-subtitle">Este formulario solo se habilita cuando llegas desde el enlace seguro enviado por Supabase.</p>
+  <div class="notice info" id="msg">Verificando el enlace de recuperación…</div>
+  <form hidden id="form">
+    <label>Nueva contraseña
+      <span class="password-field">
+        <input autocomplete="new-password" id="password" minlength="8" required type="password"/>
+        <button class="password-toggle" data-password-toggle="password" type="button"></button>
+      </span>
+      <div class="password-strength" id="strength"><span></span></div>
+      <small class="password-rules">Usa al menos 8 caracteres y evita repetir una contraseña anterior.</small>
+    </label>
+    <label>Repetir contraseña
+      <span class="password-field">
+        <input autocomplete="new-password" id="password2" minlength="8" required type="password"/>
+        <button class="password-toggle" data-password-toggle="password2" type="button"></button>
+      </span>
+    </label>
+    <button class="primary wide" id="saveBtn" type="submit">Guardar nueva contraseña</button>
+  </form>
+  <p id="back" hidden><a href="recuperar.html">Solicitar otro enlace</a></p>
+</main>
+<script type="module">
+import {updatePassword} from './js/auth.js';
+import {supabase} from './js/supabase.js';
+import {initPasswordToggles,bindPasswordStrength} from './js/password-ui.js';
+initPasswordToggles();bindPasswordStrength(password,strength);
+let ready=false;
+function enableForm(){if(ready)return;ready=true;form.hidden=false;msg.className='notice ok';msg.textContent='Enlace validado. Crea tu nueva contraseña.'}
+function invalidLink(){if(ready)return;msg.className='notice error';msg.textContent='El enlace no es válido o ya venció. Solicita uno nuevo.';back.hidden=false}
+const {data:{session}}=await supabase.auth.getSession();
+if(session)enableForm();
+const {data:listener}=supabase.auth.onAuthStateChange((event,currentSession)=>{
+  if((event==='PASSWORD_RECOVERY'||event==='SIGNED_IN'||event==='INITIAL_SESSION')&&currentSession)enableForm();
+});
+setTimeout(()=>{if(!ready)invalidLink()},4500);
+form.onsubmit=async e=>{
+  e.preventDefault();
+  if(password.value!==password2.value){msg.className='notice error';msg.textContent='Las contraseñas no coinciden.';return}
+  saveBtn.disabled=true;
+  try{
+    await updatePassword(password.value);
+    msg.className='notice ok';msg.textContent='Contraseña actualizada. Ya puedes iniciar sesión con tu nueva contraseña.';
+    form.hidden=true;
+    try{await supabase.auth.signOut()}catch{}
+    setTimeout(()=>location.href='login.html?password_updated=1',1400);
+  }catch(x){msg.className='notice error';msg.textContent=x.message;saveBtn.disabled=false}
+};
+window.addEventListener('beforeunload',()=>listener?.subscription?.unsubscribe());
+</script>
+<script src="./js/mizona-core.js" type="module"></script>
+</body>
+</html>

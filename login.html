@@ -1,5 +1,60 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Iniciar sesión · MiZona.pe</title><link href="css/global.css" rel="stylesheet"/><link href="css/mizona-unified.css" rel="stylesheet"/>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Iniciar sesión · MiZona.pe</title>
+<link href="css/global.css" rel="stylesheet"/>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
 <link href="css/mizona-phase2.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head><body class="auth-page"><main class="auth-card"><a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a><h1>Iniciar sesión</h1><div class="notice" hidden="" id="msg"></div><form id="form"><label>Correo<input autocomplete="email" id="email" required="" type="email"/></label><label>Contraseña<input autocomplete="current-password" id="password" minlength="8" required="" type="password"/></label><button class="primary wide">Ingresar</button></form><p><a href="recuperar.html">¿Olvidaste tu contraseña?</a></p><p>¿No tienes cuenta? <a href="registro.html">Regístrate</a></p></main><script type="module">import{loginUser}from'./js/auth.js';import{getCurrentUser}from'./js/supabase.js';if(await getCurrentUser())location.href='index.html';form.onsubmit=async e=>{e.preventDefault();try{await loginUser(email.value,password.value);const n=new URLSearchParams(location.search).get('next');location.href=n&&!n.includes('://')?n:'index.html'}catch(x){msg.hidden=false;msg.textContent=x.message;msg.style.borderColor='var(--danger)'}};</script><script src="./js/mizona-core.js" type="module"></script>
-</body></html>
+<link href="css/auth-security.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/>
+<link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/>
+<link href="css/mizona-logo.css" rel="stylesheet"/>
+</head>
+<body class="auth-page">
+<main class="auth-card">
+  <a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a>
+  <h1>Iniciar sesión</h1>
+  <div class="notice" hidden id="msg"></div>
+  <form id="form">
+    <label>Correo
+      <input autocomplete="email" id="email" required type="email"/>
+    </label>
+    <label>Contraseña
+      <span class="password-field">
+        <input autocomplete="current-password" id="password" minlength="8" required type="password"/>
+        <button class="password-toggle" data-password-toggle="password" type="button"></button>
+      </span>
+    </label>
+    <button class="primary wide" type="submit">Ingresar</button>
+  </form>
+  <p><a href="recuperar.html">¿Olvidaste tu contraseña?</a></p>
+  <p>¿No tienes cuenta? <a href="registro.html">Regístrate</a></p>
+</main>
+<script type="module">
+import { loginUser, getRecoveryQuestionStatus } from './js/auth.js';
+import { getCurrentUser } from './js/supabase.js';
+import { initPasswordToggles } from './js/password-ui.js';
+initPasswordToggles();
+if (await getCurrentUser()) location.href='index.html';
+form.onsubmit=async e=>{
+  e.preventDefault();
+  msg.hidden=true;
+  try{
+    await loginUser(email.value,password.value);
+    const next=new URLSearchParams(location.search).get('next');
+    if(next&&!next.includes('://')){ location.href=next; return; }
+    try{
+      const status=await getRecoveryQuestionStatus();
+      if(!status?.configurada){ location.href='seguridad.html?setup=1'; return; }
+    }catch{}
+    location.href='index.html';
+  }catch(x){
+    msg.hidden=false;msg.className='notice error';msg.textContent=x.message;
+  }
+};
+</script>
+<script src="./js/mizona-core.js" type="module"></script>
+</body>
+</html>

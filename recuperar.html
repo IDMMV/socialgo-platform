@@ -1,5 +1,70 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Recuperar contraseña</title><link href="css/global.css" rel="stylesheet"/><link href="css/mizona-unified.css" rel="stylesheet"/>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Recuperar contraseña · MiZona.pe</title>
+<link href="css/global.css" rel="stylesheet"/>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
 <link href="css/mizona-phase2.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head><body class="auth-page"><main class="auth-card"><h1>Recuperar contraseña</h1><div class="notice" hidden="" id="msg"></div><form id="form"><label>Correo<input id="email" required="" type="email"/></label><button class="primary wide">Enviar enlace</button></form><p><a href="login.html">Volver</a></p></main><script type="module">import{requestPasswordReset}from'./js/auth.js';form.onsubmit=async e=>{e.preventDefault();try{await requestPasswordReset(email.value);msg.hidden=false;msg.textContent='Si la cuenta existe, recibirás un correo.';form.reset()}catch(x){msg.hidden=false;msg.textContent=x.message}};</script><script src="./js/mizona-core.js" type="module"></script>
-</body></html>
+<link href="css/auth-security.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/>
+<link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/>
+<link href="css/mizona-logo.css" rel="stylesheet"/>
+</head>
+<body class="auth-page">
+<main class="auth-card">
+  <a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a>
+  <h1>Recuperar contraseña</h1>
+  <p class="auth-subtitle">Primero valida tu pregunta de recuperación. Después recibirás un enlace que abrirá MiZona para crear una contraseña nueva.</p>
+  <div class="notice" hidden id="msg"></div>
+  <form id="form">
+    <label>Correo de la cuenta<input autocomplete="email" id="email" required type="email"/></label>
+    <label>Pregunta de recuperación
+      <select id="question" required></select>
+    </label>
+    <label>Respuesta
+      <span class="password-field">
+        <input autocomplete="off" id="answer" minlength="4" required type="password"/>
+        <button class="password-toggle" data-password-toggle="answer" type="button"></button>
+      </span>
+    </label>
+    <button class="primary wide" id="submitBtn" type="submit">Validar y enviar enlace</button>
+  </form>
+  <div class="security-note"><strong>Importante:</strong> la pregunta es una verificación adicional. La contraseña solo se cambia desde el enlace seguro enviado a tu correo.</div>
+  <details class="recovery-fallback">
+    <summary>No configuré una pregunta de recuperación</summary>
+    <p>Las cuentas antiguas pueden usar temporalmente la recuperación únicamente por correo.</p>
+    <button class="secondary-wide" id="fallbackBtn" type="button">Enviar enlace solo por correo</button>
+  </details>
+  <p><a href="login.html">Volver a iniciar sesión</a></p>
+</main>
+<script type="module">
+import {RECOVERY_QUESTIONS,verifyRecoveryQuestion,requestPasswordReset} from './js/auth.js';
+import {initPasswordToggles} from './js/password-ui.js';
+initPasswordToggles();
+question.innerHTML='<option value="">Selecciona tu pregunta</option>'+RECOVERY_QUESTIONS.map(q=>`<option value="${q.id}">${q.label}</option>`).join('');
+function show(text,type='info'){msg.hidden=false;msg.className=`notice ${type}`;msg.textContent=text}
+async function sendReset(){
+  await requestPasswordReset(email.value);
+  show('Si los datos corresponden a una cuenta, recibirás un correo de MiZona para crear una nueva contraseña.','ok');
+}
+form.onsubmit=async e=>{
+  e.preventDefault();submitBtn.disabled=true;show('Validando datos…','info');
+  try{
+    const result=await verifyRecoveryQuestion(email.value,question.value,answer.value);
+    if(result?.bloqueada){show('Demasiados intentos. Espera unos minutos antes de volver a probar.','error');return}
+    if(!result?.valida){show('No pudimos validar los datos. Revisa la pregunta y la respuesta.','error');return}
+    await sendReset();form.reset();
+  }catch(x){show(x.message||'No se pudo iniciar la recuperación.','error')}
+  finally{submitBtn.disabled=false}
+};
+fallbackBtn.onclick=async()=>{
+  if(!email.value){show('Escribe primero el correo de tu cuenta.','error');email.focus();return}
+  fallbackBtn.disabled=true;
+  try{await sendReset()}catch(x){show(x.message||'No se pudo enviar el enlace.','error')}finally{fallbackBtn.disabled=false}
+};
+</script>
+<script src="./js/mizona-core.js" type="module"></script>
+</body>
+</html>

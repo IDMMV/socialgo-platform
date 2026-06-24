@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v3.3.0-logo-oficial";
+const CACHE_NAME = "mizona-v3.4.0-seguridad-recuperacion";
 
 const CORE = [
   "./",
@@ -23,6 +23,7 @@ const CORE = [
   "./registro.html",
   "./recuperar.html",
   "./restablecer.html",
+  "./seguridad.html",
   "./manifest.json",
   "./assets/mizona-logo.svg",
   "./assets/mizona-logo-horizontal.svg",
@@ -39,6 +40,7 @@ const CORE = [
   "./css/mizona-phase2.css",
   "./css/mizona-master-shell.css",
   "./css/mizona-logo.css",
+  "./css/auth-security.css",
   "./js/mizona-core.js",
   "./js/mizona-master-shell.js",
   "./js/mizona-ui-v2.js",
@@ -46,6 +48,8 @@ const CORE = [
   "./js/config.js",
   "./js/env.public.js",
   "./js/supabase.js",
+  "./js/password-ui.js",
+  "./js/auth.js",
   "./js/push-notifications.js",
   "./js/alertas-mizona.js",
   "./js/mapa-mizona.js",

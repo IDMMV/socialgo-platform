@@ -1,5 +1,69 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Crear cuenta · MiZona.pe</title><link href="css/global.css" rel="stylesheet"/><link href="css/mizona-unified.css" rel="stylesheet"/>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Crear cuenta · MiZona.pe</title>
+<link href="css/global.css" rel="stylesheet"/>
+<link href="css/mizona-unified.css" rel="stylesheet"/>
 <link href="css/mizona-phase2.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head><body class="auth-page"><main class="auth-card"><a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a><h1>Crear cuenta</h1><div class="notice" hidden="" id="msg"></div><form id="form"><label>Nombre completo<input id="fullName" maxlength="80" required=""/></label><label>Nombre de usuario<input id="username" maxlength="24" minlength="3" pattern="[a-zA-Z0-9_.]+" required=""/><small id="help">Letras, números, punto o guion bajo.</small></label><label>Correo<input id="email" required="" type="email"/></label><label>Tipo de cuenta<select id="accountType"><option value="personal">Personal</option><option value="creator">Creador</option><option value="business">Negocio</option></select></label><label>Contraseña<input id="password" minlength="8" required="" type="password"/></label><label>Repetir contraseña<input id="password2" minlength="8" required="" type="password"/></label><label class="toggle-row"><span>Acepto los términos</span><input required="" type="checkbox"/></label><button class="primary wide">Crear cuenta</button></form><p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p></main><script type="module">import{registerUser,usernameAvailable}from'./js/auth.js';let t;username.oninput=()=>{clearTimeout(t);t=setTimeout(async()=>{try{help.textContent=await usernameAvailable(username.value)?'✓ Disponible':'No disponible'}catch{help.textContent='No se pudo comprobar'}},400)};form.onsubmit=async e=>{e.preventDefault();if(password.value!==password2.value){msg.hidden=false;msg.textContent='Las contraseñas no coinciden.';return}try{const d=await registerUser({fullName:fullName.value,username:username.value,email:email.value,password:password.value,accountType:accountType.value});msg.hidden=false;msg.textContent=d.session?'Cuenta creada.':'Cuenta creada. Revisa tu correo para confirmarla.';if(d.session)setTimeout(()=>location.href='perfil.html',800);else form.reset()}catch(x){msg.hidden=false;msg.textContent=x.message;msg.style.borderColor='var(--danger)'}};</script><script src="./js/mizona-core.js" type="module"></script>
-</body></html>
+<link href="css/auth-security.css" rel="stylesheet"/>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/>
+<link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/>
+<link href="css/mizona-logo.css" rel="stylesheet"/>
+</head>
+<body class="auth-page">
+<main class="auth-card">
+  <a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a>
+  <h1>Crear cuenta</h1>
+  <div class="notice" hidden id="msg"></div>
+  <form id="form">
+    <label>Nombre completo<input id="fullName" maxlength="80" required/></label>
+    <label>Nombre de usuario
+      <input id="username" maxlength="24" minlength="3" pattern="[a-zA-Z0-9_.]+" required/>
+      <small id="help">Letras, números, punto o guion bajo.</small>
+    </label>
+    <label>Correo<input autocomplete="email" id="email" required type="email"/></label>
+    <label>Tipo de cuenta
+      <select id="accountType"><option value="personal">Personal</option><option value="creator">Creador</option><option value="business">Negocio</option></select>
+    </label>
+    <label>Contraseña
+      <span class="password-field">
+        <input autocomplete="new-password" id="password" minlength="8" required type="password"/>
+        <button class="password-toggle" data-password-toggle="password" type="button"></button>
+      </span>
+      <div class="password-strength" id="strength"><span></span></div>
+      <small class="password-rules">Usa 8 caracteres como mínimo. Se recomienda combinar mayúsculas, minúsculas, números y símbolos.</small>
+    </label>
+    <label>Repetir contraseña
+      <span class="password-field">
+        <input autocomplete="new-password" id="password2" minlength="8" required type="password"/>
+        <button class="password-toggle" data-password-toggle="password2" type="button"></button>
+      </span>
+    </label>
+    <label class="toggle-row"><span>Acepto los términos</span><input required type="checkbox"/></label>
+    <button class="primary wide" type="submit">Crear cuenta</button>
+  </form>
+  <div class="security-note"><strong>Protege tu recuperación:</strong> después de confirmar el correo, MiZona te pedirá configurar una pregunta de recuperación.</div>
+  <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
+</main>
+<script type="module">
+import {registerUser,usernameAvailable} from './js/auth.js';
+import {initPasswordToggles,bindPasswordStrength} from './js/password-ui.js';
+initPasswordToggles();bindPasswordStrength(password,strength);
+let t;
+username.oninput=()=>{clearTimeout(t);t=setTimeout(async()=>{try{help.textContent=await usernameAvailable(username.value)?'✓ Disponible':'No disponible'}catch{help.textContent='No se pudo comprobar'}},400)};
+form.onsubmit=async e=>{
+  e.preventDefault();
+  if(password.value!==password2.value){msg.hidden=false;msg.className='notice error';msg.textContent='Las contraseñas no coinciden.';return}
+  try{
+    const d=await registerUser({fullName:fullName.value,username:username.value,email:email.value,password:password.value,accountType:accountType.value});
+    msg.hidden=false;msg.className='notice ok';
+    msg.textContent=d.session?'Cuenta creada. Configura ahora tu recuperación.':'Cuenta creada. Revisa tu correo para confirmarla; después inicia sesión y configura tu pregunta de recuperación.';
+    if(d.session)setTimeout(()=>location.href='seguridad.html?setup=1',900);else form.reset();
+  }catch(x){msg.hidden=false;msg.className='notice error';msg.textContent=x.message}
+};
+</script>
+<script src="./js/mizona-core.js" type="module"></script>
+</body>
+</html>

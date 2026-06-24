@@ -21,6 +21,28 @@
 }
 html{background:var(--mz3-bg)}
 body.mz-master-shell-active{margin:0!important;min-height:100vh;background:var(--mz3-bg)!important;color:var(--mz3-text);overflow-x:hidden}
+
+/* Corrección de desplazamiento global.
+   global.css bloquea html/body en escritorio para el diseño antiguo de tres columnas.
+   El shell maestro necesita que el documento vuelva a desplazarse normalmente. */
+html.mz-master-document-active{
+  height:auto!important;
+  min-height:100%!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  scrollbar-gutter:stable;
+}
+body.mz-master-shell-active{
+  height:auto!important;
+  min-height:100vh!important;
+  overflow-x:hidden!important;
+  overflow-y:visible!important;
+}
+html.mz-master-document-active::-webkit-scrollbar{width:12px}
+html.mz-master-document-active::-webkit-scrollbar-track{background:#EAF0F7}
+html.mz-master-document-active::-webkit-scrollbar-thumb{background:#A6B5C7;border:3px solid #EAF0F7;border-radius:999px}
+html.mz-master-document-active::-webkit-scrollbar-thumb:hover{background:#7E91A8}
+
 body.mz-master-shell-active>*:not(.mz3-shell):not(dialog):not(script):not(style):not(link){ }
 .mz3-shell{display:grid;grid-template-columns:var(--mz3-sidebar-width) minmax(0,1fr);min-height:100vh;background:var(--mz3-bg)}
 .mz3-sidebar{position:sticky;top:0;height:100vh;z-index:1500;display:flex;flex-direction:column;padding:0;background:var(--mz3-sidebar);color:#fff;border-right:1px solid rgba(255,255,255,.05);overflow-y:auto;scrollbar-width:thin}
@@ -43,7 +65,10 @@ body.mz-master-shell-active>*:not(.mz3-shell):not(dialog):not(script):not(style)
 .mz3-add-btn{width:42px;display:grid;place-items:center;background:linear-gradient(135deg,#EF4444,#DC2626);border-color:transparent;color:#fff;font-size:23px;box-shadow:0 8px 18px rgba(220,38,38,.2)}
 .mz3-icon-btn{position:relative;width:42px;display:grid;place-items:center;font-size:19px}.mz3-icon-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;border:2px solid #fff;border-radius:50%;background:#EF4444}
 .mz3-profile-btn{display:flex;align-items:center;gap:8px;padding:0 10px 0 6px;min-width:42px}.mz3-top-avatar{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:linear-gradient(135deg,var(--mz3-primary),var(--mz3-accent));color:#fff;font-size:10px;font-weight:900;overflow:hidden}.mz3-top-avatar img{width:100%;height:100%;object-fit:cover}.mz3-profile-copy{display:grid;min-width:0}.mz3-profile-copy strong{font-size:11px}.mz3-profile-copy small{color:var(--mz3-muted);font-size:9px}
-.mz3-content{min-width:0;flex:1;background:var(--mz3-bg)}
+.mz3-content{min-width:0;flex:1;background:var(--mz3-bg);overflow:visible}
+.mz3-workspace{min-height:100vh;height:auto;overflow:visible}
+.mz3-content>.page-shell{padding-bottom:64px!important}
+
 .mz3-content>.mz-main,.mz3-content>.mz-feed,.mz3-content>.main,.mz3-content>.page-shell,.mz3-content>.content{width:100%!important;max-width:none!important;min-height:auto!important;margin:0!important;background:transparent!important}
 .mz3-content>.mz-main>.mz-topbar,.mz3-content>.mz-feed>.mz-topbar,.mz3-content>.main>.topbar,.mz3-content>.page-shell>header:first-child{display:none!important}
 .mz3-content .mz-content,.mz3-content .mz-feed-body,.mz3-content>.page-shell,.mz3-content>.main>.body,.mz3-content>.main>.content{width:min(1180px,100%)!important;max-width:1180px!important;margin:0 auto!important;padding:22px!important;box-sizing:border-box}

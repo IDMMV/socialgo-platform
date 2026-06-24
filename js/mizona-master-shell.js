@@ -153,6 +153,7 @@ function init(){
   const shell=buildShell(page,main);
   document.body.insertBefore(shell,document.body.firstChild);
   document.body.classList.add('mz-master-shell-active');
+  document.documentElement.classList.add('mz-master-document-active');
 
   const menu=shell.querySelector('#mz3Menu');
   const backdrop=shell.querySelector('#mz3Backdrop');

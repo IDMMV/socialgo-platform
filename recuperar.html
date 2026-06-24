@@ -166,10 +166,30 @@ form.addEventListener('submit',async e=>{
 fallbackBtn.addEventListener('click',async()=>{
   if(!validEmail()) return;
   fallbackBtn.disabled=true;
-  fallbackBtn.textContent='Enviando enlace…';
-  try{await sendReset()}
-  catch(x){show(x.message||'No se pudo enviar el enlace.','error')}
-  finally{fallbackBtn.disabled=false;fallbackBtn.textContent='Enviar enlace solo por correo'}
+  fallbackBtn.textContent='⏳ Enviando enlace…';
+  fallbackBtn.style.opacity='0.7';
+  try{
+    await sendReset();
+    // Mensaje de éxito claro
+    show(`✅ ¡Listo! Enviamos un enlace de recuperación a ${email.value.trim()}. Revisa tu bandeja de entrada y también la carpeta de spam o correo no deseado. El enlace expira en 1 hora.`,'ok');
+    fallbackBtn.textContent='✅ Enlace enviado';
+    fallbackBtn.style.background='#1D9E75';
+    fallbackBtn.style.color='#fff';
+    fallbackBtn.style.opacity='1';
+    // Después de 5 segundos volver al estado normal
+    setTimeout(()=>{
+      fallbackBtn.disabled=false;
+      fallbackBtn.textContent='Enviar enlace solo por correo';
+      fallbackBtn.style.background='';
+      fallbackBtn.style.color='';
+    },5000);
+  }
+  catch(x){
+    show(x.message||'No se pudo enviar el enlace. Intenta de nuevo en un momento.','error');
+    fallbackBtn.disabled=false;
+    fallbackBtn.textContent='Enviar enlace solo por correo';
+    fallbackBtn.style.opacity='1';
+  }
 });
 </script>
 <script src="./js/mizona-core.js" type="module"></script>

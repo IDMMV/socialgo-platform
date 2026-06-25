@@ -3,7 +3,8 @@
 <link href="manifest.json" rel="manifest"/><link href="css/global.css" rel="stylesheet"/><link href="css/mizona-unified.css" rel="stylesheet"/>
 <link href="css/mizona-phase2.css" rel="stylesheet"/>
 <link href="css/mizona-master-shell.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head><body>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
+</head><body>
 <main class="page-shell"><header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px"><a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a><a class="secondary" href="index.html">← Volver</a></header>
 <section class="page-card"><h1>Amigos</h1><div class="friend-tabs"><button class="active" data-tab="friends">Mis amigos</button><button data-tab="received">Solicitudes recibidas</button><button data-tab="sent">Solicitudes enviadas</button></div><div class="people-grid" id="friendsContent"><p class="notice">Cargando…</p></div></section></main>
 <script type="module">
@@ -20,4 +21,5 @@ async function sent(){content.innerHTML='<p class="notice">Cargando solicitudes�
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove("active"));b.classList.add("active");({friends,received,sent})[b.dataset.tab]()}); await friends();
 </script><script src="./js/mizona-core.js" type="module"></script>
 <script src="./js/mizona-master-shell.js" type="module"></script>
+<script type="module" src="js/mizona-sidebar-uniforme.js"></script>
 </body></html>

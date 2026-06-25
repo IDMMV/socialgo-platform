@@ -1,0 +1,226 @@
+/* ============================================================
+   MiZona.pe — BARRA LATERAL DEFINITIVA Y UNIFORME
+   Se carga al final en todas las páginas internas.
+   Mantiene exactamente el mismo ancho, logo, tipografía,
+   iconos, espacios y estados al cambiar de pestaña.
+   ============================================================ */
+:root{
+  --mz-sidebar-final-w:260px;
+  --mz-sidebar-final-bg:#0D1B36;
+  --mz-sidebar-final-bg-active:#16375f;
+  --mz-sidebar-final-text:#9AAAC0;
+  --mz-sidebar-final-text-active:#FFFFFF;
+  --mz-sidebar-final-icon:#8092AA;
+  --mz-sidebar-final-icon-active:#58A6FF;
+  --mz-sidebar-final-border:rgba(255,255,255,.075);
+  --mz-sidebar-final-row:44px;
+}
+
+/* El ancho no puede variar entre páginas */
+.mz-sidebar,
+.mz3-sidebar,
+aside.mz-sidebar,
+aside.mz3-sidebar{
+  width:var(--mz-sidebar-final-w)!important;
+  min-width:var(--mz-sidebar-final-w)!important;
+  max-width:var(--mz-sidebar-final-w)!important;
+  flex:0 0 var(--mz-sidebar-final-w)!important;
+  height:100vh!important;
+  min-height:100vh!important;
+  position:sticky!important;
+  top:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  background:var(--mz-sidebar-final-bg)!important;
+  background-image:none!important;
+  border-right:1px solid var(--mz-sidebar-final-border)!important;
+  color:#fff!important;
+  box-shadow:none!important;
+  scrollbar-width:thin;
+  scrollbar-color:#29425f transparent;
+}
+.mz-sidebar::-webkit-scrollbar,.mz3-sidebar::-webkit-scrollbar{width:5px}
+.mz-sidebar::-webkit-scrollbar-thumb,.mz3-sidebar::-webkit-scrollbar-thumb{background:#29425f;border-radius:999px}
+
+/* Grillas: la primera columna siempre usa el mismo ancho */
+.mz-layout{
+  grid-template-columns:var(--mz-sidebar-final-w) minmax(0,1fr) minmax(260px,310px)!important;
+}
+.mz-layout-2col,.mz3-shell,.mz-app{
+  grid-template-columns:var(--mz-sidebar-final-w) minmax(0,1fr)!important;
+}
+.layout:has(> .sidebar){grid-template-columns:var(--mz-sidebar-final-w) minmax(0,1fr)!important}
+
+/* Marca única */
+.mz-logo,.mz-brand,.mz3-brand,.mz-logo-unif,.sb-logo{
+  width:100%!important;
+  min-height:86px!important;
+  height:86px!important;
+  padding:12px 18px!important;
+  margin:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  flex:0 0 86px!important;
+  overflow:hidden!important;
+  border:0!important;
+  border-bottom:1px solid var(--mz-sidebar-final-border)!important;
+  border-radius:0!important;
+  background:var(--mz-sidebar-final-bg)!important;
+  text-decoration:none!important;
+  box-shadow:none!important;
+}
+.mz-logo-img,.mz-sidebar-logo,.sb-logo-img,.mz3-brand-logo{
+  display:block!important;
+  width:208px!important;
+  min-width:208px!important;
+  max-width:208px!important;
+  height:60px!important;
+  min-height:60px!important;
+  max-height:60px!important;
+  margin:0!important;
+  padding:0!important;
+  object-fit:contain!important;
+  object-position:left center!important;
+  transform:none!important;
+  filter:none!important;
+}
+.mz-logo-mark,.mz-logo-name,.mz-logo-domain,
+.mz-logo-unif-mark,.mz-logo-unif-name,.mz-logo-unif-pe,
+.mz-brand-badge,.sb-logo-mark,.sb-logo-name,.sb-logo-sub,
+.mz3-brand-mark,.mz3-brand-text{display:none!important}
+
+/* Cuenta: mismo bloque en todas las páginas */
+.mz-sidebar-user,.mz3-account,.mz-u-account{
+  min-height:70px!important;
+  height:70px!important;
+  flex:0 0 70px!important;
+  margin:0!important;
+  padding:11px 18px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:11px!important;
+  border:0!important;
+  border-bottom:1px solid var(--mz-sidebar-final-border)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:#fff!important;
+  text-decoration:none!important;
+  box-shadow:none!important;
+}
+.mz-sidebar-user:hover,.mz3-account:hover,.mz-u-account:hover{background:rgba(255,255,255,.035)!important}
+.mz-user-av,.mz3-account-avatar,.mz-u-avatar{
+  width:38px!important;height:38px!important;min-width:38px!important;max-width:38px!important;
+  display:grid!important;place-items:center!important;flex:0 0 38px!important;
+  border-radius:50%!important;background:linear-gradient(135deg,#2377D1,#0F9E8E)!important;
+  color:#fff!important;font-size:12px!important;font-weight:800!important;overflow:hidden!important;
+}
+.mz-user-av img,.mz3-account-avatar img,.mz-u-avatar img{width:100%!important;height:100%!important;object-fit:cover!important}
+.mz-user-name,.mz3-account-copy strong,.mz-u-name{
+  display:block!important;max-width:160px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+  color:#F8FAFC!important;font-size:13px!important;line-height:1.25!important;font-weight:700!important;
+}
+.mz-user-dist,.mz3-account-copy small,.mz-u-meta{
+  display:flex!important;align-items:center!important;gap:4px!important;margin-top:3px!important;
+  color:#8193AA!important;font-size:10px!important;line-height:1.2!important;font-weight:500!important;
+}
+
+/* Invitado: no cambia la altura ni el modelo */
+.mz-u-guest,.mz3-guest,.mz-sidebar .hide-logged{
+  width:100%!important;min-height:70px!important;padding:11px 18px!important;margin:0!important;
+  grid-template-columns:1fr 1fr!important;gap:8px!important;align-items:center!important;
+  border-bottom:1px solid var(--mz-sidebar-final-border)!important;background:transparent!important;
+}
+.mz-u-guest a,.mz3-guest a,.mz-sidebar .hide-logged a{
+  min-height:36px!important;padding:0 8px!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  border-radius:9px!important;font-size:10px!important;font-weight:700!important;text-align:center!important;text-decoration:none!important;
+}
+.mz-u-guest a:first-child,.mz3-guest a:first-child,.mz-sidebar .hide-logged a:first-child{background:#1F6FB8!important;color:#fff!important;border:1px solid #1F6FB8!important}
+.mz-u-guest a:last-child,.mz3-guest a:last-child,.mz-sidebar .hide-logged a:last-child{background:transparent!important;color:#A8B5C8!important;border:1px solid rgba(255,255,255,.14)!important}
+
+/* Etiquetas de sección */
+.mz-nav-sec,.mz3-nav-label,.mz-nav-label,.mz-u-label{
+  min-height:30px!important;margin:0!important;padding:13px 18px 5px!important;
+  display:block!important;background:transparent!important;color:#52657D!important;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif!important;
+  font-size:9px!important;line-height:12px!important;font-weight:800!important;
+  letter-spacing:.13em!important;text-transform:uppercase!important;
+}
+
+/* Navegación: el texto no aumenta/disminuye al activarse */
+.mz-nav,.mz3-nav,.mz-u-nav{display:block!important;margin:0!important;padding:0!important;gap:0!important}
+.mz-nav-item,.mz-nav a,.mz3-nav a,.mz-u-link{
+  width:100%!important;height:var(--mz-sidebar-final-row)!important;min-height:var(--mz-sidebar-final-row)!important;max-height:var(--mz-sidebar-final-row)!important;
+  margin:0!important;padding:0 18px!important;display:flex!important;align-items:center!important;gap:12px!important;
+  position:relative!important;overflow:hidden!important;border:0!important;border-left:3px solid transparent!important;border-radius:0!important;
+  background:transparent!important;background-image:none!important;box-shadow:none!important;transform:none!important;
+  color:var(--mz-sidebar-final-text)!important;text-decoration:none!important;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif!important;
+  font-size:13px!important;line-height:1!important;font-weight:600!important;letter-spacing:0!important;
+  transition:background-color .14s ease,color .14s ease,border-color .14s ease!important;
+}
+.mz-nav-item span:not(.mz-nav-badge):not(.mz3-nav-badge),.mz-nav a span:not(.mz-nav-badge),.mz3-nav a span:not(.mz3-nav-badge),.mz-u-link span:not(.mz-nav-badge){
+  min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+  color:inherit!important;font-size:13px!important;line-height:1!important;font-weight:600!important;
+}
+.mz-nav-item i,.mz-nav a i,.mz3-nav a i,.mz-u-link i{
+  width:22px!important;min-width:22px!important;height:22px!important;display:grid!important;place-items:center!important;
+  color:var(--mz-sidebar-final-icon)!important;font-size:20px!important;line-height:22px!important;transform:none!important;
+}
+.mz-nav-item:hover,.mz-nav a:hover,.mz3-nav a:hover,.mz-u-link:hover{
+  background:rgba(255,255,255,.045)!important;color:#D6DEE9!important;border-left-color:transparent!important;
+  font-size:13px!important;font-weight:600!important;transform:none!important;
+}
+.mz-nav-item:hover i,.mz-nav a:hover i,.mz3-nav a:hover i,.mz-u-link:hover i{color:#AAB8C9!important}
+.mz-nav-item.active,.mz-nav a.active,.mz3-nav a.active,.mz-u-link.active,
+.mz-nav-item[aria-current="page"],.mz-nav a[aria-current="page"],.mz3-nav a[aria-current="page"],.mz-u-link[aria-current="page"]{
+  background:var(--mz-sidebar-final-bg-active)!important;background-image:none!important;
+  color:var(--mz-sidebar-final-text-active)!important;border-left-color:#4EA1FF!important;
+  font-size:13px!important;font-weight:600!important;box-shadow:none!important;transform:none!important;
+}
+.mz-nav-item.active i,.mz-nav a.active i,.mz3-nav a.active i,.mz-u-link.active i,
+.mz-nav-item[aria-current="page"] i,.mz-nav a[aria-current="page"] i,.mz3-nav a[aria-current="page"] i,.mz-u-link[aria-current="page"] i{color:var(--mz-sidebar-final-icon-active)!important}
+
+.mz-nav-badge,.mz3-nav-badge{
+  margin-left:auto!important;min-width:21px!important;height:21px!important;padding:0 6px!important;
+  display:grid!important;place-items:center!important;border-radius:999px!important;
+  background:#EF4444!important;color:#fff!important;font-size:9px!important;line-height:21px!important;font-weight:800!important;
+}
+.mz-nav-badge:empty,.mz3-nav-badge:empty{display:none!important}
+
+.mz-sidebar-spacer,.mz3-sidebar-spacer,.mz-u-spacer{flex:1 0 14px!important;min-height:14px!important}
+.mz-sidebar-btn,.mz3-publish,.mz-u-publish{
+  width:calc(100% - 36px)!important;min-height:44px!important;height:44px!important;margin:12px 18px 16px!important;padding:0 14px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;flex:0 0 44px!important;
+  border:0!important;border-radius:10px!important;background:#1F73C2!important;color:#fff!important;
+  font-size:12px!important;line-height:1!important;font-weight:800!important;text-decoration:none!important;box-shadow:none!important;transform:none!important;
+}
+.mz-sidebar-btn:hover,.mz3-publish:hover,.mz-u-publish:hover{background:#2783D7!important;transform:none!important}
+.mz-sidebar-btn i,.mz3-publish i,.mz-u-publish i{font-size:18px!important}
+
+#btn-instalar-pwa{
+  width:calc(100% - 36px)!important;min-height:40px!important;margin:4px 18px 0!important;border-radius:10px!important;
+  font-size:11px!important;box-shadow:none!important;
+}
+
+/* Evita que páginas antiguas cambien el tamaño al hacer clic */
+.mz-sidebar *,.mz3-sidebar *{box-sizing:border-box!important}
+.mz-sidebar a:focus,.mz3-sidebar a:focus{outline:2px solid rgba(78,161,255,.55)!important;outline-offset:-2px!important}
+
+@media(max-width:1180px) and (min-width:901px){
+  :root{--mz-sidebar-final-w:238px}
+  .mz-logo-img,.mz-sidebar-logo,.sb-logo-img,.mz3-brand-logo{width:190px!important;min-width:190px!important;max-width:190px!important}
+  .mz-layout{grid-template-columns:var(--mz-sidebar-final-w) minmax(0,1fr)!important}
+  .mz-sidebar-right{display:none!important}
+}
+@media(max-width:900px){
+  .mz-layout,.mz-layout-2col,.mz-app,.mz3-shell{grid-template-columns:1fr!important}
+  .mz-sidebar,.mz3-sidebar,aside.mz-sidebar,aside.mz3-sidebar{
+    position:fixed!important;left:0!important;top:0!important;bottom:0!important;
+    width:min(86vw,300px)!important;min-width:min(86vw,300px)!important;max-width:min(86vw,300px)!important;
+    height:100dvh!important;z-index:1700!important;
+  }
+  .mz-logo-img,.mz-sidebar-logo,.sb-logo-img,.mz3-brand-logo{width:208px!important;min-width:208px!important;max-width:208px!important}
+}

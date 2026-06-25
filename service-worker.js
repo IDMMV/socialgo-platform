@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v6.0-mejoras-integradas-logo-final-v1";
+const CACHE_NAME = "mizona-v6.1-sidebar-uniforme-final";
 
 const CORE = [
   "./",
@@ -52,6 +52,7 @@ const CORE = [
   "./css/alertas-inteligentes.css",
   "./css/mejoras-v2.css",
   "./css/mizona-sidebar.css",
+  "./css/mizona-sidebar-uniforme.css",
   "./js/mizona-core.js",
   "./js/tema-mizona.js",
   "./js/niveles-mizona.js",
@@ -61,6 +62,7 @@ const CORE = [
   "./js/auth.js",
   "./js/password-ui.js",
   "./js/mizona-master-shell.js",
+  "./js/mizona-sidebar-uniforme.js",
   "./js/mizona-ui-v2.js",
   "./js/brand.js",
   "./js/config.js",

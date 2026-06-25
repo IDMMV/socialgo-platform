@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="css/mizona-logo.css">
 <link rel="stylesheet" href="css/alertas-inteligentes.css">
 <link rel="stylesheet" href="css/mejoras-v2.css">
+<link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
 </head>
 <body class="estado-guest">
 <div id="mz-toast" class="mz-toast"></div>
@@ -83,5 +84,6 @@ const alertaId = new URLSearchParams(location.search).get('id');
 const contenedor = document.getElementById('contenedor-comentarios');
 if (alertaId && contenedor) initComentarios(alertaId, contenedor);
 </script>
+<script type="module" src="js/mizona-sidebar-uniforme.js"></script>
 </body>
 </html>

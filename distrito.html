@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" id="meta-desc" content="Alertas vecinales y servicios en tu distrito. MiZona.pe">
+<title id="page-title">Distrito — MiZona.pe</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/favicon-32.png" type="image/png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="css/mizona-sidebar.css">
+<link rel="stylesheet" href="css/mejoras-v2.css">
+<style>
+.dist-nav{background:var(--nav);padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.dist-nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.dist-nav-mark{width:28px;height:28px;background:var(--az);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff}
+.dist-nav-name{font-size:14px;font-weight:700;color:#f1f5f9}
+.dist-nav-name span{color:#1D9E75}
+.dist-nav-btns{display:flex;gap:8px}
+.dnb{font-size:11px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer;text-decoration:none;border:none}
+.dnb-p{background:var(--az);color:#fff}
+.dnb-s{background:rgba(255,255,255,.1);color:#e2e8f0;border:1px solid rgba(255,255,255,.15)}
+
+.dist-hero{background:linear-gradient(160deg,#0a1628,#0f2a1e);padding:50px 24px 40px;text-align:center;position:relative;overflow:hidden}
+.dist-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(24,95,165,.2) 0%,transparent 70%)}
+.dist-hero h1{font-size:32px;font-weight:800;color:#f1f5f9;margin-bottom:8px;position:relative}
+.dist-hero p{font-size:14px;color:#64748b;margin-bottom:16px;position:relative}
+.dist-hero-badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;position:relative}
+
+.dist-body{max-width:900px;margin:0 auto;padding:24px}
+.dist-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+@media(max-width:640px){.dist-grid-4{grid-template-columns:1fr 1fr}}
+.dist-stat{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;box-shadow:var(--sh)}
+.dist-stat-val{font-size:28px;font-weight:800;color:var(--txt-primary)}
+.dist-stat-label{font-size:10px;color:var(--txt-third);margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+
+.dist-sections{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.dist-sections{grid-template-columns:1fr}}
+
+.dist-sec{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--sh)}
+.dist-sec-head{padding:10px 14px;border-bottom:1px solid var(--border2);font-size:11px;font-weight:700;color:var(--txt-primary);display:flex;align-items:center;justify-content:space-between}
+.dist-sec-head i{font-size:14px;color:var(--az)}
+.dist-sec-link{font-size:10px;color:var(--az);font-weight:600;text-decoration:none}
+.dist-alerta{padding:9px 14px;border-bottom:1px solid var(--border2);display:flex;gap:8px;align-items:flex-start}
+.dist-alerta:last-child{border-bottom:none}
+.dist-al-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.dist-al-title{font-size:11px;font-weight:600;color:var(--txt-primary)}
+.dist-al-meta{font-size:9px;color:var(--txt-third);margin-top:2px}
+.dist-al-time{font-size:9px;color:var(--txt-third);flex-shrink:0;margin-left:auto}
+.dist-svc{padding:9px 14px;border-bottom:1px solid var(--border2);display:flex;gap:8px;align-items:center}
+.dist-svc:last-child{border-bottom:none}
+.dist-svc-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.dist-svc-name{font-size:11px;font-weight:600;color:var(--txt-primary)}
+.dist-svc-trade{font-size:9px;color:var(--txt-third)}
+.dist-svc-stars{font-size:9px;color:var(--am);margin-left:auto;flex-shrink:0}
+
+#mapa-distrito{height:280px;width:100%;border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:16px}
+
+.dist-cta{background:linear-gradient(135deg,var(--az),var(--vd));border-radius:12px;padding:20px;text-align:center;margin-top:16px}
+.dist-cta h3{font-size:16px;font-weight:700;color:#fff;margin-bottom:6px}
+.dist-cta p{font-size:12px;color:rgba(255,255,255,.8);margin-bottom:14px}
+.dist-cta-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.dist-cta-p{background:#fff;color:var(--az);border:none;border-radius:8px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none}
+.dist-cta-s{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
+
+.dist-footer{background:var(--nav);padding:20px 24px;text-align:center;border-top:1px solid rgba(255,255,255,.07)}
+.dist-footer p{font-size:11px;color:#334155;margin-bottom:4px}
+.dist-footer a{color:var(--az-l);text-decoration:none}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="dist-nav">
+  <a class="dist-nav-logo" href="index.html">
+    <div class="dist-nav-mark">MZ</div>
+    <div class="dist-nav-name">Mi<span>Zona</span><span style="font-size:10px;color:#378ADD;font-weight:400">.pe</span></div>
+  </a>
+  <div class="dist-nav-btns">
+    <a href="login.html" class="dnb dnb-s">Ingresar</a>
+    <a href="registro.html" class="dnb dnb-p">Unirse gratis</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="dist-hero">
+  <h1 id="dist-nombre">Cargando distrito...</h1>
+  <p id="dist-desc">Alertas vecinales, servicios y comunidad en tiempo real</p>
+  <div class="dist-hero-badges">
+    <div id="dist-indice"></div>
+    <span style="background:rgba(255,255,255,.1);color:#e2e8f0;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,.15)">
+      <i class="ti ti-users" style="font-size:11px"></i> <span id="dist-vecinos">0</span> vecinos activos
+    </span>
+    <span style="background:rgba(255,255,255,.1);color:#e2e8f0;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,.15)">
+      🇵🇪 Lima, Perú
+    </span>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="dist-body">
+
+  <!-- STATS -->
+  <div class="dist-grid-4">
+    <div class="dist-stat">
+      <div class="dist-stat-val" id="st-alertas" style="color:var(--rj)">0</div>
+      <div class="dist-stat-label">Alertas activas</div>
+    </div>
+    <div class="dist-stat">
+      <div class="dist-stat-val" id="st-mes" style="color:var(--az)">0</div>
+      <div class="dist-stat-label">Alertas este mes</div>
+    </div>
+    <div class="dist-stat">
+      <div class="dist-stat-val" id="st-svc" style="color:var(--vd)">0</div>
+      <div class="dist-stat-label">Servicios</div>
+    </div>
+    <div class="dist-stat">
+      <div class="dist-stat-val" id="st-seg" style="color:var(--am)">--</div>
+      <div class="dist-stat-label">Índice seguridad</div>
+    </div>
+  </div>
+
+  <!-- RESUMEN SEMANAL -->
+  <section class="mz-resumen-card" id="resumen-semanal" style="margin-bottom:16px">
+    <div class="mz-resumen-title"><i class="ti ti-calendar-week"></i> Resumen de esta semana</div>
+    <div style="font-size:11px;color:#94a3b8">Cargando actividad reciente...</div>
+  </section>
+
+  <!-- MAPA -->
+  <div id="mapa-distrito"></div>
+
+  <!-- ALERTAS + SERVICIOS -->
+  <div class="dist-sections">
+    <div class="dist-sec">
+      <div class="dist-sec-head">
+        <span><i class="ti ti-bell"></i> Alertas recientes</span>
+        <a href="alertas.html" class="dist-sec-link">Ver todas</a>
+      </div>
+      <div id="alertas-lista">
+        <div style="padding:20px;text-align:center;color:var(--txt-third);font-size:12px">Cargando alertas...</div>
+      </div>
+    </div>
+    <div class="dist-sec">
+      <div class="dist-sec-head">
+        <span><i class="ti ti-tool"></i> Servicios destacados</span>
+        <a href="servicios.html" class="dist-sec-link">Ver todos</a>
+      </div>
+      <div id="svc-lista">
+        <div style="padding:20px;text-align:center;color:var(--txt-third);font-size:12px">Cargando servicios...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="dist-cta">
+    <h3>¿Vives en <span id="dist-cta-nombre">este distrito</span>?</h3>
+    <p>Únete gratis, recibe alertas en tiempo real y conecta con vecinos de tu zona.</p>
+    <div class="dist-cta-btns">
+      <a href="registro.html" class="dist-cta-p"><i class="ti ti-user-plus" style="font-size:14px"></i> Crear cuenta gratis</a>
+      <a href="index.html" class="dist-cta-s"><i class="ti ti-eye" style="font-size:14px"></i> Ver la plataforma</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="dist-footer">
+  <p>MiZona.pe · Tu zona, tu gente, tus oportunidades · <a href="index.html">Ir a MiZona</a></p>
+  <p style="font-size:10px;margin-top:4px">Lima, Perú · 2026</p>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script type="module">
+import { PUBLIC_ENV } from './js/env.public.js';
+import { escapeHtml, timeAgo } from './js/mizona-ui-v2.js';
+import './js/tema-mizona.js';
+
+const sb = supabase.createClient(PUBLIC_ENV.SUPABASE_URL, PUBLIC_ENV.SUPABASE_PUBLISHABLE_KEY);
+const params = new URLSearchParams(location.search);
+const slug = (params.get('d') || 'los-olivos').toLowerCase();
+const COLORES = {
+  robo:'#E24B4A', accidente:'#f59e0b', agua:'#185FA5', luz:'#185FA5',
+  mascota:'#d97706', persona:'#8b5cf6', incendio:'#ef4444', otro:'#64748b'
+};
+
+function numero(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function iconoAlerta(color) {
+  return L.divIcon({
+    html:`<div style="width:15px;height:15px;background:${color};border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div>`,
+    iconSize:[15,15], iconAnchor:[7,7], className:''
+  });
+}
+
+async function ajustarSesion() {
+  const { data:{ session } } = await sb.auth.getSession();
+  if (!session?.user) return;
+  const botones = document.querySelector('.dist-nav-btns');
+  if (botones) {
+    botones.innerHTML = `
+      <a href="index.html" class="dnb dnb-s">Ir a MiZona</a>
+      <a href="perfil.html" class="dnb dnb-p">Mi perfil</a>`;
+  }
+}
+
+async function init() {
+  await ajustarSesion();
+
+  const { data: dist, error: distError } = await sb
+    .from('distritos_stats')
+    .select('*')
+    .eq('slug', slug)
+    .maybeSingle();
+
+  const nombre = dist?.distrito || slug.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  const descripcion = dist?.descripcion || `Alertas vecinales, servicios y comunidad en ${nombre}.`;
+
+  document.getElementById('dist-nombre').textContent = nombre;
+  document.getElementById('dist-desc').textContent = descripcion;
+  document.getElementById('dist-cta-nombre').textContent = nombre;
+  document.title = `${nombre} — MiZona.pe`;
+  document.getElementById('meta-desc').content = `Alertas vecinales y servicios en ${nombre}. MiZona.pe`;
+
+  const seg = numero(dist?.indice_seguridad || 70);
+  document.getElementById('dist-vecinos').textContent = numero(dist?.total_vecinos);
+  document.getElementById('st-alertas').textContent = numero(dist?.total_alertas);
+  document.getElementById('st-mes').textContent = numero(dist?.total_alertas_mes);
+  document.getElementById('st-svc').textContent = numero(dist?.total_servicios);
+  document.getElementById('st-seg').textContent = seg;
+  const cls = seg >= 70 ? 'mz-seg-bueno' : seg >= 40 ? 'mz-seg-medio' : 'mz-seg-bajo';
+  const txt = seg >= 70 ? '✓ Bueno' : seg >= 40 ? '⚠ Moderado' : '● Bajo';
+  document.getElementById('dist-indice').innerHTML = `<span class="mz-indice-seg ${cls}">${txt} · ${seg}/100</span>`;
+
+  const { data: resumen } = await sb.from('resumenes_semanales')
+    .select('semana_inicio,semana_fin,total_alertas,total_vecinos_activos,alertas_por_categoria,alerta_mas_confirmada,resumen_texto')
+    .ilike('distrito', nombre)
+    .order('semana_inicio',{ascending:false})
+    .limit(1)
+    .maybeSingle();
+  const resumenBox = document.getElementById('resumen-semanal');
+  if (resumenBox) {
+    if (resumen) {
+      const top = resumen.alerta_mas_confirmada;
+      resumenBox.innerHTML = `
+        <div class="mz-resumen-title"><i class="ti ti-calendar-week"></i> Resumen de esta semana</div>
+        <div class="mz-resumen-item"><span class="mz-resumen-label">Alertas registradas</span><span class="mz-resumen-val">${numero(resumen.total_alertas)}</span></div>
+        <div class="mz-resumen-item"><span class="mz-resumen-label">Vecinos participantes</span><span class="mz-resumen-val">${numero(resumen.total_vecinos_activos)}</span></div>
+        ${top?.titulo ? `<div class="mz-resumen-item"><span class="mz-resumen-label">Más confirmada</span><span class="mz-resumen-val">${escapeHtml(top.titulo)} · ${numero(top.confirmaciones)}</span></div>` : ''}
+        <div style="font-size:10px;color:#94a3b8;line-height:1.5;margin-top:8px">${escapeHtml(resumen.resumen_texto||'Actividad semanal actualizada por MiZona.')}</div>`;
+    } else {
+      resumenBox.innerHTML = '<div class="mz-resumen-title"><i class="ti ti-calendar-week"></i> Resumen de esta semana</div><div style="font-size:10px;color:#94a3b8">Todavía no hay actividad suficiente para generar un resumen.</div>';
+    }
+  }
+
+  const coords = dist?.coordenadas || {lat:-12.046, lng:-77.043};
+  const mapa = L.map('mapa-distrito', {zoomControl:true,scrollWheelZoom:false})
+    .setView([numero(coords.lat)||-12.046, numero(coords.lng)||-77.043], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19, attribution:'© OpenStreetMap'
+  }).addTo(mapa);
+
+  const [{ data: alertas, error: errorAlertas }, { data: servicios, error: errorServicios }] = await Promise.all([
+    sb.from('alertas')
+      .select('id,titulo,categoria,estado,created_at,latitud,longitud,zona_referencia,total_confirmaciones')
+      .ilike('distrito', nombre)
+      .in('estado',['reportada','verificada','en_revision'])
+      .order('created_at',{ascending:false})
+      .limit(10),
+    sb.from('servicios_mizona')
+      .select('id,nombre,categoria,calificacion,verificado,distrito,zona_atencion')
+      .ilike('distrito', nombre)
+      .eq('estado','activo')
+      .eq('disponible',true)
+      .order('verificado',{ascending:false})
+      .order('calificacion',{ascending:false})
+      .limit(5)
+  ]);
+
+  if (errorAlertas) {
+    document.getElementById('alertas-lista').innerHTML =
+      `<div style="padding:16px;text-align:center;color:var(--rj);font-size:11px">No se pudieron cargar las alertas.</div>`;
+  } else if (alertas?.length) {
+    alertas.filter(a=>a.latitud!=null&&a.longitud!=null).forEach(a => {
+      const color = COLORES[a.categoria] || COLORES.otro;
+      L.marker([Number(a.latitud),Number(a.longitud)],{icon:iconoAlerta(color)})
+        .addTo(mapa)
+        .bindPopup(`<b>${escapeHtml(a.titulo)}</b><br><small>${escapeHtml(a.zona_referencia||nombre)}</small><br><a href="alerta.html?id=${encodeURIComponent(a.id)}">Ver detalle</a>`);
+    });
+    document.getElementById('alertas-lista').innerHTML = alertas.slice(0,5).map(a => `
+      <a class="dist-alerta" href="alerta.html?id=${encodeURIComponent(a.id)}" style="text-decoration:none">
+        <div class="dist-al-dot" style="background:${COLORES[a.categoria]||COLORES.otro}"></div>
+        <div style="flex:1;min-width:0">
+          <div class="dist-al-title">${escapeHtml(a.titulo)}</div>
+          <div class="dist-al-meta">${escapeHtml(a.zona_referencia||nombre)} · ${numero(a.total_confirmaciones)} confirmaron</div>
+        </div>
+        <div class="dist-al-time">${timeAgo(a.created_at)}</div>
+      </a>`).join('');
+  } else {
+    document.getElementById('alertas-lista').innerHTML =
+      '<div style="padding:16px;text-align:center;color:var(--txt-third);font-size:12px">Sin alertas activas en este momento ✓</div>';
+  }
+
+  if (errorServicios) {
+    document.getElementById('svc-lista').innerHTML =
+      '<div style="padding:16px;text-align:center;color:var(--rj);font-size:11px">No se pudieron cargar los servicios.</div>';
+  } else if (servicios?.length) {
+    const fondos=['#eff6ff','#f0fdf4','#fffbeb','#f5f3ff','#fef2f2'];
+    const textos=['#1d4ed8','#14532d','#713f12','#4c1d95','#991b1b'];
+    document.getElementById('svc-lista').innerHTML = servicios.map((servicio,i) => {
+      const ini=(servicio.nombre||'S').substring(0,2).toUpperCase();
+      const rating=numero(servicio.calificacion);
+      return `<a class="dist-svc" href="servicios.html?q=${encodeURIComponent(servicio.nombre||'')}" style="text-decoration:none">
+        <div class="dist-svc-av" style="background:${fondos[i%fondos.length]};color:${textos[i%textos.length]}">${escapeHtml(ini)}</div>
+        <div style="min-width:0">
+          <div class="dist-svc-name">${escapeHtml(servicio.nombre||'Servicio local')} ${servicio.verificado?'✓':''}</div>
+          <div class="dist-svc-trade">${escapeHtml(servicio.categoria||'Servicio')} · ${escapeHtml(servicio.zona_atencion||nombre)}</div>
+        </div>
+        <div class="dist-svc-stars">${rating>0?`★ ${rating.toFixed(1)}`:'Nuevo'}</div>
+      </a>`;
+    }).join('');
+  } else {
+    document.getElementById('svc-lista').innerHTML =
+      '<div style="padding:16px;text-align:center;color:var(--txt-third);font-size:12px">Sé el primero en registrar un servicio en esta zona.</div>';
+  }
+
+  if (distError) console.warn('No se encontraron estadísticas precalculadas:', distError.message);
+}
+
+init().catch(error => {
+  console.error(error);
+  document.getElementById('alertas-lista').innerHTML =
+    '<div style="padding:16px;text-align:center;color:var(--rj);font-size:11px">No se pudo abrir la página del distrito.</div>';
+});
+</script>
+
+</body>
+</html>

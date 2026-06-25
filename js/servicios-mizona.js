@@ -191,6 +191,8 @@ searchInputs.forEach((input) => input.addEventListener("input", () => {
   render();
 }));
 category.addEventListener("change", render);
+const initialSearch = new URLSearchParams(location.search).get("q");
+if (initialSearch) searchInputs.forEach((input) => { input.value = initialSearch; });
 document.querySelectorAll("#openServiceForm,#openServiceFormSecondary,#mobileServiceAdd").forEach((button) => button.addEventListener("click", (event) => { event.preventDefault(); openForm(); }));
 document.querySelectorAll("[data-close-dialog]").forEach((button) => button.addEventListener("click", () => dialog.close()));
 

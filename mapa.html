@@ -57,6 +57,7 @@
 <link rel="stylesheet" href="css/mizona-unified.css">
 <link rel="stylesheet" href="css/mizona-phase2.css">
 <link rel="stylesheet" href="css/alertas-inteligentes.css">
+<link rel="stylesheet" href="css/mejoras-v2.css">
 </head>
 <body>
 <div class="mz-layout-2col">
@@ -92,7 +93,11 @@
         <div style="font-size:14px;font-weight:700;color:var(--txt)">Mapa de alertas</div>
         <div style="font-size:10px;color:var(--txt3)">Incidentes y avisos en tiempo real</div>
       </div>
-      <button onclick="usarUbicacion()" style="background:var(--az);color:#fff;border:none;border-radius:var(--rs);padding:8px 14px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">
+      
+        <button id="btn-calor" type="button" style="background:var(--am-bg);color:var(--am);border:1px solid var(--am-bd);border-radius:8px;padding:6px 12px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">
+        <i class="ti ti-flame" style="font-size:13px"></i> Mapa de calor
+      </button>
+        <button onclick="usarUbicacion()" style="background:var(--az);color:#fff;border:none;border-radius:var(--rs);padding:8px 14px;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">
         <i class="ti ti-current-location" style="font-size:14px"></i> Usar mi ubicación
       </button>
       <div class="mz-dist-tag" id="dist-tag-mapa"><i class="ti ti-map-pin"></i><span id="dist-mapa">Cargando...</span></div>
@@ -600,5 +605,90 @@ window.addEventListener('beforeunload', () => {
 initMapa();
 </script>
 <script type="module" src="./js/mizona-core.js"></script>
+<script type="module" src="./js/tema-mizona.js"></script>
+
+
+<script type="module">
+import { initMapaCalor, cambiarMesCalor, destroyMapaCalor } from './js/mapa-calor.js';
+
+const btnCalor = document.getElementById('btn-calor');
+let modalCalor = null;
+let distritoCalor = null;
+
+function cerrarMapaCalor() {
+  destroyMapaCalor();
+  modalCalor?.remove();
+  modalCalor = null;
+  if (btnCalor) {
+    btnCalor.disabled = false;
+    btnCalor.innerHTML = '<i class="ti ti-flame" style="font-size:13px"></i> Mapa de calor';
+  }
+}
+
+async function abrirMapaCalor() {
+  if (modalCalor) return;
+  if (btnCalor) {
+    btnCalor.disabled = true;
+    btnCalor.innerHTML = '<i class="ti ti-loader-2 ti-spin"></i> Cargando...';
+  }
+
+  distritoCalor = document.getElementById('dist-mapa')?.textContent?.trim();
+  if (!distritoCalor || /cargando|tu zona/i.test(distritoCalor)) distritoCalor = null;
+
+  modalCalor = document.createElement('div');
+  modalCalor.className = 'mz-heat-overlay';
+  modalCalor.style.cssText = 'position:fixed;inset:0;background:rgba(2,6,23,.82);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px';
+  modalCalor.innerHTML = `
+    <section style="background:var(--card,#fff);border:1px solid var(--bd,#e2e8f0);border-radius:16px;width:min(760px,100%);max-height:92vh;overflow:auto;box-shadow:0 24px 80px rgba(0,0,0,.35)">
+      <header style="background:#111827;padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:3">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:800;color:#f8fafc">🔥 Mapa de calor histórico</div>
+          <div style="font-size:9px;color:#94a3b8">Concentración aproximada de alertas, sin mostrar domicilios exactos</div>
+        </div>
+        <button id="cerrar-calor" type="button" aria-label="Cerrar" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#e2e8f0;width:34px;height:34px;border-radius:9px;cursor:pointer">✕</button>
+      </header>
+      <div style="padding:10px 14px;background:var(--bg,#f8fafc);border-bottom:1px solid var(--bd,#e2e8f0);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <label for="mes-calor" style="font-size:11px;font-weight:700;color:var(--txt2,#475569)">Mes</label>
+        <input type="month" id="mes-calor" style="border:1px solid var(--bd,#e2e8f0);border-radius:7px;padding:6px 9px;font-size:11px;background:var(--card,#fff);color:var(--txt,#1e293b)" value="${new Date().toISOString().slice(0,7)}">
+        <span style="font-size:9px;color:var(--txt3,#94a3b8)">${distritoCalor ? `Filtrando: ${distritoCalor}` : 'Mostrando todas las zonas disponibles'}</span>
+        <span style="margin-left:auto;font-size:9px;color:var(--txt3,#94a3b8)">🟢 Bajo &nbsp; 🟠 Medio &nbsp; 🔴 Alto</span>
+      </div>
+      <div id="mapa-calor-contenedor" style="height:min(58vh,470px);min-height:340px"></div>
+      <footer style="padding:10px 14px;font-size:9px;line-height:1.5;color:var(--txt3,#94a3b8);border-top:1px solid var(--bd,#e2e8f0)">
+        Los puntos están agrupados por cuadrículas aproximadas. El mapa sirve para reconocer tendencias, no para señalar personas o viviendas.
+      </footer>
+    </section>`;
+  document.body.appendChild(modalCalor);
+
+  modalCalor.querySelector('#cerrar-calor')?.addEventListener('click', cerrarMapaCalor);
+  modalCalor.addEventListener('click', event => {
+    if (event.target === modalCalor) cerrarMapaCalor();
+  });
+  modalCalor.querySelector('#mes-calor')?.addEventListener('change', async event => {
+    try {
+      await cambiarMesCalor(event.target.value, distritoCalor);
+    } catch (error) {
+      window.mzToast?.(error.message || 'No se pudo cambiar el mes.', 'error');
+    }
+  });
+
+  try {
+    const centro = window.mapaInst?.getCenter
+      ? [window.mapaInst.getCenter().lat, window.mapaInst.getCenter().lng]
+      : undefined;
+    await initMapaCalor('mapa-calor-contenedor', distritoCalor, { centro });
+    if (btnCalor) {
+      btnCalor.disabled = false;
+      btnCalor.innerHTML = '<i class="ti ti-flame" style="font-size:13px"></i> Mapa de calor';
+    }
+  } catch (error) {
+    window.mzToast?.(error.message || 'No se pudo abrir el mapa de calor.', 'error');
+    cerrarMapaCalor();
+  }
+}
+
+btnCalor?.addEventListener('click', abrirMapaCalor);
+</script>
+
 </body>
 </html>

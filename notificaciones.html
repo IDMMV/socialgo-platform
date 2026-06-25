@@ -33,7 +33,8 @@
 @media(max-width:900px){.push-grid{grid-template-columns:1fr;padding:10px;padding-bottom:90px}.pref-grid{grid-template-columns:1fr}.mz-topbar{position:sticky;top:0;z-index:50}.push-card{border-radius:14px}}
 </style>
 <link href="css/mizona-master-shell.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/></head>
+<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/mejoras-v2.css">
+</head>
 <body>
 <div class="mz-layout-2col">
 <aside class="mz-sidebar">
@@ -261,5 +262,6 @@ supabase.channel(`push-inbox-${user.id}`).on('postgres_changes',{event:'*',schem
 </script>
 <script src="./js/mizona-core.js" type="module"></script>
 <script src="./js/mizona-master-shell.js" type="module"></script>
+<script type="module" src="./js/tema-mizona.js"></script>
 </body>
 </html>

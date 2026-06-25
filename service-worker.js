@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v5.0-alertas-inteligentes";
+const CACHE_NAME = "mizona-v6.0-mejoras-integradas";
 
 const CORE = [
   "./",
@@ -8,6 +8,7 @@ const CORE = [
   "./sugerencias.html",
   "./admin-alertas.html",
   "./mapa.html",
+  "./distrito.html",
   "./servicios.html",
   "./solicitudes.html",
   "./ofertas.html",
@@ -49,7 +50,16 @@ const CORE = [
   "./css/auth-security.css",
   "./css/negocios-ofertas.css",
   "./css/alertas-inteligentes.css",
+  "./css/mejoras-v2.css",
+  "./css/mizona-sidebar.css",
   "./js/mizona-core.js",
+  "./js/tema-mizona.js",
+  "./js/niveles-mizona.js",
+  "./js/mapa-calor.js",
+  "./js/voz-mizona.js",
+  "./js/comentarios-alerta.js",
+  "./js/auth.js",
+  "./js/password-ui.js",
   "./js/mizona-master-shell.js",
   "./js/mizona-ui-v2.js",
   "./js/brand.js",

@@ -15,6 +15,7 @@
 <link href="css/mizona-unified.css" rel="stylesheet"/>
 <link href="css/mizona-phase2.css" rel="stylesheet"/>
 <link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/negocios-ofertas.css">
+<link rel="stylesheet" href="css/mejoras-v2.css">
 </head>
 <body class="estado-guest">
 <div class="mz-toast" id="mz-toast"></div>
@@ -128,8 +129,11 @@
 <main class="mz-feed">
 <div class="mz-topbar">
 <div class="mz-search" onclick="location.href='explorar.html'"><i class="ti ti-search"></i><span>Buscar en tu zona...</span></div>
-<div class="mz-dist-tag" id="dist-tag"><i class="ti ti-map-pin"></i><span id="dist-nombre">Mi zona</span></div>
-<div class="mz-icon-btn" onclick="location.href='notificaciones.html'"><i class="ti ti-bell"></i><div class="mz-notif-dot" id="notif-dot" style="display:none"></div></div>
+<div class="mz-dist-tag" id="dist-tag" role="button" tabindex="0" title="Abrir la página pública de tu distrito" style="cursor:pointer"><i class="ti ti-map-pin"></i><span id="dist-nombre">Mi zona</span></div>
+<button class="mz-tema-toggle" id="btn-tema-idx" type="button" title="Cambiar tema" aria-label="Cambiar tema" style="flex-shrink:0">
+        <i class="ti ti-moon" id="tema-icon-idx"></i>
+      </button>
+      <div class="mz-icon-btn" onclick="location.href='notificaciones.html'"><i class="ti ti-bell"></i><div class="mz-notif-dot" id="notif-dot" style="display:none"></div></div>
 <div class="mz-icon-btn hide-guest" onclick="location.href='mensajes.html'"><i class="ti ti-message"></i></div>
 <div class="mz-icon-btn hide-logged" onclick="location.href='login.html'"><i class="ti ti-user"></i></div>
 </div>
@@ -627,5 +631,33 @@ cargarServiciosInicio();
   </div>
 </div>
 <script src="js/instalar-pwa.js" defer></script>
+<script type="module">
+import { getTema, toggleTema } from './js/tema-mizona.js';
+const btnTema = document.getElementById('btn-tema-idx');
+const iconoTema = document.getElementById('tema-icon-idx');
+function pintarTema() {
+  const tema = getTema();
+  if (iconoTema) iconoTema.className = tema === 'dia' ? 'ti ti-moon' : 'ti ti-sun';
+  if (btnTema) btnTema.title = tema === 'dia' ? 'Activar modo noche' : 'Activar modo día';
+}
+btnTema?.addEventListener('click', () => { toggleTema(); pintarTema(); });
+pintarTema();
+
+function slugDistrito(texto='') {
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+}
+function abrirDistrito() {
+  const nombre = document.getElementById('dist-nombre')?.textContent?.trim();
+  if (!nombre || /mi zona|tu zona|cargando/i.test(nombre)) {
+    location.href = 'explorar.html';
+    return;
+  }
+  location.href = `distrito.html?d=${encodeURIComponent(slugDistrito(nombre))}`;
+}
+const tagDistrito = document.getElementById('dist-tag');
+tagDistrito?.addEventListener('click', abrirDistrito);
+tagDistrito?.addEventListener('keydown', e => { if (e.key==='Enter' || e.key===' ') { e.preventDefault(); abrirDistrito(); } });
+</script>
 </body>
 </html>

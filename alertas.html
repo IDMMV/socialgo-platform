@@ -83,6 +83,7 @@
   .mz-feed-body{padding-bottom:96px}
 }
 </style>
+<link rel="stylesheet" href="css/mejoras-v2.css">
 </head>
 <body class="estado-guest">
 <div id="mz-toast" class="mz-toast"></div>
@@ -153,7 +154,7 @@
               <label class="mz-field"><span>Distrito</span><input name="distrito" id="form-distrito" value="Ventanilla" required></label>
               <label class="mz-field full"><span>Título <button type="button" class="mz-voz-btn" data-voz-para="titulo" title="Dictar con micrófono"><i class="ti ti-microphone"></i> Dictar</button></span><input name="titulo" id="titulo" maxlength="120" required placeholder="Describe brevemente lo ocurrido"></label>
               <label class="mz-field full"><span>Descripción <button type="button" class="mz-voz-btn" data-voz-para="descripcion" title="Dictar descripción con micrófono"><i class="ti ti-microphone"></i> Dictar</button></span><textarea name="descripcion" id="descripcion" rows="5" maxlength="1200" required placeholder="Incluye hora, referencia y detalles útiles. No publiques acusaciones ni datos sensibles."></textarea></label>
-              <label class="mz-field full"><span>Zona o referencia <button type="button" class="mz-voz-btn" data-voz-para="zona_referencia" title="Dictar referencia"><i class="ti ti-microphone"></i> Dictar</button></span><input name="zona_referencia" id="zona_referencia" id="alertReference" placeholder="Ej.: Av. Las Palmeras, cerca del mercado"></label>
+              <label class="mz-field full"><span>Zona o referencia <button type="button" class="mz-voz-btn" data-voz-para="zona_referencia" title="Dictar referencia"><i class="ti ti-microphone"></i> Dictar</button></span><input name="zona_referencia" id="zona_referencia" placeholder="Ej.: Av. Las Palmeras, cerca del mercado"></label>
               <label class="mz-field full"><span>Privacidad de la ubicación</span>
                 <select name="precision_ubicacion" id="alertPrivacy">
                   <option value="aprox_50m">Aproximada a 50 m</option>
@@ -291,5 +292,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<script type="module" src="./js/tema-mizona.js"></script>
 </body>
 </html>

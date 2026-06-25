@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="css/mizona-phase2.css">
 <link rel="stylesheet" href="css/mizona-logo.css">
 <link rel="stylesheet" href="css/alertas-inteligentes.css">
+<link rel="stylesheet" href="css/mejoras-v2.css">
 </head>
 <body class="estado-guest">
 <div id="mz-toast" class="mz-toast"></div>
@@ -57,6 +58,9 @@
           <div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-history"></i> Historial y actualizaciones</div></div>
           <div class="mz-detail-pad"><div class="mz-timeline" id="alertTimeline"><div class="mz-loader">Cargando historial...</div></div></div>
         </article>
+        <article class="mz-detail-card" id="contenedor-comentarios">
+          <div class="mz-loader">Cargando comentarios...</div>
+        </article>
       </section>
       <aside style="display:grid;gap:14px;align-content:start">
         <article class="mz-detail-card"><div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-users"></i> Participación</div></div><div class="mz-detail-pad" id="alertParticipation"></div></article>
@@ -70,5 +74,14 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module" src="js/alerta-detalle.js"></script>
 <script type="module" src="js/mizona-core.js"></script>
+<script type="module" src="./js/tema-mizona.js"></script>
+
+
+<script type="module">
+import { initComentarios } from './js/comentarios-alerta.js';
+const alertaId = new URLSearchParams(location.search).get('id');
+const contenedor = document.getElementById('contenedor-comentarios');
+if (alertaId && contenedor) initComentarios(alertaId, contenedor);
+</script>
 </body>
 </html>

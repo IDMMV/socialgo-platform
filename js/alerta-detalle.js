@@ -75,6 +75,7 @@ function renderMain() {
   const isAuthor=user && String(user.id)===String(alertData.autor_id);
   main.innerHTML=`<div class="mz-detail-pad">
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><span class="mz-status-chip ${cls}">${label}</span><small style="font-size:9px;color:var(--txt3)">${timeAgo(alertData.created_at)}</small></div>
+    <div style="display:flex;align-items:center;gap:6px;color:var(--txt3);font-size:9px;margin:8px 0 2px"><i class="ti ${alertData.tipo_fuente === 'oficial' ? 'ti-shield-check' : 'ti-shield-lock'}"></i>${alertData.tipo_fuente === 'oficial' ? 'Fuente oficial verificada' : 'Reportado por un vecino verificado · identidad protegida'}</div>
     <h1 class="mz-detail-title">${escapeHtml(alertData.titulo)}</h1>
     <div class="mz-detail-description">${escapeHtml(alertData.descripcion)}</div>
     ${isAuthor && alertData.motivo_moderacion ? `<div class="mz-rejection-box"><strong>Motivo indicado por moderación</strong>${escapeHtml(alertData.motivo_moderacion)}</div>`:''}

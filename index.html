@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="css/mizona-stability.css">
 <link rel="stylesheet" href="css/emergency-center.css">
 <link rel="stylesheet" href="css/nearby-location.css">
+<link rel="stylesheet" href="css/perfiles-mizona.css">
 </head>
 <body class="auth-pending">
 <div class="mz-toast" id="mz-toast"></div>
@@ -166,15 +167,17 @@
 <div class="mz-crear hide-guest">
 <div class="mz-crear-top">
 <div class="mz-user-av" id="crear-av" style="width:34px;height:34px;font-size:11px">JH</div>
-<div class="mz-crear-input" onclick="abrirPublicar()">¿Qué pasa en tu zona?</div>
+<div class="mz-crear-input" onclick="location.href='publicar.html'">¿Qué quieres compartir con tu zona?</div>
 </div>
 <div class="mz-crear-tipos">
 <div class="mz-tipo-btn" onclick="abrirModal('modal-alerta')"><i class="ti ti-bell" style="color:var(--rj)"></i> Alerta</div>
 <div class="mz-tipo-btn" onclick="abrirModal('modal-solicitud')"><i class="ti ti-clipboard-list" style="color:var(--vd)"></i> Solicitud</div>
 <div class="mz-tipo-btn" onclick="location.href='servicios.html#registrar'"><i class="ti ti-tool" style="color:var(--az)"></i> Mi servicio</div>
-<div class="mz-tipo-btn"><i class="ti ti-photo" style="color:var(--am)"></i> Foto</div>
+<div class="mz-tipo-btn" onclick="location.href='publicar.html'"><i class="ti ti-photo" style="color:var(--am)"></i> Publicación</div>
 </div>
 </div>
+<!-- PUBLICACIONES REALES DE LA COMUNIDAD -->
+<section id="homePublications" style="margin-bottom:10px"></section>
 <!-- ALERTA CIUDADANA -->
 <div class="mz-alerta-ciudadana" id="ac-1">
 <div class="mz-ac-icon"><i class="ti ti-alert-circle" style="color:var(--rj)"></i></div>
@@ -309,7 +312,7 @@
 <div class="mz-bn-inner">
 <div class="mz-bn-item active" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
 <div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
-<div class="mz-bn-item" onclick="abrirPublicar()"><div class="mz-bn-center"><i class="ti ti-plus"></i></div></div>
+<div class="mz-bn-item" onclick="location.href='publicar.html'"><div class="mz-bn-center"><i class="ti ti-plus"></i></div></div>
 <div class="mz-bn-item" onclick="location.href='servicios.html'"><i class="ti ti-tool"></i><span>Servicios</span></div>
 <div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
 </div>
@@ -590,6 +593,7 @@ window.addEventListener('mizona:location',event=>{homePoint=event.detail.point;i
 window.addEventListener('mizona:radius-change',event=>{homeRadius=event.detail.radius;cargarAlertasEnMapa(alertasHomeCache);cargarServiciosInicio();});
 </script>
 <script src="./js/inicio-ofertas.js" type="module"></script>
+<script src="./js/home-publicaciones.js" type="module"></script>
 <script src="./js/mizona-core.js" type="module"></script>
 
 <!-- INSTALACIÓN PWA -->

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#185fa5">
+  <title>Crear publicación · MiZona.pe</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/favicon-32.png" type="image/png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/perfiles-mizona.css">
+</head>
+<body class="profile-page">
+  <main class="publish-shell">
+    <header class="publish-header">
+      <div><h1>Crear publicación</h1><p>Comparte información útil con tu zona y tus seguidores.</p></div>
+      <a class="profile-btn" href="index.html"><i class="ti ti-x"></i> Cerrar</a>
+    </header>
+
+    <div class="publish-layout">
+      <aside class="publish-types" id="publishTypes">
+        <button class="publish-type-btn" data-special="alerta"><i class="ti ti-alert-triangle" style="color:#d83b45;background:#fff0f1"></i><span><strong>Alerta o incidente</strong><small>Robo, accidente, riesgo o emergencia</small></span></button>
+        <div id="accountPublishTypes"></div>
+      </aside>
+
+      <section class="publish-form-card">
+        <div id="publishStatus" class="publish-alert-note" hidden></div>
+        <h2 class="publish-section-title" id="publishTitle">¿Qué quieres compartir?</h2>
+        <form id="publishForm">
+          <div class="publish-grid">
+            <div class="publish-field full"><label for="postTitle">Título</label><input id="postTitle" maxlength="120" placeholder="Escribe un título claro" required></div>
+            <div class="publish-field full"><label for="postContent">Descripción</label><textarea id="postContent" maxlength="5000" placeholder="Explica lo importante con claridad" required></textarea><div class="publish-help">No publiques teléfonos personales, domicilios privados ni acusaciones sin verificar.</div></div>
+            <div class="publish-field"><label for="postLocation">Zona o referencia pública</label><input id="postLocation" maxlength="120" placeholder="Ej.: Parque El Olivar, Bellavista"><div class="publish-help">No uses tu dirección exacta.</div></div>
+            <div class="publish-field" id="eventDateField" hidden><label for="postEventDate">Fecha y hora</label><input id="postEventDate" type="datetime-local"></div>
+            <div class="publish-field"><label for="postVisibility">Quién puede verlo</label><select id="postVisibility"><option value="public">Público / seguidores</option><option value="followers">Solo seguidores</option><option value="friends">Solo amigos</option><option value="private">Solo yo</option></select></div>
+            <div class="publish-field"><label for="postImage">Foto opcional</label><input id="postImage" type="file" accept="image/jpeg,image/png,image/webp"><div class="publish-help">JPG, PNG o WEBP. Evita mostrar rostros de menores o placas sin necesidad.</div></div>
+            <div class="publish-field full"><div class="publish-preview"><strong>Vista previa de imagen</strong><img id="imagePreview" class="publish-image-preview" alt="Vista previa"></div></div>
+            <div class="publish-field"><label><input id="allowComments" type="checkbox" checked> Permitir comentarios</label></div>
+            <div class="publish-field"><div class="publish-help"><strong>Autor visible:</strong> las publicaciones normales aparecerán en tu perfil para que los vecinos puedan conocerte y seguirte. Para robos, violencia o emergencias usa “Alerta o incidente”; allí tu identidad queda protegida.</div></div>
+          </div>
+          <div class="publish-actions"><a class="profile-btn" href="index.html">Cancelar</a><button class="profile-btn primary" id="publishButton" type="submit"><i class="ti ti-send"></i> Publicar</button></div>
+        </form>
+      </section>
+    </div>
+  </main>
+  <script type="module" src="js/crear-publicacion.js"></script>
+</body>
+</html>

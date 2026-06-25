@@ -179,6 +179,7 @@ async function loadAlerts() {
         <span class="mz-status-chip ${status.cls}">${status.text}</span>
         <small>${timeAgo(alert.created_at)}</small>
       </div>
+      <div style="display:flex;align-items:center;gap:6px;color:var(--txt3);font-size:9px;margin:5px 0 2px"><i class="ti ${alert.tipo_fuente === 'oficial' ? 'ti-shield-check' : 'ti-shield-lock'}"></i>${alert.tipo_fuente === 'oficial' ? 'Fuente oficial verificada' : 'Reportado por un vecino verificado · identidad protegida'}</div>
       <h3>${escapeHtml(alert.titulo)}</h3>
       <p>${escapeHtml(alert.descripcion || '')}</p>
       ${isAuthor && alert.motivo_moderacion ? `<div class="mz-rejection-box"><strong>Motivo de moderación</strong>${escapeHtml(alert.motivo_moderacion)}</div>` : ''}

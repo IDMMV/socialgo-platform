@@ -170,6 +170,7 @@ async function renderSheet() {
         <span><i class="ti ti-users"></i> ${Number(currentAlert.conf || 0)} confirmaciones</span>
         <span><i class="ti ti-shield-lock"></i> ${esc(currentAlert.privacidadTexto || 'Ubicación aproximada')}</span>
       </div>
+      <div style="display:flex;align-items:center;gap:6px;color:#64748b;font-size:10px;margin:4px 0 10px"><i class="ti ${currentAlert.tipo_fuente === 'oficial' ? 'ti-shield-check' : 'ti-shield-lock'}"></i>${currentAlert.tipo_fuente === 'oficial' ? 'Fuente oficial verificada' : 'Reportado por un vecino verificado · identidad protegida'}</div>
       ${currentAlert.descripcion ? `<div class="mz-map-sheet-description">${esc(currentAlert.descripcion)}</div>` : ''}
       <div class="mz-map-sheet-actions">
         <button type="button" class="primary" data-sheet-confirm><i class="ti ti-eye-check"></i> También lo vi</button>

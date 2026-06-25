@@ -443,7 +443,7 @@ async function cargarAlertas({silencioso=false} = {}) {
   try {
     const {data,error} = await sb
       .from('alertas')
-      .select('id,categoria,titulo,descripcion,distrito,zona_referencia,estado,latitud,longitud,precision_ubicacion,created_at,total_confirmaciones,total_seguidores,autor_id')
+      .select('id,categoria,titulo,descripcion,distrito,zona_referencia,estado,latitud,longitud,precision_ubicacion,created_at,total_confirmaciones,total_seguidores,autor_id,tipo_fuente')
       .in('estado',['reportada','verificada','en_revision'])
       .not('latitud','is',null)
       .order('created_at',{ascending:false})
@@ -466,7 +466,8 @@ async function cargarAlertas({silencioso=false} = {}) {
       conf:Number(a.total_confirmaciones || 0),
       seguidores:Number(a.total_seguidores || 0),
       id:a.id,
-      autor_id:a.autor_id || null
+      autor_id:a.autor_id || null,
+      tipo_fuente:a.tipo_fuente || 'ciudadana'
     }));
     renderAlertas();
   } catch (error) {

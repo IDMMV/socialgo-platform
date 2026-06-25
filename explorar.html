@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>Explorar personas · MiZona.pe</title>
+<title>Explorar perfiles · MiZona.pe</title>
 <link href="manifest.json" rel="manifest"/>
 <link href="css/global.css" rel="stylesheet"/>
 <link href="css/mizona-unified.css" rel="stylesheet"/>
@@ -12,6 +12,7 @@
 <link href="css/mizona-master-shell.css" rel="stylesheet"/>
 <link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
 <link rel="stylesheet" href="css/mizona-stability.css">
+<link rel="stylesheet" href="css/perfiles-mizona.css">
 </head>
 <body class="auth-pending">
 <main class="page-shell">
@@ -20,9 +21,9 @@
 <a class="secondary" href="index.html">← Volver</a>
 </header>
 <section class="page-card">
-<h1>Explorar personas</h1>
+<h1>Explorar perfiles</h1><p style="color:#64748b">Encuentra vecinos, profesionales, negocios, instituciones y organizaciones de tu zona.</p>
 <form class="comment-form" id="searchForm">
-<input id="searchInput" maxlength="50" placeholder="Buscar por nombre o usuario"/>
+<input id="searchInput" maxlength="50" placeholder="Buscar por nombre, usuario o actividad"/>
 <button class="primary" type="submit">Buscar</button>
 </form>
 </section>
@@ -86,12 +87,13 @@
             <div>
               <strong>${escapeHtml(person.nombre_visible || "Usuario")}</strong>
               <small>@${escapeHtml(person.username)}</small>
+              <span class="profile-type-chip ${escapeHtml(person.tipo_perfil || 'vecino')}" style="margin-top:6px;padding:4px 8px;font-size:9px">${escapeHtml(({vecino:'Vecino',profesional:'Profesional',negocio:'Negocio',institucion:'Institución',organizacion:'Organización vecinal'})[person.tipo_perfil] || 'Vecino')}</span>
               <p>${escapeHtml(person.biografia || "")}</p>
             </div>
             <div class="person-card-actions">
               <a class="secondary" href="usuario.html?u=${encodeURIComponent(person.username)}">Ver perfil</a>
               ${currentUser ? `<button class="primary" data-follow="${person.id}" data-following="${person.siguiendo ? "1" : "0"}">
-                ${person.siguiendo ? "Dejar de seguir" : "Seguir"}
+                ${person.siguiendo ? "Siguiendo" : person.seguimiento_pendiente ? "Solicitud enviada" : "Seguir"}
               </button>
               <button class="secondary" data-message="${person.id}">Mensaje</button>
               <button class="secondary" data-friend="${person.id}">${person.estado_amistad === "aceptada" ? "Amigos" : person.estado_amistad === "pendiente" ? "Solicitud enviada" : "Agregar amigo"}</button>` : ""}
@@ -106,18 +108,14 @@
       document.querySelectorAll("[data-follow]").forEach(button => {
         button.addEventListener("click", async () => {
           const target = button.dataset.follow;
-          const following = button.dataset.following === "1";
-
-          const result = following
-            ? await supabase.from("seguidores").delete()
-                .eq("seguidor_id", currentUser.id).eq("seguido_id", target)
-            : await supabase.from("seguidores").insert({
-                seguidor_id: currentUser.id,
-                seguido_id: target
-              });
-
-          if (result.error) alert(result.error.message);
-          else loadPeople(input.value);
+          let result = await supabase.rpc("mizona_toggle_seguimiento", { p_seguido_id: target });
+          if (result.error && /function|schema cache/i.test(result.error.message || "")) {
+            const following = button.dataset.following === "1";
+            result = following
+              ? await supabase.from("seguidores").delete().eq("seguidor_id", currentUser.id).eq("seguido_id", target)
+              : await supabase.from("seguidores").insert({ seguidor_id: currentUser.id, seguido_id: target });
+          }
+          if (result.error) alert(result.error.message); else loadPeople(input.value);
         });
       });
 

@@ -31,9 +31,14 @@ function timeAgo(dateString) {
 
 export async function createPost({
   content,
+  title = null,
+  category = "general",
+  locationText = null,
+  eventDate = null,
   visibility = "public",
   allowComments = true,
   allowDownloads = false,
+  showAuthor = true,
   imageFile = null
 }) {
   const user = await getCurrentUser();
@@ -62,7 +67,12 @@ export async function createPost({
       .from("publicaciones")
       .insert({
         autor_id: user.id,
+        titulo: String(title || "").trim() || null,
         contenido: cleanContent || null,
+        categoria_publicacion: category || "general",
+        ubicacion_texto: String(locationText || "").trim() || null,
+        fecha_evento: eventDate || null,
+        perfil_autor_visible: showAuthor !== false,
         tipo: imageFile ? "imagen" : "texto",
         archivo_url: upload?.url ?? null,
         visibilidad: visibility,
@@ -393,8 +403,11 @@ export async function blockUser(blockedUserId) {
 
 export function renderPost(post, currentUserId, poll = null) {
   const isOwner = currentUserId && currentUserId === post.autor_id;
+  const showAuthor = post.perfil_autor_visible !== false || isOwner;
+  const displayName = showAuthor ? (post.nombre_visible || post.username || "Usuario") : "Vecino de tu zona";
+  const displayUsername = showAuthor ? (post.username || "usuario") : "identidad protegida";
   const avatarText = escapeHtml(
-    String(post.nombre_visible || post.username || "U")
+    String(displayName || "U")
       .split(/\s+/)
       .slice(0, 2)
       .map(part => part.charAt(0))
@@ -402,10 +415,15 @@ export function renderPost(post, currentUserId, poll = null) {
       .toUpperCase()
   );
 
-  const profileImage = post.avatar_url || post.portada_url || null;
+  const profileImage = showAuthor ? (post.avatar_url || post.portada_url || null) : null;
   const avatar = profileImage
     ? `<div class="avatar"><img src="${escapeHtml(profileImage)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`
-    : `<div class="avatar">${avatarText}</div>`;
+    : `<div class="avatar">${showAuthor ? avatarText : "🛡"}</div>`;
+  const categoryLabels = {general:"Publicación",consejo:"Consejo",recomendacion:"Recomendación",evento:"Evento",foto:"Foto de la zona",trabajo:"Trabajo realizado",producto:"Producto",comunicado:"Comunicado",campana:"Campaña",actividad:"Actividad",reunion:"Reunión",alerta_oficial:"Alerta oficial",empleo:"Empleo"};
+  const categoryLabel = categoryLabels[post.categoria_publicacion] || "Publicación";
+  const authorNameHtml = showAuthor
+    ? `<a href="usuario.html?u=${encodeURIComponent(post.username || "")}" style="color:inherit;text-decoration:none">${escapeHtml(displayName)}</a>`
+    : escapeHtml(displayName);
 
 
   const pollHtml = poll ? `
@@ -442,8 +460,9 @@ export function renderPost(post, currentUserId, poll = null) {
       <header class="post-header">
         ${avatar}
         <div>
-          <strong>${escapeHtml(post.nombre_visible || "Usuario")}</strong>
-          <small>@${escapeHtml(post.username || "usuario")} · ${timeAgo(post.creado_en)}</small>
+          <strong>${authorNameHtml}</strong>
+          <small>@${escapeHtml(displayUsername)} · ${timeAgo(post.creado_en)}</small>
+          <span style="display:inline-flex;margin-top:4px;padding:2px 7px;border-radius:999px;background:#eef5ff;color:#185fa5;font-size:9px;font-weight:800">${escapeHtml(categoryLabel)}</span>
         </div>
         <button class="icon-button" data-post-menu="${post.id}" aria-label="Opciones">•••</button>
 
@@ -466,7 +485,7 @@ export function renderPost(post, currentUserId, poll = null) {
         : post.archivo_url
           ? `<img class="post-image"
                  src="${escapeHtml(post.archivo_url)}"
-                 alt="Imagen publicada por ${escapeHtml(post.username || "usuario")}"
+                 alt="Imagen publicada por ${escapeHtml(displayName)}"
                  loading="lazy"
                  onerror="this.outerHTML='<div class=&quot;media-unavailable&quot;>La imagen ya no está disponible.</div>'">`
           : ""}

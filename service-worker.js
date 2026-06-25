@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v8-cercania-500m-mapa-evidencias";
+const CACHE_NAME = "mizona-v9-perfiles-publicaciones-final";
 
 const CORE = [
   "./",
@@ -31,6 +31,8 @@ const CORE = [
   "./proveedor.html",
   "./verificar-telefono.html",
   "./contactos-confianza.html",
+  "./seguidores.html",
+  "./publicar.html",
   "./login.html",
   "./registro.html",
   "./recuperar.html",
@@ -61,7 +63,11 @@ const CORE = [
   "./css/integral-modules.css",
   "./css/mizona-stability.css",
   "./css/nearby-location.css",
+  "./css/perfiles-mizona.css",
   "./js/nearby-location.js",
+  "./js/perfil-publico.js",
+  "./js/crear-publicacion.js",
+  "./js/seguidores.js",
   "./js/incident-sheet.js",
   "./js/empleos-mizona.js",
   "./js/mizona-core.js",
@@ -102,6 +108,8 @@ const CORE = [
   "./js/oferta-detalle.js",
   "./js/admin-negocios.js",
   "./js/inicio-ofertas.js",
+  "./js/publicaciones.js",
+  "./js/home-publicaciones.js",
   "./js/instalar-pwa.js",
   "./assets/screenshot-mobile.png"
 ];

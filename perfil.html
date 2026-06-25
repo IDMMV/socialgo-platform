@@ -41,6 +41,7 @@
 <link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
 <link rel="stylesheet" href="css/mizona-stability.css">
 <link rel="stylesheet" href="css/nearby-location.css">
+<link rel="stylesheet" href="css/perfiles-mizona.css">
 </head>
 <body class="auth-pending">
 <div id="mz-global-toast" class="mz-toast"></div>
@@ -125,6 +126,8 @@
         <div class="mz-perfil-user"><i class="ti ti-at" style="font-size:10px"></i> <span id="p-user">@usuario</span></div>
         <div class="mz-perfil-dist"><i class="ti ti-map-pin" style="font-size:11px"></i> <span id="p-dist">Sin distrito</span></div>
         <div class="mz-perfil-bio" id="p-bio"></div>
+        <div id="p-tipo" class="profile-type-chip vecino"><i class="ti ti-user"></i> Vecino</div>
+        <br><a id="p-public-link" class="profile-public-link" href="usuario.html"><i class="ti ti-world"></i> Ver mi perfil público</a>
       </div>
 
       <!-- BADGES NIVEL -->
@@ -134,14 +137,17 @@
 
       <!-- STATS -->
       <div class="mz-perfil-stats">
-        <div class="mz-perfil-stat"><div class="mz-perfil-stat-val" id="st-alertas">0</div><div class="mz-perfil-stat-label">Alertas</div></div>
-        <div class="mz-perfil-stat"><div class="mz-perfil-stat-val" id="st-conf">0</div><div class="mz-perfil-stat-label">Confirmaciones</div></div>
-        <div class="mz-perfil-stat"><div class="mz-perfil-stat-val" id="st-svc">0</div><div class="mz-perfil-stat-label">Servicios</div></div>
-        <div class="mz-perfil-stat"><div class="mz-perfil-stat-val" id="st-com">0</div><div class="mz-perfil-stat-label">Comentarios</div></div>
+        <div class="mz-perfil-stat"><div class="mz-perfil-stat-val" id="st-publicaciones">0</div><div class="mz-perfil-stat-label">Publicaciones</div></div>
+        <div class="mz-perfil-stat"><div class="mz-perfil-stat-val" id="st-seguidores">0</div><div class="mz-perfil-stat-label">Seguidores</div></div>
+        <div class="mz-perfil-stat"><div class="mz-perfil-stat-val" id="st-seguidos">0</div><div class="mz-perfil-stat-label">Siguiendo</div></div>
+        <div class="mz-perfil-stat"><div class="mz-perfil-stat-val" id="st-alertas">0</div><div class="mz-perfil-stat-label">Alertas privadas</div></div>
       </div>
 
       <!-- ACCIONES RÁPIDAS -->
       <div class="mz-perfil-acciones">
+        <button class="mz-perfil-btn" style="background:var(--az);color:#fff" onclick="location.href='publicar.html'">
+          <i class="ti ti-plus" style="font-size:13px"></i> Crear publicación
+        </button>
         <button class="mz-perfil-btn mz-perfil-btn-alerta" onclick="location.href='alertas.html#reportar'">
           <i class="ti ti-bell" style="font-size:13px"></i> Nueva alerta
         </button>
@@ -175,6 +181,12 @@
           <div class="mz-field"><label>Zona / Urbanización</label><input class="mz-input" id="f-zona" type="text" placeholder="Ej: Urb. El Naranjal"></div>
         </div>
         <div class="mz-field"><label>Biografía</label><textarea class="mz-input" id="f-bio" maxlength="300" rows="3" style="resize:vertical" placeholder="Cuéntanos algo sobre ti..."></textarea></div>
+        <div class="profile-config-grid">
+          <div class="mz-field"><label>Tipo de perfil</label><select class="mz-input" id="f-tipo"><option value="vecino">Vecino</option><option value="profesional">Profesional</option><option value="negocio">Negocio</option><option value="institucion">Institución</option><option value="organizacion">Organización vecinal</option></select><div class="profile-config-note">Los perfiles profesionales, negocios e instituciones requieren aprobación.</div></div>
+          <div class="mz-field"><label>Privacidad del perfil</label><select class="mz-input" id="f-privacidad"><option value="publico">Público</option><option value="privado">Privado</option></select><div class="profile-config-note">En un perfil privado las solicitudes de seguimiento deben aprobarse.</div></div>
+          <div class="mz-field"><label><input id="f-seguidores" type="checkbox" checked> Permitir seguidores</label></div>
+          <div class="mz-field"><label><input id="f-mostrar-distrito" type="checkbox" checked> Mostrar mi distrito públicamente</label></div>
+        </div>
         <div class="mz-row">
           <button class="mz-save-btn" onclick="guardarPerfil()"><i class="ti ti-device-floppy" style="font-size:14px"></i> Guardar</button>
           <button style="background:var(--bg-input);color:var(--txt-second);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:11px;cursor:pointer" onclick="toggleEdit()">Cancelar</button>
@@ -185,8 +197,8 @@
     <!-- ACTIVIDAD -->
     <div class="mz-card">
       <div class="act-tabs">
-        <button class="act-tab active" onclick="verAct('alertas',this)"><i class="ti ti-bell" style="font-size:13px"></i> Alertas</button>
-        <button class="act-tab" onclick="verAct('confirmaciones',this)"><i class="ti ti-check" style="font-size:13px"></i> Confirmaciones</button>
+        <button class="act-tab active" onclick="verAct('publicaciones',this)"><i class="ti ti-notes" style="font-size:13px"></i> Publicaciones</button>
+        <button class="act-tab" onclick="verAct('alertas',this)"><i class="ti ti-lock" style="font-size:13px"></i> Mis alertas</button>
         <button class="act-tab" onclick="verAct('servicios',this)"><i class="ti ti-tool" style="font-size:13px"></i> Servicios</button>
         <button class="act-tab" onclick="verAct('comentarios',this)"><i class="ti ti-message" style="font-size:13px"></i> Comentarios</button>
       </div>
@@ -231,6 +243,10 @@
         <button class="sec-btn sec-btn-az" onclick="location.href='contactos-confianza.html'">Administrar</button>
       </div>
       <div class="security-item">
+        <div><div class="sec-label">Seguidores y solicitudes</div><div class="sec-sub">Aprueba seguidores si tu perfil es privado</div></div>
+        <button class="sec-btn sec-btn-az" onclick="location.href='seguidores.html'">Administrar</button>
+      </div>
+      <div class="security-item">
         <div><div class="sec-label">Ofrecer servicios</div><div class="sec-sub">Solicita aprobación antes de publicar</div></div>
         <button class="sec-btn sec-btn-az" onclick="location.href='proveedor.html'">Solicitar</button>
       </div>
@@ -249,7 +265,7 @@
   <div class="mz-bn-inner">
     <div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
     <div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
-    <div class="mz-bn-item"><div class="mz-bn-center" onclick="location.href='alertas.html#reportar'"><i class="ti ti-plus"></i></div></div>
+    <div class="mz-bn-item"><div class="mz-bn-center" onclick="location.href='publicar.html'"><i class="ti ti-plus"></i></div></div>
     <div class="mz-bn-item" onclick="location.href='servicios.html'"><i class="ti ti-tool"></i><span>Servicios</span></div>
     <div class="mz-bn-item active"><i class="ti ti-user"></i><span>Perfil</span></div>
   </div>
@@ -296,12 +312,15 @@ async function init() {
   if (!session?.user) { location.href = 'login.html?next=perfil.html'; return; }
   usuario = session.user;
   await cargarPerfil();
-  await verAct('alertas', document.querySelector('.act-tab.active'));
+  await verAct('publicaciones', document.querySelector('.act-tab.active'));
 }
 
 async function cargarPerfil() {
   const { data } = await sb.from('perfiles').select('*').eq('id', usuario.id).single();
   if (!data) return;
+  let adminState = false;
+  try { const adminResult = await sb.rpc('is_admin'); adminState = Boolean(adminResult.data); } catch (_) {}
+  data.is_admin = adminState;
   perfil = data;
   const adminLink = document.getElementById('perfil-admin-link');
   if (adminLink) adminLink.style.display = data.is_admin ? 'flex' : 'none';
@@ -330,6 +349,12 @@ async function cargarPerfil() {
   document.getElementById('p-user').textContent = '@' + (data.username || 'usuario');
   document.getElementById('p-dist').textContent = data.distrito || 'Sin distrito';
   document.getElementById('p-bio').textContent = data.biografia || '';
+  const tipoPerfil = data.tipo_perfil || (data.proveedor_estado === 'aprobado' ? (data.proveedor_tipo === 'independiente' ? 'profesional' : data.proveedor_tipo === 'organizacion' ? 'organizacion' : 'negocio') : 'vecino');
+  const tipoInfo = {vecino:['ti-user','Vecino'],profesional:['ti-briefcase','Profesional'],negocio:['ti-building-store','Negocio'],institucion:['ti-building-community','Institución'],organizacion:['ti-users-group','Organización vecinal']}[tipoPerfil] || ['ti-user','Vecino'];
+  const tipoChip = document.getElementById('p-tipo');
+  tipoChip.className = `profile-type-chip ${tipoPerfil}`;
+  tipoChip.innerHTML = `<i class="ti ${tipoInfo[0]}"></i> ${tipoInfo[1]}`;
+  document.getElementById('p-public-link').href = `usuario.html?u=${encodeURIComponent(data.username || '')}`;
 
   // Nivel
   const puntos = data.puntos_total || 0;
@@ -338,11 +363,16 @@ async function cargarPerfil() {
     (data.verificado ? ' <span class="mz-nivel-badge" style="color:#14532d;background:#f0fdf4;border:1px solid #86efac">✓ Verificado</span>' : '');
   document.getElementById('p-nivel-barra').innerHTML = renderBarraNivel(puntos);
 
-  // Stats
+  // Estadísticas públicas y alertas privadas
+  const [postsCount,followersCount,followingCount] = await Promise.all([
+    sb.from('publicaciones').select('id',{count:'exact',head:true}).eq('autor_id',usuario.id),
+    sb.from('seguidores').select('seguido_id',{count:'exact',head:true}).eq('seguido_id',usuario.id),
+    sb.from('seguidores').select('seguidor_id',{count:'exact',head:true}).eq('seguidor_id',usuario.id)
+  ]);
+  document.getElementById('st-publicaciones').textContent = postsCount.count || 0;
+  document.getElementById('st-seguidores').textContent = followersCount.count || 0;
+  document.getElementById('st-seguidos').textContent = followingCount.count || 0;
   document.getElementById('st-alertas').textContent = data.total_alertas || 0;
-  document.getElementById('st-conf').textContent = data.total_confirmaciones_dadas || 0;
-  document.getElementById('st-svc').textContent = data.total_servicios || 0;
-  document.getElementById('st-com').textContent = data.total_comentarios || 0;
 
   // Formulario
   document.getElementById('f-nombre').value = data.nombre_visible || '';
@@ -352,6 +382,16 @@ async function cargarPerfil() {
   document.getElementById('f-dist').value = data.distrito || '';
   document.getElementById('f-zona').value = data.zona || '';
   document.getElementById('f-bio').value = data.biografia || '';
+  document.getElementById('f-tipo').value = tipoPerfil;
+  const typeSelect = document.getElementById('f-tipo');
+  [...typeSelect.options].forEach(option => {
+    if (option.value === 'vecino') return;
+    const allowed = data.is_admin || data.verificado || (data.proveedor_estado === 'aprobado' && option.value === tipoPerfil);
+    option.disabled = !allowed;
+  });
+  document.getElementById('f-privacidad').value = data.privacidad_perfil || 'publico';
+  document.getElementById('f-seguidores').checked = data.permitir_seguidores !== false;
+  document.getElementById('f-mostrar-distrito').checked = data.mostrar_distrito_publico !== false;
 }
 
 // ===== EDITAR =====
@@ -362,6 +402,13 @@ window.toggleEdit = function() {
 
 window.guardarPerfil = async function() {
   try {
+    const requestedType = document.getElementById('f-tipo').value;
+    const approvedType = perfil?.proveedor_estado === 'aprobado'
+      ? (perfil.proveedor_tipo === 'independiente' ? 'profesional' : perfil.proveedor_tipo === 'organizacion' ? 'organizacion' : 'negocio')
+      : (perfil?.is_admin || perfil?.verificado ? requestedType : 'vecino');
+    if (requestedType !== approvedType && requestedType !== 'vecino') {
+      throw new Error('El administrador debe aprobar este tipo de perfil antes de activarlo. Usa la opción Ofrecer servicios.');
+    }
     const email = document.getElementById('f-email').value.trim();
     if (email !== usuario.email) {
       const { error } = await sb.auth.updateUser({ email });
@@ -373,6 +420,10 @@ window.guardarPerfil = async function() {
       distrito: document.getElementById('f-dist').value.trim() || null,
       zona: document.getElementById('f-zona').value.trim() || null,
       biografia: document.getElementById('f-bio').value.trim() || null,
+      tipo_perfil: approvedType,
+      privacidad_perfil: document.getElementById('f-privacidad').value,
+      permitir_seguidores: document.getElementById('f-seguidores').checked,
+      mostrar_distrito_publico: document.getElementById('f-mostrar-distrito').checked,
     }).eq('id', usuario.id);
     if (error) throw error;
     toast('✅ Perfil actualizado');
@@ -390,7 +441,12 @@ window.verAct = async function(tipo, btn) {
 
   try {
     let html = '';
-    if (tipo === 'alertas') {
+    if (tipo === 'publicaciones') {
+      let { data, error } = await sb.from('publicaciones').select('id,titulo,contenido,tipo,archivo_url,categoria_publicacion,visibilidad,creado_en').eq('autor_id',usuario.id).order('creado_en',{ascending:false}).limit(20);
+      if (error) ({data}=await sb.from('publicaciones').select('id,contenido,tipo,archivo_url,visibilidad,creado_en').eq('autor_id',usuario.id).order('creado_en',{ascending:false}).limit(20));
+      if (!data?.length) html = '<div class="act-empty"><span class="act-empty-icon">📝</span>Aún no tienes publicaciones públicas.<br><a href="publicar.html" style="color:var(--az);font-weight:700;text-decoration:none">Crear publicación →</a></div>';
+      else html = data.map(p => `<div class="act-item"><div class="act-item-body"><div class="act-item-title">${escapeHtml(p.titulo || p.contenido?.slice(0,90) || 'Publicación')}</div><div class="act-item-meta"><span>${escapeHtml(p.categoria_publicacion || p.tipo || 'general')}</span><span>· ${escapeHtml(p.visibilidad || 'public')}</span></div></div><a href="usuario.html?u=${encodeURIComponent(perfil.username)}" style="color:var(--az);font-size:10px;font-weight:700;text-decoration:none">Ver →</a></div>`).join('');
+    } else if (tipo === 'alertas') {
       const { data } = await sb.from('alertas').select('id,titulo,categoria,estado,created_at,total_confirmaciones,zona_referencia')
         .eq('autor_id', usuario.id).order('created_at', {ascending:false}).limit(10);
       if (!data?.length) {

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Seguidores · MiZona.pe</title>
+<link rel="manifest" href="manifest.json"><link rel="icon" href="assets/favicon-32.png" type="image/png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="css/global.css"><link rel="stylesheet" href="css/perfiles-mizona.css">
+<style>.followers-shell{max-width:920px;margin:auto;padding:24px 18px 90px}.followers-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.followers-card{background:#fff;border:1px solid #dfe7f1;border-radius:18px;padding:17px;margin-bottom:14px}.followers-tabs{display:flex;gap:6px;margin-bottom:14px}.followers-tabs button{border:1px solid #d9e3ef;background:#fff;border-radius:10px;padding:9px 13px;font-weight:800;cursor:pointer}.followers-tabs button.active{background:#185fa5;color:#fff;border-color:#185fa5}.follower-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #edf2f7}.follower-row:last-child{border-bottom:0}.follower-avatar{width:48px;height:48px;border-radius:50%;background:#eaf2fb;color:#185fa5;display:flex;align-items:center;justify-content:center;font-weight:900;overflow:hidden}.follower-avatar img{width:100%;height:100%;object-fit:cover}.follower-info{flex:1;min-width:0}.follower-info strong,.follower-info small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.follower-info small{font-size:11px;color:#64748b;margin-top:3px}.follower-actions{display:flex;gap:7px;flex-wrap:wrap}@media(max-width:560px){.follower-row{align-items:flex-start}.follower-actions{width:100%;margin-left:60px}.followers-head h1{font-size:22px}}</style>
+</head>
+<body class="profile-page">
+<main class="followers-shell">
+<header class="followers-head"><div><h1>Seguidores y solicitudes</h1><p style="color:#64748b;margin:4px 0 0">Administra quién puede seguir tu perfil.</p></div><a class="profile-btn" href="perfil.html"><i class="ti ti-arrow-left"></i> Mi perfil</a></header>
+<div class="followers-tabs"><button class="active" data-view="requests">Solicitudes</button><button data-view="followers">Seguidores</button><button data-view="following">Siguiendo</button></div>
+<section class="followers-card" id="followersContent"><div class="profile-empty"><i class="ti ti-loader-2"></i>Cargando…</div></section>
+</main>
+<script type="module" src="js/seguidores.js"></script>
+</body></html>

@@ -1,140 +1,76 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>Perfil · MiZona</title>
-<link href="manifest.json" rel="manifest"/>
-<link href="css/global.css" rel="stylesheet"/>
-<link href="css/mizona-unified.css" rel="stylesheet"/>
-<link href="css/mizona-phase2.css" rel="stylesheet"/>
-<link href="css/mizona-master-shell.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
-<link rel="stylesheet" href="css/mizona-stability.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#185fa5">
+  <title>Perfil · MiZona.pe</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/favicon-32.png" type="image/png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/perfiles-mizona.css">
+  <style>
+    .public-topbar{height:72px;background:#fff;border-bottom:1px solid #dfe7f1;display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:50}
+    .public-topbar-inner{max-width:1180px;width:100%;margin:auto;display:flex;align-items:center;gap:18px}.public-logo img{width:180px;display:block}.public-search{flex:1;max-width:580px;position:relative}.public-search input{width:100%;border:1px solid #d7e1ed;background:#f7f9fc;border-radius:14px;padding:12px 15px 12px 40px}.public-search i{position:absolute;left:14px;top:13px;color:#7b8da5}.public-nav-actions{display:flex;gap:8px}.public-nav-actions a{border:1px solid #dbe4ef;border-radius:11px;padding:9px 12px;text-decoration:none;color:#21324c;font-weight:800;font-size:12px}.public-mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #dfe7f1;z-index:80;height:64px;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom)}.public-mobile-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#64748b;text-decoration:none;font-size:10px;gap:2px}.public-mobile-nav i{font-size:20px}.public-mobile-nav .plus i{background:#185fa5;color:#fff;border-radius:50%;width:43px;height:43px;display:flex;align-items:center;justify-content:center;margin-top:-18px;box-shadow:0 8px 20px rgba(24,95,165,.3)}
+    @media(max-width:720px){.public-topbar{height:58px;padding:0 12px}.public-logo img{width:142px}.public-search{display:none}.public-nav-actions a:not(:first-child){display:none}.public-mobile-nav{display:grid}}
+  </style>
 </head>
-<body class="auth-pending">
-<main class="page-shell">
-<header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
-<a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a>
-<a class="secondary" href="explorar.html">← Explorar</a>
-</header>
-<section class="page-card" id="profileBox">
-<p class="notice">Cargando perfil…</p>
-</section>
-<section class="page-card" style="margin-top:18px">
-<h2>Publicaciones</h2>
-<div class="activity-grid" id="userPosts">
-<p class="notice">Cargando publicaciones…</p>
-</div>
-</section>
-</main>
-<script type="module">
-    import { applyBrand } from "./js/brand.js";
-    import { supabase, getCurrentUser } from "./js/supabase.js";
-    import { openOrRequestChat } from "./js/chat-access.js";
+<body class="profile-page">
+  <header class="public-topbar">
+    <div class="public-topbar-inner">
+      <a class="public-logo" href="index.html"><img src="assets/mizona-logo-horizontal.svg" alt="MiZona.pe"></a>
+      <label class="public-search"><i class="ti ti-search"></i><input type="search" placeholder="Buscar en MiZona..."></label>
+      <nav class="public-nav-actions"><a href="explorar.html"><i class="ti ti-compass"></i> Explorar</a><a href="mensajes.html"><i class="ti ti-message"></i> Mensajes</a><a href="perfil.html"><i class="ti ti-user"></i> Mi perfil</a></nav>
+    </div>
+  </header>
 
-    applyBrand();
+  <main class="profile-shell">
+    <div class="profile-topline"><a class="profile-back" href="explorar.html"><i class="ti ti-arrow-left"></i> Volver a explorar</a><a class="profile-btn" href="index.html"><i class="ti ti-home"></i> Inicio</a></div>
+    <div id="profileLoad" class="profile-empty"><i class="ti ti-loader-2"></i><strong>Cargando perfil…</strong></div>
 
-    const params = new URLSearchParams(location.search);
-    const username = params.get("u");
-    const profileBox = document.querySelector("#profileBox");
-    const postsBox = document.querySelector("#userPosts");
-    const currentUser = await getCurrentUser();
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;")
-        .replaceAll(">","&gt;").replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    if (!username) {
-      profileBox.innerHTML = `<p class="notice">Usuario no especificado.</p>`;
-    } else {
-      const { data: profile, error } = await supabase
-        .from("perfiles_publicos")
-        .select("*")
-        .eq("username", username)
-        .maybeSingle();
-
-      if (error || !profile) {
-        profileBox.innerHTML = `<p class="notice">Perfil no encontrado.</p>`;
-      } else {
-        document.title = `${profile.nombre_visible || profile.username} · MiZona`;
-
-        profileBox.innerHTML = `
-          <div class="public-profile-header">
-            <div class="public-profile-avatar">
-              ${profile.avatar_url
-                ? `<img src="${escapeHtml(profile.avatar_url)}" alt="">`
-                : escapeHtml((profile.nombre_visible || "U").charAt(0).toUpperCase())}
-            </div>
-            <div>
-              <h1>${escapeHtml(profile.nombre_visible || "Usuario")}</h1>
-              <p>@${escapeHtml(profile.username)}</p>
-              <p>${escapeHtml(profile.biografia || "")}</p>
-              <div class="profile-stats">
-                <span><strong>${profile.total_seguidores || 0}</strong> seguidores</span>
-                <span><strong>${profile.total_seguidos || 0}</strong> seguidos</span>
+    <div id="profileReady" hidden>
+      <div class="profile-layout">
+        <section class="profile-main">
+          <article class="public-profile-card">
+            <div class="public-cover" id="publicCover"></div>
+            <div class="public-profile-head">
+              <div class="public-avatar" id="publicAvatar">MZ</div>
+              <div class="public-actions" id="publicActions"></div>
+              <h1 class="public-name" id="publicName"></h1>
+              <div class="public-handle" id="publicHandle"></div>
+              <p class="public-bio" id="publicBio"></p>
+              <div class="profile-meta-row" id="publicMeta"></div>
+              <div id="publicType" class="profile-type-chip"></div>
+              <div class="public-stats">
+                <div class="public-stat"><strong id="statPosts">0</strong><span>Publicaciones</span></div>
+                <div class="public-stat"><strong id="statFollowers">0</strong><span>Seguidores</span></div>
+                <div class="public-stat"><strong id="statFollowing">0</strong><span>Siguiendo</span></div>
+                <div class="public-stat"><strong id="statExtra">0</strong><span id="statExtraLabel">Actividades</span></div>
               </div>
-              ${currentUser && currentUser.id !== profile.id ? `
-                <div class="modal-actions" style="justify-content:flex-start;margin-top:12px">
-                  <button id="followButton" class="primary">${profile.siguiendo ? "Dejar de seguir" : "Seguir"}</button>
-                  <button id="friendButton" class="secondary">${profile.estado_amistad === "aceptada" ? "Amigos" : profile.estado_amistad === "pendiente" ? "Solicitud enviada" : "Agregar amigo"}</button>
-                  <button id="messageButton" class="secondary">Enviar mensaje</button>
-                </div>` : ""}
             </div>
-          </div>`;
+            <nav class="profile-tabs" id="profileTabs"></nav>
+          </article>
+          <section class="profile-content" id="profileContent"></section>
+        </section>
 
-        document.querySelector("#followButton")?.addEventListener("click", async () => {
-          const result = profile.siguiendo
-            ? await supabase.from("seguidores").delete()
-                .eq("seguidor_id", currentUser.id).eq("seguido_id", profile.id)
-            : await supabase.from("seguidores").insert({
-                seguidor_id: currentUser.id,
-                seguido_id: profile.id
-              });
+        <aside class="profile-aside">
+          <section class="profile-side-card"><h3>¿Por qué seguir esta cuenta?</h3><p id="whyFollow"></p></section>
+          <section class="profile-side-card"><h3>Información pública</h3><div class="profile-meta-row" id="profileContact" style="display:grid;gap:9px"></div></section>
+          <section class="profile-side-card"><div class="privacy-note"><i class="ti ti-lock"></i><div><strong>Privacidad protegida</strong><br>Las alertas sensibles por robo, violencia o emergencia no aparecen en el perfil público ni revelan la identidad del reportante.</div></div></section>
+          <section class="profile-side-card"><h3>Seguridad en MiZona</h3><p>Reporta perfiles falsos, publicaciones engañosas o mensajes inapropiados desde el menú de cada contenido.</p></section>
+        </aside>
+      </div>
+    </div>
+  </main>
 
-          if (result.error) alert(result.error.message);
-          else location.reload();
-        });
-
-        document.querySelector("#friendButton")?.addEventListener("click", async () => {
-          const { error } = await supabase.rpc("enviar_solicitud_amistad", { p_destinatario: profile.id });
-          if (error) alert(error.message); else location.reload();
-        });
-
-        document.querySelector("#messageButton")?.addEventListener("click", async () => {
-          try { await openOrRequestChat(profile.id); }
-          catch (error) { alert(error.message); }
-        });
-
-        const { data: posts, error: postsError } = await supabase
-          .from("publicaciones")
-          .select("id,contenido,archivo_url,tipo,creado_en")
-          .eq("autor_id", profile.id)
-          .eq("visibilidad", "public")
-          .eq("estado_moderacion", "aprobado")
-          .order("creado_en", { ascending: false });
-
-        postsBox.innerHTML = postsError
-          ? `<p class="notice">${escapeHtml(postsError.message)}</p>`
-          : posts?.length
-            ? posts.map(post => `
-              <article class="mini-post">
-                <small>${new Date(post.creado_en).toLocaleString("es-PE")}</small>
-                ${post.contenido ? `<p>${escapeHtml(post.contenido)}</p>` : ""}
-                ${post.archivo_url && post.tipo === "imagen"
-                  ? `<img class="post-image" src="${escapeHtml(post.archivo_url)}" alt="">`
-                  : ""}
-              </article>`).join("")
-            : `<p class="notice">Este usuario todavía no tiene publicaciones públicas.</p>`;
-      }
-    }
-  </script>
-<script src="./js/mizona-core.js" type="module"></script>
-<script src="./js/mizona-master-shell.js" type="module"></script>
-<script type="module" src="js/mizona-sidebar-uniforme.js"></script>
+  <nav class="public-mobile-nav">
+    <a href="index.html"><i class="ti ti-home"></i>Inicio</a>
+    <a href="mapa.html"><i class="ti ti-map"></i>Mapa</a>
+    <a class="plus" href="publicar.html"><i class="ti ti-plus"></i>Publicar</a>
+    <a href="mensajes.html"><i class="ti ti-message"></i>Mensajes</a>
+    <a href="perfil.html"><i class="ti ti-user"></i>Perfil</a>
+  </nav>
+  <script type="module" src="js/perfil-publico.js"></script>
 </body>
 </html>

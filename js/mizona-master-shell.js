@@ -9,7 +9,8 @@ const PAGE_INFO = {
   'proveedor.html':['Ofrecer servicios'], 'negocio.html':['Mi negocio'], 'negocio-publico.html':['Negocio local'],
   'oferta.html':['Detalle de oferta'], 'admin-proveedores.html':['Proveedores'], 'admin-negocios.html':['Negocios y ofertas'],
   'admin-alertas.html':['Alertas y sugerencias'], 'sugerencias.html':['Sugerencias'], 'explorar.html':['Explorar'],
-  'admin.html':['Administración'], 'usuario.html':['Perfil público'], 'verificar-telefono.html':['Verificar teléfono']
+  'admin.html':['Administración'], 'usuario.html':['Perfil público'], 'verificar-telefono.html':['Verificar teléfono'],
+  'seguidores.html':['Seguidores'], 'publicar.html':['Crear publicación']
 };
 
 const NAV = [
@@ -20,7 +21,7 @@ const NAV = [
     ['ofertas.html','ti-tag','Zona Ofertas'],['ride.html','ti-car','MiZonaRide'],['empleos.html','ti-briefcase','Empleos'],
     ['explorar.html','ti-compass','Explorar'],['sugerencias.html','ti-bulb','Sugerencias']]],
   ['Cuenta',[
-    ['mensajes.html','ti-message','Mensajes'],['amistades.html','ti-users','Amigos'],
+    ['mensajes.html','ti-message','Mensajes'],['amistades.html','ti-users','Amigos'],['seguidores.html','ti-user-check','Seguidores'],
     ['contactos-confianza.html','ti-shield-heart','Contactos de confianza'],['notificaciones.html','ti-bell-ringing','Notificaciones'],
     ['perfil.html','ti-user','Mi perfil'],['proveedor.html','ti-tool','Ofrecer servicios'],['negocio.html','ti-building-store','Mi negocio'],
     ['admin.html','ti-shield','Administración','admin']]]
@@ -39,7 +40,7 @@ function navHtml(page){
 }
 function mobileHtml(page){
   const items=[['index.html','ti-home','Inicio'],['alertas.html','ti-bell','Alertas'],['__plus__','ti-plus',''],['mensajes.html','ti-message','Mensajes'],['perfil.html','ti-user','Perfil']];
-  return items.map(([href,icon,label])=>href==='__plus__'?`<a class="mz3-mobile-plus" href="alertas.html#reportar" aria-label="Publicar"><i class="ti ${icon}"></i></a>`:`<a href="${href}" class="${activeFor(page,href)?'active':''}"><i class="ti ${icon}"></i><span>${label}</span></a>`).join('');
+  return items.map(([href,icon,label])=>href==='__plus__'?`<a class="mz3-mobile-plus" href="publicar.html" aria-label="Publicar"><i class="ti ${icon}"></i></a>`:`<a href="${href}" class="${activeFor(page,href)?'active':''}"><i class="ti ${icon}"></i><span>${label}</span></a>`).join('');
 }
 function detachMain(){
   let wrapper=null,main=null;
@@ -65,7 +66,7 @@ function buildShell(page,main){
   <section class="mz3-workspace"><header class="mz3-topbar"><button class="mz3-menu" id="mz3Menu" type="button"><i class="ti ti-menu-2"></i></button>
     <button class="mz3-location" id="mz3Location" type="button"><i class="ti ti-map-pin-filled"></i><span id="mz3Zone">Mi zona</span></button>
     <label class="mz3-search"><i class="ti ti-search"></i><input id="mz3Search" type="search" placeholder="Buscar en MiZona..."></label>
-    <a class="mz3-add-btn" href="alertas.html#reportar" aria-label="Publicar"><i class="ti ti-plus"></i></a>
+    <a class="mz3-add-btn" href="publicar.html" aria-label="Publicar"><i class="ti ti-plus"></i></a>
     <a class="mz3-icon-btn" href="notificaciones.html" aria-label="Notificaciones"><i class="ti ti-bell"></i><span class="mz3-icon-dot" id="mz3NotifDot" hidden></span></a>
     <a class="mz3-profile-btn" id="mz3TopProfile" href="perfil.html"><span class="mz3-top-avatar" id="mz3TopAvatar">U</span><span class="mz3-profile-copy"><strong id="mz3TopName" data-mz-first-name>Perfil</strong><small id="mz3TopMeta">Ver cuenta</small></span></a>
   </header><div class="mz3-content"></div></section><nav class="mz3-mobile-nav">${mobileHtml(page)}</nav>`;
@@ -81,7 +82,8 @@ function renderAccount(shell,snapshot){
   const meta=snapshot.publicHandle || snapshot.district || 'Mi zona';
   shell.querySelector('#mz3SideName').textContent=snapshot.fullName; shell.querySelector('#mz3SideMeta').textContent=meta;
   shell.querySelector('#mz3Zone').textContent=snapshot.district||'Mi zona'; shell.querySelector('#mz3TopName').textContent=snapshot.firstName;
-  shell.querySelector('#mz3TopMeta').textContent=snapshot.providerStatus==='aprobado'?'Proveedor aprobado':'Ver cuenta';
+  const typeLabels={vecino:'Cuenta vecinal',profesional:'Perfil profesional',negocio:'Negocio local',institucion:'Institución',organizacion:'Organización vecinal'};
+  shell.querySelector('#mz3TopMeta').textContent=typeLabels[snapshot.profileType] || (snapshot.providerStatus==='aprobado'?'Proveedor aprobado':'Ver cuenta');
   const avatar=avatarHtml(snapshot); shell.querySelector('#mz3SideAvatar').innerHTML=avatar;shell.querySelector('#mz3TopAvatar').innerHTML=avatar;
 }
 async function loadAccount(shell){
@@ -101,7 +103,7 @@ function bind(shell,main){
   const close=()=>document.body.classList.remove('mz3-drawer-open');
   shell.querySelector('#mz3Menu')?.addEventListener('click',()=>document.body.classList.toggle('mz3-drawer-open'));
   shell.querySelector('#mz3Backdrop')?.addEventListener('click',close); shell.querySelectorAll('.mz3-sidebar a').forEach(a=>a.addEventListener('click',close));
-  shell.querySelector('#mz3Publish')?.addEventListener('click',()=>location.href='alertas.html#reportar');
+  shell.querySelector('#mz3Publish')?.addEventListener('click',()=>location.href='publicar.html');
   shell.querySelector('#mz3Location')?.addEventListener('click',()=>location.href='mapa.html');
   shell.querySelector('#mz3Search')?.addEventListener('keydown',e=>{if(e.key==='Enter'){const q=e.currentTarget.value.trim();location.href=q?`explorar.html?q=${encodeURIComponent(q)}`:'explorar.html';}});
   shell.querySelector('#mz3Logout')?.addEventListener('click',async()=>{try{await supabase.auth.signOut();clearSessionSnapshot();location.href='index.html';}catch{window.mzToast?.('No se pudo cerrar sesión','error');}});

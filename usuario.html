@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" class="profile-document">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -63,6 +63,44 @@
       </div>
     </div>
   </main>
+
+  <dialog id="editPostDialog" class="profile-edit-dialog" aria-labelledby="editPostDialogTitle">
+    <form id="editPostForm" class="profile-edit-form">
+      <div class="profile-edit-head">
+        <div>
+          <span class="profile-edit-kicker">Publicación propia</span>
+          <h2 id="editPostDialogTitle">Modificar publicación</h2>
+        </div>
+        <button type="button" class="profile-edit-close" data-close-edit-dialog aria-label="Cerrar"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="profile-edit-notice"><i class="ti ti-clock"></i><span>La modificación está disponible únicamente durante los primeros <strong>5 minutos</strong>. La publicación se puede borrar en cualquier momento.</span></div>
+      <input type="hidden" id="editPostId">
+      <div class="profile-edit-grid">
+        <label class="profile-edit-field full"><span>Título</span><input id="editPostTitle" maxlength="160" placeholder="Título opcional"></label>
+        <label class="profile-edit-field full"><span>Contenido</span><textarea id="editPostContent" maxlength="5000" rows="7" placeholder="Escribe el contenido de la publicación"></textarea></label>
+        <label class="profile-edit-field"><span>Tipo</span>
+          <select id="editPostCategory">
+            <option value="general">Publicación</option><option value="consejo">Consejo</option><option value="recomendacion">Recomendación</option>
+            <option value="evento">Evento</option><option value="foto">Foto de la zona</option><option value="trabajo">Trabajo realizado</option>
+            <option value="producto">Producto</option><option value="comunicado">Comunicado</option><option value="campana">Campaña</option>
+            <option value="actividad">Actividad</option><option value="reunion">Reunión</option><option value="empleo">Empleo</option>
+          </select>
+        </label>
+        <label class="profile-edit-field"><span>Visibilidad</span>
+          <select id="editPostVisibility"><option value="public">Pública</option><option value="followers">Seguidores</option><option value="friends">Amigos</option><option value="private">Privada</option></select>
+        </label>
+        <label class="profile-edit-field full"><span>Ubicación visible</span><input id="editPostLocation" maxlength="180" placeholder="Ej.: San Martín de Porres"></label>
+        <label class="profile-edit-field"><span>Fecha del evento</span><input id="editPostEventDate" type="datetime-local"></label>
+        <label class="profile-edit-check"><input id="editPostComments" type="checkbox"><span>Permitir comentarios</span></label>
+      </div>
+      <p class="profile-edit-media-note"><i class="ti ti-photo"></i> La imagen o video original se mantiene. Para cambiar el archivo multimedia, borra la publicación y crea una nueva.</p>
+      <div id="editPostStatus" class="profile-edit-status" hidden></div>
+      <div class="profile-edit-actions">
+        <button type="button" class="profile-btn" data-close-edit-dialog>Cancelar</button>
+        <button type="submit" class="profile-btn primary" id="savePostChanges"><i class="ti ti-device-floppy"></i> Guardar cambios</button>
+      </div>
+    </form>
+  </dialog>
 
   <nav class="public-mobile-nav">
     <a href="index.html"><i class="ti ti-home"></i>Inicio</a>

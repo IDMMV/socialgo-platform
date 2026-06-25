@@ -1,5 +1,6 @@
 import { supabase, getCurrentUser } from './supabase.js';
 import { openOrRequestChat } from './chat-access.js';
+import { deletePost } from './publicaciones.js';
 
 const qs = (s, root=document) => root.querySelector(s);
 const esc = value => String(value ?? '')
@@ -39,6 +40,7 @@ let currentUser = null;
 let profile = null;
 let activeTab = null;
 let datasets = {posts:[],services:[],offers:[],jobs:[],businesses:[]};
+const EDIT_WINDOW_MS = 5 * 60 * 1000;
 
 function initials(name){
   return String(name||'U').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase();
@@ -50,6 +52,25 @@ function canSeeContent(){
   if (isOwner()) return true;
   if (profile.privacidad_perfil !== 'privado') return true;
   return Boolean(profile.siguiendo || profile.estado_amistad === 'aceptada');
+}
+function editRemainingMs(post){
+  const created=new Date(post?.creado_en).getTime();
+  if(!Number.isFinite(created)) return 0;
+  return Math.max(0, EDIT_WINDOW_MS-(Date.now()-created));
+}
+function canEditPost(post){ return isOwner() && editRemainingMs(post)>0; }
+function editRemainingLabel(post){
+  const ms=editRemainingMs(post);
+  if(ms<=0) return '';
+  const min=Math.max(1,Math.ceil(ms/60000));
+  return `${min} min`;
+}
+function toLocalDateTime(value){
+  if(!value) return '';
+  const date=new Date(value);
+  if(Number.isNaN(date.getTime())) return '';
+  const local=new Date(date.getTime()-date.getTimezoneOffset()*60000);
+  return local.toISOString().slice(0,16);
 }
 function toast(message,type='ok'){
   let node=qs('#profileToast');
@@ -154,7 +175,13 @@ function postCard(post){
   const kind=post.categoria_publicacion||'general';
   const title=post.titulo||String(post.contenido||'Publicación').split('\n')[0].slice(0,85);
   const text=post.contenido||'';
-  return `<article class="profile-post">
+  const editable=canEditPost(post);
+  const ownerTools=isOwner()?`<div class="profile-post-owner-tools">
+    ${editable?`<button type="button" class="profile-owner-action" data-edit-profile-post="${esc(post.id)}"><i class="ti ti-pencil"></i> Modificar <small>${editRemainingLabel(post)}</small></button>`:`<span class="profile-edit-closed" title="La publicación solo se puede modificar durante los primeros 5 minutos"><i class="ti ti-lock"></i> Edición cerrada</span>`}
+    <button type="button" class="profile-owner-action danger" data-delete-profile-post="${esc(post.id)}"><i class="ti ti-trash"></i> Borrar</button>
+  </div>`:'';
+  return `<article class="profile-post" data-profile-post-id="${esc(post.id)}">
+    ${ownerTools}
     ${post.archivo_url&&post.tipo==='imagen'?`<img src="${esc(post.archivo_url)}" alt="${esc(title)}" loading="lazy">`:''}
     ${post.archivo_url&&['video','clip'].includes(post.tipo)?`<video src="${esc(post.archivo_url)}" controls playsinline style="width:100%;max-height:340px;background:#111"></video>`:''}
     <div class="profile-post-body"><span class="profile-post-kind">${esc(KIND_LABELS[kind]||'Publicación')}</span><h3>${esc(title)}</h3>${text&&text!==title?`<p>${esc(text).replaceAll('\n','<br>')}</p>`:''}
@@ -184,6 +211,83 @@ function renderContent(){
   root.querySelectorAll('[data-contact-provider]').forEach(btn=>btn.addEventListener('click',sendMessage));
   root.querySelectorAll('[data-share-post]').forEach(btn=>btn.addEventListener('click',()=>shareUrl(`${location.origin}/usuario.html?u=${encodeURIComponent(profile.username)}`,'Publicación en MiZona')));
   root.querySelectorAll('[data-share-offer]').forEach(btn=>btn.addEventListener('click',()=>shareUrl(`${location.origin}/oferta.html?id=${encodeURIComponent(btn.dataset.shareOffer)}`,'Oferta en MiZona')));
+  root.querySelectorAll('[data-edit-profile-post]').forEach(btn=>btn.addEventListener('click',()=>openEditPost(btn.dataset.editProfilePost)));
+  root.querySelectorAll('[data-delete-profile-post]').forEach(btn=>btn.addEventListener('click',()=>removeProfilePost(btn.dataset.deleteProfilePost,btn)));
+}
+
+function findPost(postId){ return datasets.posts.find(item=>String(item.id)===String(postId)); }
+function setEditStatus(message=''){
+  const box=qs('#editPostStatus');
+  if(!box) return;
+  box.textContent=message;box.hidden=!message;
+}
+function closeEditPost(){
+  const dialog=qs('#editPostDialog');
+  if(!dialog) return;
+  if(typeof dialog.close==='function'&&dialog.open) dialog.close(); else dialog.removeAttribute('open');
+  setEditStatus('');
+}
+function openEditPost(postId){
+  const post=findPost(postId);
+  if(!post) return toast('No se encontró la publicación.','error');
+  if(!canEditPost(post)){renderContent();return toast('El plazo de 5 minutos para modificar esta publicación ya terminó.','error');}
+  qs('#editPostId').value=post.id;
+  qs('#editPostTitle').value=post.titulo||'';
+  qs('#editPostContent').value=post.contenido||'';
+  qs('#editPostCategory').value=post.categoria_publicacion||'general';
+  qs('#editPostVisibility').value=post.visibilidad||'public';
+  qs('#editPostLocation').value=post.ubicacion_texto||'';
+  qs('#editPostEventDate').value=toLocalDateTime(post.fecha_evento);
+  qs('#editPostComments').checked=post.permitir_comentarios!==false;
+  setEditStatus('');
+  const dialog=qs('#editPostDialog');
+  if(typeof dialog.showModal==='function') dialog.showModal(); else dialog.setAttribute('open','');
+}
+async function saveEditedPost(event){
+  event.preventDefault();
+  const post=findPost(qs('#editPostId').value);
+  if(!post) return setEditStatus('No se encontró la publicación.');
+  if(!canEditPost(post)){setEditStatus('El plazo de 5 minutos ya terminó. Cierra esta ventana y vuelve a cargar el perfil.');renderContent();return;}
+  const title=qs('#editPostTitle').value.trim();
+  const content=qs('#editPostContent').value.trim();
+  if(!title&&!content&&!post.archivo_url) return setEditStatus('La publicación necesita un título o contenido.');
+  const button=qs('#savePostChanges');
+  const original=button.innerHTML;button.disabled=true;button.innerHTML='<i class="ti ti-loader-2"></i> Guardando…';setEditStatus('');
+  try{
+    const eventValue=qs('#editPostEventDate').value;
+    const payload={
+      titulo:title||null,contenido:content||null,categoria_publicacion:qs('#editPostCategory').value,
+      visibilidad:qs('#editPostVisibility').value,ubicacion_texto:qs('#editPostLocation').value.trim()||null,
+      fecha_evento:eventValue?new Date(eventValue).toISOString():null,permitir_comentarios:qs('#editPostComments').checked
+    };
+    const {data,error}=await supabase.from('publicaciones').update(payload)
+      .eq('id',post.id).eq('autor_id',currentUser.id)
+      .select('id,autor_id,titulo,contenido,tipo,archivo_url,miniatura_url,visibilidad,permitir_comentarios,categoria_publicacion,ubicacion_texto,fecha_evento,creado_en').maybeSingle();
+    if(error) throw error;
+    if(!data) throw new Error('No se pudo modificar. El plazo de 5 minutos puede haber terminado.');
+    datasets.posts=datasets.posts.map(item=>String(item.id)===String(data.id)?{...item,...data}:item);
+    closeEditPost();renderHeader();renderContent();toast('Publicación modificada correctamente.');
+  }catch(error){
+    const message=/5 minutos|row-level security|42501/i.test(error.message||'')?'Solo puedes modificar tu publicación durante los primeros 5 minutos.':(error.message||'No se pudo modificar la publicación.');
+    setEditStatus(message);
+  }finally{button.disabled=false;button.innerHTML=original;}
+}
+async function removeProfilePost(postId,button){
+  const post=findPost(postId);
+  if(!post) return toast('No se encontró la publicación.','error');
+  if(!isOwner()) return toast('Solo el autor puede borrar esta publicación.','error');
+  if(!confirm('¿Borrar esta publicación? Esta acción no se puede deshacer.')) return;
+  const original=button?.innerHTML;if(button){button.disabled=true;button.innerHTML='<i class="ti ti-loader-2"></i> Borrando…';}
+  try{
+    await deletePost(post.id,post.archivo_url||null);
+    datasets.posts=datasets.posts.filter(item=>String(item.id)!==String(post.id));
+    renderHeader();renderContent();toast('Publicación borrada.');
+  }catch(error){toast(error.message||'No se pudo borrar la publicación.','error');if(button){button.disabled=false;button.innerHTML=original;}}
+}
+function bindEditDialog(){
+  qs('#editPostForm')?.addEventListener('submit',saveEditedPost);
+  document.querySelectorAll('[data-close-edit-dialog]').forEach(btn=>btn.addEventListener('click',closeEditPost));
+  qs('#editPostDialog')?.addEventListener('click',event=>{if(event.target===event.currentTarget) closeEditPost();});
 }
 
 function renderAside(){
@@ -235,6 +339,7 @@ async function shareUrl(url,text){
 }
 
 async function init(){
+  bindEditDialog();
   const username=new URLSearchParams(location.search).get('u');
   const root=qs('#profileLoad');
   if(!username){root.innerHTML='<div class="profile-empty"><strong>Falta indicar el usuario.</strong></div>';return;}

@@ -1,3 +1,14 @@
+/* MiZona V6.2 — el perfil público debe usar el desplazamiento normal de la página. */
+html.profile-document,
+html.profile-document body.profile-page{
+  width:100%;height:auto!important;min-height:100%;overflow-x:hidden!important;overflow-y:auto!important;
+}
+html.profile-document{scrollbar-gutter:stable;scroll-behavior:smooth}
+html.profile-document::-webkit-scrollbar{width:12px}
+html.profile-document::-webkit-scrollbar-track{background:#edf2f7}
+html.profile-document::-webkit-scrollbar-thumb{background:#9db0c5;border:3px solid #edf2f7;border-radius:999px}
+html.profile-document::-webkit-scrollbar-thumb:hover{background:#7289a3}
+
 :root{
   --mz-blue:#185fa5;--mz-blue-2:#2477c7;--mz-navy:#0f2342;--mz-page:#f4f7fb;
   --mz-card:#fff;--mz-border:#dfe7f1;--mz-text:#14213d;--mz-muted:#64748b;
@@ -64,3 +75,35 @@ body.publish-page{height:auto!important;min-height:100vh!important;overflow-y:au
 body.publish-page .publish-shell{min-height:100vh;padding-bottom:150px}
 body.publish-page .publish-actions{position:relative;z-index:2;padding-bottom:18px}
 @media(max-width:640px){body.publish-page .publish-shell{padding-bottom:calc(145px + env(safe-area-inset-bottom))}}
+
+
+/* MiZona V6.2 — administración de publicaciones propias */
+.profile-post{position:relative}
+.profile-post-owner-tools{display:flex;align-items:center;justify-content:flex-end;gap:7px;padding:10px 12px 0;flex-wrap:wrap}
+.profile-owner-action{display:inline-flex;align-items:center;gap:5px;border:1px solid #cdd9e7;background:#f8fbff;color:#28415f;border-radius:9px;padding:7px 9px;font-size:10px;font-weight:900;cursor:pointer}
+.profile-owner-action:hover{border-color:var(--mz-blue);color:var(--mz-blue);background:#eef6ff}
+.profile-owner-action.danger{border-color:#f1c1c5;background:#fff6f7;color:#b4232c}
+.profile-owner-action.danger:hover{background:#ffecef;border-color:#df6b75;color:#8d1821}
+.profile-owner-action small{font-size:9px;font-weight:800;opacity:.8}
+.profile-edit-closed{display:inline-flex;align-items:center;gap:5px;color:#7c8ca0;font-size:10px;font-weight:800;padding:6px 3px}
+
+.profile-edit-dialog{width:min(720px,calc(100% - 24px));max-height:min(90dvh,820px);padding:0;border:0;border-radius:20px;color:var(--mz-text);background:#fff;box-shadow:0 28px 90px rgba(15,35,66,.3);overflow:auto}
+.profile-edit-dialog::backdrop{background:rgba(15,35,66,.62);backdrop-filter:blur(3px)}
+.profile-edit-form{padding:20px}
+.profile-edit-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;border-bottom:1px solid var(--mz-border);padding-bottom:13px;margin-bottom:14px}
+.profile-edit-kicker{display:block;color:var(--mz-blue);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.profile-edit-head h2{margin:0;font-size:21px}
+.profile-edit-close{width:38px;height:38px;border:1px solid var(--mz-border);border-radius:10px;background:#fff;color:#52657e;font-size:20px;display:grid;place-items:center}
+.profile-edit-notice{display:flex;gap:9px;align-items:flex-start;padding:11px 12px;margin-bottom:14px;border:1px solid #f7d59d;border-radius:12px;background:#fff8e8;color:#79531e;font-size:11px;line-height:1.45}
+.profile-edit-notice i{font-size:18px;flex:none}
+.profile-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.profile-edit-field{display:grid;gap:6px}.profile-edit-field.full{grid-column:1/-1}
+.profile-edit-field>span,.profile-edit-check span{font-size:11px;font-weight:900;color:#344762}
+.profile-edit-field input,.profile-edit-field textarea,.profile-edit-field select{width:100%;border:1px solid #ccd8e6;border-radius:11px;background:#fff;color:var(--mz-text);padding:10px 11px;outline:none}
+.profile-edit-field textarea{resize:vertical;min-height:130px}
+.profile-edit-field input:focus,.profile-edit-field textarea:focus,.profile-edit-field select:focus{border-color:var(--mz-blue);box-shadow:0 0 0 3px rgba(24,95,165,.11)}
+.profile-edit-check{display:flex;align-items:center;gap:9px;align-self:end;min-height:42px;padding:0 3px}.profile-edit-check input{width:18px;height:18px;accent-color:var(--mz-blue)}
+.profile-edit-media-note{margin:13px 0 0;color:#6b7c92;font-size:10px;line-height:1.45}
+.profile-edit-status{margin-top:12px;padding:10px 12px;border-radius:11px;background:#fff0f1;border:1px solid #efb8bd;color:#9b2730;font-size:11px;font-weight:800}
+.profile-edit-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:16px;padding-top:14px;border-top:1px solid var(--mz-border)}
+@media(max-width:620px){.profile-edit-form{padding:15px}.profile-edit-grid{grid-template-columns:1fr}.profile-edit-field.full{grid-column:auto}.profile-edit-dialog{max-height:92dvh}.profile-post-owner-tools{justify-content:flex-start}}

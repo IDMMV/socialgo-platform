@@ -99,14 +99,19 @@ export async function updatePost(postId, content) {
 
   const clean = String(content || "").trim();
   if (!clean) throw new Error("La publicación no puede quedar vacía.");
+  const cutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString();
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("publicaciones")
     .update({ contenido: clean })
     .eq("id", postId)
-    .eq("autor_id", user.id);
+    .eq("autor_id", user.id)
+    .gte("creado_en", cutoff)
+    .select("id")
+    .maybeSingle();
 
   if (error) throw error;
+  if (!data) throw new Error("Solo puedes modificar tu publicación durante los primeros 5 minutos.");
 }
 
 export async function loadFeed(limit = 30) {
@@ -316,13 +321,16 @@ export async function deletePost(postId, fileUrl = null) {
   const user = await getCurrentUser();
   if (!user) throw new Error("Debes iniciar sesión.");
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("publicaciones")
     .delete()
     .eq("id", postId)
-    .eq("autor_id", user.id);
+    .eq("autor_id", user.id)
+    .select("id")
+    .maybeSingle();
 
   if (error) throw error;
+  if (!data) throw new Error("No se pudo borrar la publicación o ya no existe.");
 
   if (fileUrl) {
     await removeStorageObject("publicaciones", fileUrl).catch(console.error);
@@ -403,6 +411,7 @@ export async function blockUser(blockedUserId) {
 
 export function renderPost(post, currentUserId, poll = null) {
   const isOwner = currentUserId && currentUserId === post.autor_id;
+  const canEdit = isOwner && (Date.now() - new Date(post.creado_en).getTime()) < 5 * 60 * 1000;
   const showAuthor = post.perfil_autor_visible !== false || isOwner;
   const displayName = showAuthor ? (post.nombre_visible || post.username || "Usuario") : "Vecino de tu zona";
   const displayUsername = showAuthor ? (post.username || "usuario") : "identidad protegida";
@@ -467,7 +476,7 @@ export function renderPost(post, currentUserId, poll = null) {
         <button class="icon-button" data-post-menu="${post.id}" aria-label="Opciones">•••</button>
 
         <div class="menu-popup hidden" data-menu-for="${post.id}">
-          ${isOwner ? `<button data-edit-post="${post.id}">✏️ Editar</button>
+          ${isOwner ? `${canEdit?`<button data-edit-post="${post.id}">✏️ Editar (máx. 5 min)</button>`:`<button type="button" disabled title="El plazo de edición terminó">🔒 Edición cerrada</button>`}
           <button data-delete-post="${post.id}">🗑️ Eliminar</button>` : `
           <button data-report-post="${post.id}">🚩 Reportar</button>
           <button data-block-user="${post.autor_id}">⛔ Bloquear usuario</button>`}

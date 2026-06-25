@@ -479,7 +479,7 @@ end $$;
 
 -- 2) Distancia Haversine en metros
 create or replace function public.mizona_distance_meters(
-  lat1 numeric, lon1 numeric, lat2 numeric, lon2 numeric
+  p_lat1 numeric, p_lon1 numeric, p_lat2 numeric, p_lon2 numeric
 )
 returns numeric
 language sql
@@ -487,10 +487,10 @@ immutable
 parallel safe
 as $$
   select case
-    when lat1 is null or lon1 is null or lat2 is null or lon2 is null then null
+    when p_lat1 is null or p_lon1 is null or p_lat2 is null or p_lon2 is null then null
     else 6371000 * 2 * asin(sqrt(
-      power(sin(radians((lat2-lat1)/2)),2) +
-      cos(radians(lat1))*cos(radians(lat2))*power(sin(radians((lon2-lon1)/2)),2)
+      power(sin(radians((p_lat2-p_lat1)/2)),2) +
+      cos(radians(p_lat1))*cos(radians(p_lat2))*power(sin(radians((p_lon2-p_lon1)/2)),2)
     ))
   end;
 $$;

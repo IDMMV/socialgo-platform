@@ -1,26 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="320" height="80">
-
-  <!-- Pin icono -->
-  <path d="M30 4C18.954 4 10 12.954 10 24C10 35.046 30 56 30 56S50 35.046 50 24C50 12.954 41.046 4 30 4Z" fill="#185FA5"/>
-  <circle cx="30" cy="23" r="13" fill="#ffffff"/>
-  <text x="30" y="27" text-anchor="middle"
-    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"
-    font-size="10" font-weight="700" fill="#185FA5">MZ</text>
-  <circle cx="30" cy="56" r="2.5" fill="#1D9E75"/>
-
-  <!-- Nombre MiZona -->
-  <text x="62" y="34"
-    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"
-    font-size="30" font-weight="700" fill="#185FA5">Mi</text>
-  <text x="108" y="34"
-    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"
-    font-size="30" font-weight="700" fill="#1D9E75">Zona</text>
-  <text x="232" y="18"
-    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"
-    font-size="13" font-weight="400" fill="#94a3b8">.pe</text>
-
-  <!-- Slogan -->
-  <text x="62" y="54"
-    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"
-    font-size="10" font-weight="400" fill="#64748b">Tu zona, tu gente, tus oportunidades.</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 220" role="img" aria-label="MiZona.pe">
+  <defs>
+    <linearGradient id="pinGrad" x1="20" y1="25" x2="165" y2="188" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0D1B36"/><stop offset="0.50" stop-color="#1877F2"/><stop offset="1" stop-color="#00B894"/></linearGradient>
+    <linearGradient id="greenGrad" x1="78" y1="115" x2="130" y2="170" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#00B894"/><stop offset="1" stop-color="#0EA66B"/></linearGradient>
+    <linearGradient id="wordGrad" x1="300" y1="75" x2="545" y2="90" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1877F2"/><stop offset="1" stop-color="#00B894"/></linearGradient>
+  </defs>
+  
+  <g transform="translate(36 28) scale(0.66)">
+    <path d="M128 235 C92 188 52 151 52 100 C52 55 86 21 128 21 C170 21 204 55 204 100 C204 151 164 188 128 235Z" fill="url(#pinGrad)"/>
+    <path d="M75 95 C83 55 111 39 128 39 C150 39 174 55 181 95 C166 84 146 78 128 78 C109 78 90 84 75 95Z" fill="#FFFFFF" opacity="0.98"/>
+    <path d="M74 147 C91 135 108 130 128 130 C148 130 166 135 182 147 C169 179 147 205 128 228 C109 205 87 179 74 147Z" fill="url(#greenGrad)"/>
+    <path d="M87 120 L128 87 L169 120 V161 H146 V136 H110 V161 H87Z" fill="#0D1B36"/>
+    <rect x="118" y="122" width="10" height="10" rx="2" fill="#FFFFFF"/><rect x="132" y="122" width="10" height="10" rx="2" fill="#FFFFFF"/><rect x="118" y="136" width="10" height="10" rx="2" fill="#FFFFFF"/><rect x="132" y="136" width="10" height="10" rx="2" fill="#FFFFFF"/>
+  </g>
+  <text x="188" y="116" font-family="Arial, Helvetica, sans-serif" font-size="74" font-weight="900" letter-spacing="-4"><tspan fill="#0D1B36">Mi</tspan><tspan fill="url(#wordGrad)">Zona</tspan><tspan font-size="38" fill="#0D1B36">.pe</tspan></text>
+  <text x="188" y="148" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700"><tspan fill="#1877F2">Tu zona</tspan><tspan fill="#506174">, tu gente, </tspan><tspan fill="#00B894">tus oportunidades.</tspan></text>
 </svg>

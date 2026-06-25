@@ -51,3 +51,40 @@
 .clips-logo-img{display:block;width:150px;height:auto;object-fit:contain}
 .mz-preview-logo{display:block;width:190px;height:auto;object-fit:contain}
 @media(max-width:600px){.clips-logo-img{width:112px}}
+
+
+/* ============================================================
+   Logo final único — aplicado en toda la web/app
+   ============================================================ */
+.mz-logo-mark,.mz-logo-name,.mz-logo-domain,
+.mz-logo-unif-mark,.mz-logo-unif-name,.mz-logo-unif-pe,
+.mz-brand-badge,.sb-logo-mark,.sb-logo-name,.sb-logo-sub,
+.mz3-brand-mark,.mz3-brand-text{display:none!important}
+
+.mz-logo,.mz-brand,.sb-logo,.mz-logo-unif{
+  min-height:68px!important;
+  display:flex!important;
+  align-items:center!important;
+  padding:10px 14px!important;
+  box-sizing:border-box!important;
+}
+.mz-logo-img,.mz-sidebar-logo,.sb-logo-img{
+  display:block!important;
+  width:184px!important;
+  max-width:100%!important;
+  height:auto!important;
+  object-fit:contain!important;
+  object-position:left center!important;
+}
+.mz-brand-horizontal{
+  display:block!important;
+  width:232px!important;
+  max-width:100%!important;
+  height:auto!important;
+  object-fit:contain!important;
+}
+.clips-logo-img{width:150px!important;height:auto!important}
+@media(max-width:900px){
+  .mz-logo-img,.mz-sidebar-logo,.sb-logo-img{width:166px!important}
+  .mz-brand-horizontal{width:210px!important}
+}

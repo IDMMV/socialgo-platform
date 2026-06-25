@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v6.0-mejoras-integradas";
+const CACHE_NAME = "mizona-v6.0-mejoras-integradas-logo-final-v1";
 
 const CORE = [
   "./",

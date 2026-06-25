@@ -1,22 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- Fondo redondeado para ícono de app -->
-  <rect width="512" height="512" rx="110" fill="#111827"/>
-
-  <!-- Pin grande centrado -->
-  <path d="M256 60C191.726 60 140 111.726 140 176C140 240.274 256 420 256 420S372 240.274 372 176C372 111.726 320.274 60 256 60Z" fill="#185FA5"/>
-
-  <!-- Círculo blanco interior -->
-  <circle cx="256" cy="172" r="76" fill="#ffffff"/>
-
-  <!-- MZ grande y bold -->
-  <text x="256" y="196"
-    text-anchor="middle"
-    font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"
-    font-size="64" font-weight="700" fill="#185FA5" letter-spacing="-2">MZ</text>
-
-  <!-- Punto verde en la punta -->
-  <circle cx="256" cy="420" r="12" fill="#1D9E75"/>
-
-  <!-- Punto brillante en la punta del pin para efecto 3D sutil -->
-  <circle cx="256" cy="420" r="5" fill="#4ade80"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="MiZona icono">
+  <defs>
+    <linearGradient id="pinGrad" x1="40" y1="20" x2="210" y2="230" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0D1B36"/>
+      <stop offset="0.50" stop-color="#1877F2"/>
+      <stop offset="1" stop-color="#00B894"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="90" y1="150" x2="165" y2="214" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00B894"/>
+      <stop offset="1" stop-color="#0EA66B"/>
+    </linearGradient>
+  </defs>
+  <path d="M128 235 C92 188 52 151 52 100 C52 55 86 21 128 21 C170 21 204 55 204 100 C204 151 164 188 128 235Z" fill="url(#pinGrad)"/>
+  <path d="M75 95 C83 55 111 39 128 39 C150 39 174 55 181 95 C166 84 146 78 128 78 C109 78 90 84 75 95Z" fill="#FFFFFF" opacity="0.98"/>
+  <path d="M74 147 C91 135 108 130 128 130 C148 130 166 135 182 147 C169 179 147 205 128 228 C109 205 87 179 74 147Z" fill="url(#greenGrad)"/>
+  <path d="M87 120 L128 87 L169 120 V161 H146 V136 H110 V161 H87Z" fill="#0D1B36"/>
+  <rect x="118" y="122" width="10" height="10" rx="2" fill="#FFFFFF"/>
+  <rect x="132" y="122" width="10" height="10" rx="2" fill="#FFFFFF"/>
+  <rect x="118" y="136" width="10" height="10" rx="2" fill="#FFFFFF"/>
+  <rect x="132" y="136" width="10" height="10" rx="2" fill="#FFFFFF"/>
 </svg>

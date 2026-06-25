@@ -56,3 +56,11 @@
 .profile-config-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.profile-config-note{font-size:10px;color:var(--txt-third,#64748b);line-height:1.5;margin-top:4px}.profile-public-link{display:inline-flex;align-items:center;gap:5px;color:var(--az,#185fa5);font-size:11px;font-weight:800;text-decoration:none;margin-top:8px}
 @media(max-width:900px){.profile-layout{grid-template-columns:1fr}.profile-aside{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.profile-side-card{margin-bottom:0}.publish-layout{grid-template-columns:1fr}.publish-types{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px}.profile-grid{grid-template-columns:1fr}}
 @media(max-width:640px){.profile-shell,.publish-shell{padding:12px 10px 86px}.public-cover{height:150px}.public-profile-head{padding:0 14px 16px}.public-avatar{width:88px;height:88px;font-size:27px;margin-top:-44px}.public-actions{margin-top:10px;justify-content:flex-start}.public-name{font-size:23px}.public-stats{grid-template-columns:repeat(2,1fr)}.public-stat:nth-child(2){border-right:0}.public-stat:nth-child(-n+2){border-bottom:1px solid var(--mz-border)}.profile-tabs{padding:0 7px}.profile-content{padding:10px}.profile-aside{display:block}.profile-side-card{margin-bottom:10px}.publish-types{grid-template-columns:1fr}.publish-grid,.profile-config-grid{grid-template-columns:1fr}.publish-field.full{grid-column:auto}.publish-form-card{padding:14px}.publish-header h1{font-size:22px}}
+
+
+/* MiZona V4 — desplazamiento seguro del formulario de publicación */
+html:has(body.publish-page){overflow-y:auto!important;overflow-x:hidden}
+body.publish-page{height:auto!important;min-height:100vh!important;overflow-y:auto!important;overflow-x:hidden!important;padding-bottom:env(safe-area-inset-bottom)}
+body.publish-page .publish-shell{min-height:100vh;padding-bottom:150px}
+body.publish-page .publish-actions{position:relative;z-index:2;padding-bottom:18px}
+@media(max-width:640px){body.publish-page .publish-shell{padding-bottom:calc(145px + env(safe-area-inset-bottom))}}

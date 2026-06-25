@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v9-perfiles-publicaciones-final";
+const CACHE_NAME = "mizona-v10-operativa";
 
 const CORE = [
   "./",
@@ -38,6 +38,7 @@ const CORE = [
   "./recuperar.html",
   "./restablecer.html",
   "./manifest.json",
+  "./OneSignalSDKWorker.js",
   "./assets/mizona-logo.svg",
   "./assets/mizona-logo-horizontal.svg",
   "./assets/mizona-logo-blanco.svg",
@@ -111,6 +112,12 @@ const CORE = [
   "./js/publicaciones.js",
   "./js/home-publicaciones.js",
   "./js/instalar-pwa.js",
+  "./conductor.html",
+  "./admin-conductores.html",
+  "./css/ride.css",
+  "./js/ride.js",
+  "./js/conductor.js",
+  "./js/admin-conductores.js",
   "./assets/screenshot-mobile.png"
 ];
 

@@ -1,0 +1,23 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Ser conductor · MiZona</title>
+<link rel="manifest" href="manifest.json"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"><link rel="stylesheet" href="css/global.css"><link rel="stylesheet" href="css/mizona-master-shell.css"><link rel="stylesheet" href="css/mizona-sidebar-uniforme.css"><link rel="stylesheet" href="css/mizona-stability.css"><link rel="stylesheet" href="css/ride.css"></head>
+<body class="auth-pending ride-page"><div class="mz-layout-2col"><aside class="mz-sidebar"></aside><main class="mz-feed"><div class="ride-wrap">
+<section class="ride-hero"><div><h1>Conviértete en conductor verificado</h1><p>Registra tus datos y documentos. El administrador revisará la solicitud antes de mostrar tu vehículo en línea.</p></div><a class="ride-btn secondary" href="ride.html"><i class="ti ti-arrow-left"></i> Volver a MiZonaRide</a></section>
+<div id="driverStatus" class="ride-status">Cargando tu solicitud…</div>
+<section class="ride-card"><div class="ride-card-head"><h2>Datos personales y del vehículo</h2><span id="requestBadge"></span></div><div class="ride-card-body">
+<form id="driverForm" class="driver-form-grid">
+<div class="ride-field full"><label>Nombres y apellidos</label><input id="driverNames" required maxlength="100"></div>
+<div class="ride-field"><label>Celular verificado</label><input id="driverPhone" required readonly></div><div class="ride-field"><label>DNI</label><input id="driverDni" inputmode="numeric" maxlength="8" required></div>
+<div class="ride-field"><label>Número de licencia</label><input id="driverLicense" required maxlength="20"></div><div class="ride-field"><label>Categoría de licencia</label><input id="driverLicenseCategory" placeholder="Ej.: A-IIa" required maxlength="12"></div>
+<div class="ride-field"><label>Vencimiento de licencia</label><input id="driverLicenseExpiry" type="date"></div><div class="ride-field"><label>Placa</label><input id="vehiclePlate" required maxlength="10"></div>
+<div class="ride-field"><label>Marca</label><input id="vehicleBrand" required maxlength="40"></div><div class="ride-field"><label>Modelo</label><input id="vehicleModel" required maxlength="40"></div>
+<div class="ride-field"><label>Año</label><input id="vehicleYear" type="number" min="1980" max="2035"></div><div class="ride-field"><label>Color</label><input id="vehicleColor" maxlength="30"></div>
+<div class="ride-field"><label>Vencimiento SOAT</label><input id="soatExpiry" type="date"></div><div class="ride-field"><label>Vencimiento revisión técnica</label><input id="technicalExpiry" type="date"></div>
+<div class="full"><h3 style="font-size:14px;margin:8px 0 10px">Documentos para revisión</h3><div class="driver-doc-grid">
+<div class="driver-doc"><label>DNI – frente</label><input type="file" data-doc-type="dni_frente" accept="image/*,application/pdf"></div><div class="driver-doc"><label>DNI – reverso</label><input type="file" data-doc-type="dni_reverso" accept="image/*,application/pdf"></div>
+<div class="driver-doc"><label>Licencia de conducir</label><input type="file" data-doc-type="licencia" accept="image/*,application/pdf"></div><div class="driver-doc"><label>SOAT</label><input type="file" data-doc-type="soat" accept="image/*,application/pdf"></div>
+<div class="driver-doc"><label>Tarjeta de propiedad</label><input type="file" data-doc-type="tarjeta_propiedad" accept="image/*,application/pdf"></div><div class="driver-doc"><label>Revisión técnica</label><input type="file" data-doc-type="revision_tecnica" accept="image/*,application/pdf"></div>
+<div class="driver-doc"><label>Foto del vehículo</label><input type="file" data-doc-type="foto_vehiculo" accept="image/*"></div></div></div>
+<div class="full" id="uploadedDocs"></div>
+<div class="full" style="display:flex;gap:9px;flex-wrap:wrap"><button class="ride-btn primary" id="submitDriver" type="submit"><i class="ti ti-send"></i> Enviar para revisión</button><a class="ride-btn secondary" href="verificar-telefono.html?next=conductor.html" id="verifyPhoneLink" hidden>Verificar celular</a></div>
+</form></div></section></div></main></div>
+<script type="module" src="js/conductor.js"></script><script type="module" src="js/mizona-core.js"></script><script type="module" src="js/mizona-master-shell.js"></script><script type="module" src="js/mizona-sidebar-uniforme.js"></script></body></html>

@@ -3,8 +3,8 @@ import { supabase, getCurrentUser } from "./supabase.js";
 
 const APP_ID = String(PUBLIC_ENV.ONESIGNAL_APP_ID || "").trim();
 const ONESIGNAL_SCRIPT_ID = "mizona-onesignal-sdk";
-const WORKER_PATH = "push/onesignal/OneSignalSDKWorker.js";
-const WORKER_SCOPE = "/push/onesignal/";
+const WORKER_PATH = "OneSignalSDKWorker.js";
+const WORKER_SCOPE = "/";
 
 let initPromise = null;
 let sdkInstance = null;
@@ -237,6 +237,14 @@ function installAuthListener() {
   });
 }
 
+async function verifyWorkerFile(){
+  const response=await fetch(`/${WORKER_PATH}`,{cache:"no-store"});
+  if(!response.ok) throw makeError(`No se encontró /${WORKER_PATH} (HTTP ${response.status}). Sube el archivo a la raíz de MiZona.`,"worker_missing");
+  const type=String(response.headers.get("content-type")||"");
+  if(!/javascript|ecmascript/i.test(type)) throw makeError(`El servidor devolvió un tipo inválido para /${WORKER_PATH}: ${type||"sin Content-Type"}.`,"worker_mime");
+  return true;
+}
+
 export async function bootstrapPushNotifications() {
   if (!isOneSignalConfigured()) {
     return { configured: false, reason: "missing_app_id" };
@@ -247,6 +255,7 @@ export async function bootstrapPushNotifications() {
   if (initPromise) return initPromise;
 
   initPromise = (async () => {
+    await verifyWorkerFile();
     await loadSdkScript();
     const OneSignal = await getSdkInstance();
     await OneSignal.init({

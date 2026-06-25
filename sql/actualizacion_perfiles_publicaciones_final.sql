@@ -125,7 +125,7 @@ begin
   if p_seguido_id=v_uid then raise exception 'No puedes seguirte a ti mismo'; end if;
 
   select privacidad_perfil,permitir_seguidores into v_privacidad,v_permitir
-  from public.perfiles where id=p_seguido_id and estado='activo';
+  from public.perfiles p where p.id=p_seguido_id and p.estado='activo';
   if not found then raise exception 'Perfil no disponible'; end if;
   if not v_permitir then raise exception 'Este perfil no acepta seguidores'; end if;
 
@@ -134,8 +134,8 @@ begin
     return query select 'dejado'::text,'Dejaste de seguir este perfil.'::text; return;
   end if;
 
-  select id into v_request from public.solicitudes_seguimiento
-  where solicitante_id=v_uid and destinatario_id=p_seguido_id and estado='pendiente' limit 1;
+  select ss.id into v_request from public.solicitudes_seguimiento ss
+  where ss.solicitante_id=v_uid and ss.destinatario_id=p_seguido_id and ss.estado='pendiente' limit 1;
   if v_request is not null then
     update public.solicitudes_seguimiento set estado='cancelada',respondido_en=now() where id=v_request;
     return query select 'cancelado'::text,'Solicitud de seguimiento cancelada.'::text; return;

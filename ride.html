@@ -1,89 +1,11 @@
-<!DOCTYPE html>
-
-<html lang="es">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>MiZonaRide — MiZona.pe</title>
-<link rel="stylesheet" href="css/mizona-sidebar.css">
-<link href="manifest.json" rel="manifest"/>
-<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet"/>
-<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
-<link href="css/mizona.css" rel="stylesheet"/>
-<link href="css/mizona-unified.css" rel="stylesheet"/>
-<link href="css/mizona-phase2.css" rel="stylesheet"/>
-<link href="css/mizona-master-shell.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/mejoras-v2.css">
-<link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
-<link rel="stylesheet" href="css/mizona-stability.css">
-</head>
-<body class="auth-pending">
-<div class="mz-layout-2col">
-<aside class="mz-sidebar">
-<div class="mz-logo"><img alt="MiZona.pe" class="mz-logo-img" src="assets/mizona-logo-blanco.svg"/></div>
-<a class="mz-nav-item" href="index.html"><i class="ti ti-home"></i><span>Volver a inicio</span></a>
-<div class="mz-sidebar-spacer"></div>
-</aside>
-<main class="mz-feed">
-<div class="mz-topbar">
-<div style="font-size:13px;font-weight:700;color:#1e293b;flex:1">🚗 MiZonaRide</div>
-<div class="mz-dist-tag"><i class="ti ti-map-pin"></i> Tu zona</div>
-</div>
-<div class="mz-feed-body">
-<span class="mz-zona" style="background:#1e3a5f">MiZonaRide — Taxi comunitario</span>
-<div id="mapa-ride" style="height:280px;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0"></div>
-<div class="mz-card">
-<div class="mz-card-head"><div class="mz-card-title"><i class="ti ti-car"></i> ¿A dónde vas?</div></div>
-<div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
-<div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:7px">
-<div style="width:8px;height:8px;background:#E24B4A;border-radius:50%;flex-shrink:0"></div>
-<span style="font-size:10px;color:#475569;flex:1">Tu ubicación actual</span>
-<span style="font-size:9px;color:#185FA5;font-weight:600">Cambiar</span>
-</div>
-<div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:7px">
-<div style="width:8px;height:8px;background:#185FA5;border-radius:50%;flex-shrink:0"></div>
-<span style="font-size:10px;color:#94a3b8;flex:1">¿Cuál es tu destino?</span>
-<span style="font-size:9px;color:#185FA5;font-weight:600">Buscar</span>
-</div>
-<div style="display:flex;align-items:center;gap:8px">
-<span style="font-size:10px;color:#64748b;flex-shrink:0">Tu precio:</span>
-<input placeholder="S/. 8.00" style="flex:1;background:#f1f5f9;border:1px solid #185FA5;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700;color:#185FA5;outline:none" type="text"/>
-<span style="font-size:8px;color:#94a3b8">Conductor puede contraofertar</span>
-</div>
-<button onclick="alert('Buscando conductores en tu zona...')" style="width:100%;background:linear-gradient(135deg,#185FA5,#1D9E75);color:#fff;border:none;border-radius:10px;padding:12px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
-<i class="ti ti-car" style="font-size:16px"></i> Buscar conductor en mi zona
-        </button>
-<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 10px;font-size:9px;color:#1d4ed8">
-<strong>4 conductores disponibles</strong> en tu zona · Sin comisión · Pago por Yape directo
-        </div>
-</div>
-</div>
-</div>
-</main>
-</div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-const m = L.map('mapa-ride',{zoomControl:true,scrollWheelZoom:false}).setView([-11.9525,-77.0662],14);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(m);
-const conductores=[{lat:-11.948,lng:-77.064,nombre:'Carlos V.',precio:'S/.8'},{lat:-11.957,lng:-77.071,nombre:'Luis P.',precio:'S/.10'},{lat:-11.955,lng:-77.059,nombre:'Roberto M.',precio:'S/.7'}];
-conductores.forEach(c=>{
-  const ico=L.divIcon({html:`<div style="background:#185FA5;color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3)">🚗</div>`,iconSize:[32,32],iconAnchor:[16,16],className:''});
-  L.marker([c.lat,c.lng],{icon:ico}).addTo(m).bindPopup(`<b>${c.nombre}</b><br>Precio sugerido: ${c.precio}<br><button onclick="alert('Contactando a ${c.nombre}...')" style="margin-top:5px;background:#185FA5;color:#fff;border:none;border-radius:5px;padding:4px 10px;cursor:pointer;font-size:9px">Contactar</button>`);
-});
-if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>{m.setView([pos.coords.latitude,pos.coords.longitude],15);},{});}
-</script>
-<nav class="mz-bottom-nav">
-<div class="mz-bn-inner">
-<div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div>
-<div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div>
-<div class="mz-bn-item"><div class="mz-bn-center" onclick="location.href='index.html#publicar'"><i class="ti ti-plus"></i></div></div>
-<div class="mz-bn-item" onclick="location.href='servicios.html'"><i class="ti ti-tool"></i><span>Servicios</span></div>
-<div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div>
-</div>
-</nav>
-<script src="./js/mizona-core.js" type="module"></script>
-<script src="./js/mizona-master-shell.js" type="module"></script>
-<script type="module" src="./js/tema-mizona.js"></script>
-<script type="module" src="js/mizona-sidebar-uniforme.js"></script>
-</body>
-</html>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#185FA5"><title>MiZonaRide · MiZona</title><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><link rel="stylesheet" href="css/global.css"><link rel="stylesheet" href="css/mizona-master-shell.css"><link rel="stylesheet" href="css/mizona-sidebar-uniforme.css"><link rel="stylesheet" href="css/mizona-stability.css"><link rel="stylesheet" href="css/ride.css"></head>
+<body class="auth-pending ride-page"><div class="mz-layout-2col"><aside class="mz-sidebar"></aside><main class="mz-feed"><div class="ride-wrap">
+<section class="ride-hero"><div><h1>MiZonaRide</h1><p>Encuentra conductores verificados cerca de ti. La ubicación del vehículo solo se muestra mientras el conductor está en línea.</p></div><a class="ride-btn secondary" href="conductor.html"><i class="ti ti-steering-wheel"></i> Quiero ser conductor</a></section>
+<div id="rideStatus" class="ride-status">Obteniendo tu ubicación y conductores disponibles…</div>
+<section class="ride-grid"><article class="ride-card"><div class="ride-card-head"><h2>Conductores en línea cerca de ti</h2><button class="ride-btn secondary" id="refreshDrivers" type="button"><i class="ti ti-refresh"></i> Actualizar</button></div><div id="rideMap" class="ride-map"></div></article>
+<aside style="display:grid;gap:16px"><article class="ride-card"><div class="ride-card-head"><h2>¿A dónde vas?</h2></div><div class="ride-card-body"><form id="rideSearchForm" class="ride-form"><div class="ride-field"><label>Tu ubicación</label><input id="originText" readonly placeholder="Ubicación actual"></div><div class="ride-field"><label>Destino o referencia</label><input id="destinationText" placeholder="Ej.: Plaza San Miguel" maxlength="140"></div><div class="ride-field"><label>Precio propuesto</label><input id="offeredPrice" inputmode="decimal" placeholder="S/ 10.00"></div><button class="ride-btn primary" type="submit"><i class="ti ti-search"></i> Buscar conductor en mi zona</button></form></div></article>
+<article class="ride-card"><div class="ride-card-head"><h2>Tu modo conductor</h2><span><span class="online-dot" id="onlineDot"></span></span></div><div class="ride-card-body"><div id="driverOnlineBox" class="driver-online-box"><p style="font-size:11px;color:#64748b;margin:0">Comprobando si tu cuenta de conductor está aprobada…</p></div></div></article></aside></section>
+<section class="ride-card"><div class="ride-card-head"><h2>Vehículos disponibles</h2><span id="driverCount">0</span></div><div class="ride-card-body"><div id="driverList" class="driver-list"></div></div></section>
+</div></main></div>
+<nav class="mz-bottom-nav"><div class="mz-bn-inner"><div class="mz-bn-item" onclick="location.href='index.html'"><i class="ti ti-home"></i><span>Inicio</span></div><div class="mz-bn-item" onclick="location.href='alertas.html'"><i class="ti ti-bell"></i><span>Alertas</span></div><div class="mz-bn-item"><div class="mz-bn-center" onclick="location.href='publicar.html'"><i class="ti ti-plus"></i></div></div><div class="mz-bn-item" onclick="location.href='mensajes.html'"><i class="ti ti-message"></i><span>Mensajes</span></div><div class="mz-bn-item" onclick="location.href='perfil.html'"><i class="ti ti-user"></i><span>Perfil</span></div></div></nav>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script type="module" src="js/ride.js"></script><script type="module" src="js/mizona-core.js"></script><script type="module" src="js/mizona-master-shell.js"></script><script type="module" src="js/mizona-sidebar-uniforme.js"></script></body></html>

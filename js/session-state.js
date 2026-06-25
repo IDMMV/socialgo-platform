@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 
-const CACHE_KEY = 'mizona.session.profile.v4';
+const CACHE_KEY = 'mizona.session.profile.v6';
 const CACHE_TTL = 1000 * 60 * 60 * 24 * 7;
 let currentPromise = null;
 let listenerReady = false;
@@ -38,7 +38,8 @@ export function canonicalProfile(user, profile = {}) {
     publicHandle: username ? `@${username}` : '',
     district,
     avatarUrl: clean(profile.avatar_url),
-    phoneVerified: profile.telefono_verificado === true,
+    emailVerified: Boolean(user?.email_confirmed_at || user?.confirmed_at),
+    optionalPhone: clean(profile.telefono_contacto),
     providerStatus: clean(profile.proveedor_estado || 'no_solicitado'),
     providerType: clean(profile.proveedor_tipo || ''),
     accountType: clean(profile.tipo_cuenta || 'personal') || 'personal',
@@ -89,7 +90,7 @@ export async function getSessionSnapshot({ force = false } = {}) {
     let profile = {};
     let { data, error } = await supabase
       .from('perfiles')
-      .select('id,nombre_visible,username,avatar_url,distrito,zona,telefono_verificado,proveedor_estado,proveedor_tipo,tipo_cuenta,tipo_perfil,privacidad_perfil')
+      .select('id,nombre_visible,username,avatar_url,distrito,zona,telefono_contacto,proveedor_estado,proveedor_tipo,tipo_cuenta,tipo_perfil,privacidad_perfil')
       .eq('id', user.id)
       .maybeSingle();
     // Durante una actualización progresiva, conserva la identidad estable aun si
@@ -97,7 +98,7 @@ export async function getSessionSnapshot({ force = false } = {}) {
     if (error) {
       const fallback = await supabase
         .from('perfiles')
-        .select('id,nombre_visible,username,avatar_url,distrito,zona,telefono_verificado,tipo_cuenta')
+        .select('id,nombre_visible,username,avatar_url,distrito,zona,telefono_contacto,tipo_cuenta')
         .eq('id', user.id)
         .maybeSingle();
       data = fallback.data; error = fallback.error;

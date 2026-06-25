@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v11-phone-push";
+const CACHE_NAME = "mizona-v12-email-push-phone-optional";
 
 const CORE = [
   "./",

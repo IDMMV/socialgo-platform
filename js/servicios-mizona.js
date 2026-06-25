@@ -111,9 +111,8 @@ async function openForm() {
   if (!user) { location.href=`login.html?next=${encodeURIComponent('servicios.html#registrar')}`; return; }
   status.hidden = true;
   try {
-    const { data: profile } = await supabase.from('perfiles').select('distrito,zona,telefono_verificado,proveedor_estado').eq('id',user.id).maybeSingle();
+    const { data: profile } = await supabase.from('perfiles').select('distrito,zona,proveedor_estado').eq('id',user.id).maybeSingle();
     profileDistrict = profile?.distrito || profileDistrict;
-    if (!profile?.telefono_verificado) { if (confirm('Debes verificar tu celular antes de publicar servicios. ¿Ir a verificarlo?')) location.href='verificar-telefono.html?next=servicios.html%23registrar'; return; }
     if (profile?.proveedor_estado !== 'aprobado') { if (confirm('El administrador debe aprobarte como proveedor antes de publicar. ¿Enviar tu solicitud ahora?')) location.href='proveedor.html'; return; }
     if (profile?.distrito && !form.elements.distrito.value) form.elements.distrito.value=profile.distrito;
     if (profile?.zona && !form.elements.zona_atencion.value) form.elements.zona_atencion.value=profile.zona;

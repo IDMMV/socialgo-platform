@@ -316,8 +316,8 @@ export async function requestPushPermission({ saveLocation = true } = {}) {
   if (!isOneSignalConfigured()) throw makeError("Primero configura el App ID de OneSignal.", "missing_app_id");
   const user = await getCurrentUser();
   if (!user) throw makeError("Debes iniciar sesión para activar notificaciones.", "login_required");
-  const { data: profile } = await supabase.from("perfiles").select("telefono_verificado").eq("id", user.id).maybeSingle();
-  if (!profile?.telefono_verificado) throw makeError("Verifica tu celular antes de activar notificaciones.", "phone_verification_required");
+  const emailConfirmed = Boolean(user.email_confirmed_at || user.confirmed_at);
+  if (!emailConfirmed) throw makeError("Confirma tu correo antes de activar notificaciones.", "email_confirmation_required");
   if (isIos() && !isStandalone()) {
     throw makeError("En iPhone o iPad, agrega MiZona a la pantalla de inicio y ábrela desde su icono.", "ios_install_required");
   }

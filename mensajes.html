@@ -85,12 +85,7 @@
     const safetyActions = document.querySelector("#chatSafetyActions");
     const blockButton = document.querySelector("#blockChatUser");
     const reportButton = document.querySelector("#reportChatUser");
-    const { data: myProfile } = await supabase.from("perfiles").select("telefono_verificado").eq("id", user.id).maybeSingle();
-    if (!myProfile?.telefono_verificado) {
-      input.placeholder = "Verifica tu celular para enviar mensajes";
-      const verify = document.createElement("a"); verify.href = "verificar-telefono.html?next=mensajes.html"; verify.className = "mz-btn primary"; verify.textContent = "Verificar celular";
-      form.appendChild(verify);
-    }
+    input.placeholder = "Escribe un mensaje…";
 
     let activeConversationId = params.get("c");
     let requestedContact = params.get("contacto") || params.get("contact");
@@ -303,8 +298,8 @@
 
       renderConversations(conversationSearch.value);
       chatLayout.classList.add("chat-open");
-      input.disabled = !myProfile?.telefono_verificado;
-      sendButton.disabled = !myProfile?.telefono_verificado;
+      input.disabled = false;
+      sendButton.disabled = false;
       safetyActions.hidden = false;
 
       const current = conversations.find(item => item.conversacion_id === id);

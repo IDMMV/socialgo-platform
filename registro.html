@@ -5,6 +5,7 @@
 <title>Crear cuenta · MiZona.pe</title>
 <link rel="manifest" href="manifest.json"><link rel="stylesheet" href="css/global.css"><link rel="stylesheet" href="css/mizona-unified.css"><link rel="stylesheet" href="css/mizona-phase2.css"><link rel="stylesheet" href="css/auth-security.css"><link rel="stylesheet" href="css/mizona-logo.css"><link rel="stylesheet" href="css/mizona-stability.css">
 <link rel="icon" href="assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<style>.phone-optional-row{display:flex;align-items:stretch;border:1px solid #cbd5e1;border-radius:10px;overflow:hidden;background:#fff}.phone-optional-row span{display:flex;align-items:center;padding:0 12px;background:#eef4fb;border-right:1px solid #cbd5e1;font-weight:800;color:#0f3f78}.phone-optional-row input{border:0!important;border-radius:0!important;min-width:0;flex:1}</style>
 </head>
 <body class="auth-page">
 <main class="auth-card auth-card-wide">
@@ -16,13 +17,13 @@
     <label>Nombre completo<input id="fullName" maxlength="80" autocomplete="name" required></label>
     <label>Nombre de usuario<input id="username" maxlength="24" minlength="3" pattern="[a-zA-Z0-9_.]+" autocomplete="username" required><small id="help">Letras, números, punto o guion bajo.</small></label>
     <label>Correo<input autocomplete="email" id="email" required type="email"></label>
-    <label>Celular<input autocomplete="tel" id="phone" inputmode="tel" placeholder="+51 999 999 999" minlength="9" required><small>Será privado y se verificará con un código.</small></label>
+    <label>Celular (opcional)<div class="phone-optional-row"><span>+51</span><input autocomplete="tel" id="phone" inputmode="numeric" placeholder="999 999 999" maxlength="9" pattern="9[0-9]{8}"></div><small>Es privado. No es necesario para usar MiZona ni para recibir notificaciones push.</small></label>
     <label>Contraseña<span class="password-field"><input autocomplete="new-password" id="password" minlength="8" required type="password"><button class="password-toggle" data-password-toggle="password" type="button"></button></span><div class="password-strength" id="strength"><span></span></div><small class="password-rules">Mínimo 8 caracteres.</small></label>
     <label>Repetir contraseña<span class="password-field"><input autocomplete="new-password" id="password2" minlength="8" required type="password"><button class="password-toggle" data-password-toggle="password2" type="button"></button></span></label>
     <label class="toggle-row full"><span>Acepto los términos y confirmo que usaré las alertas responsablemente.</span><input required type="checkbox"></label>
     <button class="primary wide full" type="submit">Crear cuenta personal</button>
   </div></form>
-  <div class="security-note"><strong>Siguiente paso:</strong> confirma tu correo y verifica tu celular para enviar alertas, mensajes y solicitudes de proveedor.</div>
+  <div class="security-note"><strong>Siguiente paso:</strong> confirma tu correo. Después podrás iniciar sesión, activar OneSignal y usar alertas, chat y solicitudes. El celular es opcional.</div>
   <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
 </main>
 <script type="module">
@@ -30,6 +31,7 @@ import {registerUser,usernameAvailable} from './js/auth.js';
 import {initPasswordToggles,bindPasswordStrength} from './js/password-ui.js';
 initPasswordToggles();bindPasswordStrength(password,strength);
 let t; username.oninput=()=>{clearTimeout(t);t=setTimeout(async()=>{try{help.textContent=await usernameAvailable(username.value)?'✓ Disponible':'No disponible'}catch{help.textContent='No se pudo comprobar'}},400)};
-form.onsubmit=async e=>{e.preventDefault();msg.hidden=true;if(password.value!==password2.value){msg.hidden=false;msg.className='notice error';msg.textContent='Las contraseñas no coinciden.';return}try{const d=await registerUser({fullName:fullName.value,username:username.value,email:email.value,password:password.value,phone:phone.value});msg.hidden=false;msg.className='notice ok';msg.textContent=d.session?'Cuenta creada. Ahora verifica tu celular.':'Cuenta creada. Confirma primero el correo; luego inicia sesión para verificar tu celular.';if(d.session)setTimeout(()=>location.href='verificar-telefono.html?setup=1',900);else form.reset()}catch(x){msg.hidden=false;msg.className='notice error';msg.textContent=x.message}};
+phone.addEventListener('input',()=>{phone.value=phone.value.replace(/\D/g,'').slice(0,9)});
+form.onsubmit=async e=>{e.preventDefault();msg.hidden=true;if(password.value!==password2.value){msg.hidden=false;msg.className='notice error';msg.textContent='Las contraseñas no coinciden.';return}const digits=phone.value.replace(/\D/g,'');if(digits&&(!/^9\d{8}$/.test(digits))){msg.hidden=false;msg.className='notice error';msg.textContent='El celular opcional debe tener 9 dígitos y empezar con 9.';return}try{const d=await registerUser({fullName:fullName.value,username:username.value,email:email.value,password:password.value,phone:digits});msg.hidden=false;msg.className='notice ok';msg.textContent=d.session?'Cuenta creada. Ya puedes ingresar y activar tus notificaciones.':'Cuenta creada. Revisa tu correo y confirma la cuenta antes de iniciar sesión.';if(d.session)setTimeout(()=>location.href='index.html',900);else form.reset()}catch(x){msg.hidden=false;msg.className='notice error';msg.textContent=x.message}};
 </script><script type="module" src="./js/mizona-core.js"></script>
 </body></html>

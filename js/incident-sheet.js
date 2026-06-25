@@ -89,11 +89,7 @@ async function uploadEvidence(file, note, button) {
     location.href = `login.html?next=${encodeURIComponent(`mapa.html?alerta=${currentAlert.id}`)}`;
     return;
   }
-  const { data: profile } = await supabase.from('perfiles').select('telefono_verificado').eq('id', user.id).maybeSingle();
-  if (!profile?.telefono_verificado) {
-    if (confirm('Debes verificar tu celular antes de aportar evidencia. ¿Ir a verificarlo?')) location.href = `verificar-telefono.html?next=${encodeURIComponent(`mapa.html?alerta=${currentAlert.id}`)}`;
-    return;
-  }
+  if (!(user.email_confirmed_at || user.confirmed_at)) { alert('Confirma tu correo antes de aportar evidencia.'); return; }
   button.disabled = true;
   button.textContent = 'Subiendo…';
   try {

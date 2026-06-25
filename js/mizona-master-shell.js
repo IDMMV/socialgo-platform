@@ -9,7 +9,7 @@ const PAGE_INFO = {
   'proveedor.html':['Ofrecer servicios'], 'negocio.html':['Mi negocio'], 'negocio-publico.html':['Negocio local'],
   'oferta.html':['Detalle de oferta'], 'admin-proveedores.html':['Proveedores'], 'admin-negocios.html':['Negocios y ofertas'],
   'admin-alertas.html':['Alertas y sugerencias'], 'sugerencias.html':['Sugerencias'], 'explorar.html':['Explorar'],
-  'admin.html':['Administración'], 'usuario.html':['Perfil público'], 'verificar-telefono.html':['Verificar teléfono'],
+  'admin.html':['Administración'], 'usuario.html':['Perfil público'], 'verificar-telefono.html':['Celular opcional'],
   'seguidores.html':['Seguidores'], 'publicar.html':['Crear publicación']
 };
 

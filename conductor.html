@@ -6,7 +6,7 @@
 <section class="ride-card"><div class="ride-card-head"><h2>Datos personales y del vehículo</h2><span id="requestBadge"></span></div><div class="ride-card-body">
 <form id="driverForm" class="driver-form-grid">
 <div class="ride-field full"><label>Nombres y apellidos</label><input id="driverNames" required maxlength="100"></div>
-<div class="ride-field"><label>Celular verificado</label><input id="driverPhone" required readonly></div><div class="ride-field"><label>DNI</label><input id="driverDni" inputmode="numeric" maxlength="8" required></div>
+<div class="ride-field"><label>Celular de contacto (opcional)</label><input id="driverPhone" inputmode="numeric" maxlength="9" placeholder="999 999 999"></div><div class="ride-field"><label>DNI</label><input id="driverDni" inputmode="numeric" maxlength="8" required></div>
 <div class="ride-field"><label>Número de licencia</label><input id="driverLicense" required maxlength="20"></div><div class="ride-field"><label>Categoría de licencia</label><input id="driverLicenseCategory" placeholder="Ej.: A-IIa" required maxlength="12"></div>
 <div class="ride-field"><label>Vencimiento de licencia</label><input id="driverLicenseExpiry" type="date"></div><div class="ride-field"><label>Placa</label><input id="vehiclePlate" required maxlength="10"></div>
 <div class="ride-field"><label>Marca</label><input id="vehicleBrand" required maxlength="40"></div><div class="ride-field"><label>Modelo</label><input id="vehicleModel" required maxlength="40"></div>
@@ -18,6 +18,6 @@
 <div class="driver-doc"><label>Tarjeta de propiedad</label><input type="file" data-doc-type="tarjeta_propiedad" accept="image/*,application/pdf"></div><div class="driver-doc"><label>Revisión técnica</label><input type="file" data-doc-type="revision_tecnica" accept="image/*,application/pdf"></div>
 <div class="driver-doc"><label>Foto del vehículo</label><input type="file" data-doc-type="foto_vehiculo" accept="image/*"></div></div></div>
 <div class="full" id="uploadedDocs"></div>
-<div class="full" style="display:flex;gap:9px;flex-wrap:wrap"><button class="ride-btn primary" id="submitDriver" type="submit"><i class="ti ti-send"></i> Enviar para revisión</button><a class="ride-btn secondary" href="verificar-telefono.html?next=conductor.html" id="verifyPhoneLink" hidden>Verificar celular</a></div>
+<div class="full" style="display:flex;gap:9px;flex-wrap:wrap"><button class="ride-btn primary" id="submitDriver" type="submit"><i class="ti ti-send"></i> Enviar para revisión</button><a class="ride-btn secondary" href="perfil.html">Revisar mi perfil</a></div>
 </form></div></section></div></main></div>
 <script type="module" src="js/conductor.js"></script><script type="module" src="js/mizona-core.js"></script><script type="module" src="js/mizona-master-shell.js"></script><script type="module" src="js/mizona-sidebar-uniforme.js"></script></body></html>

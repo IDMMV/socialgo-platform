@@ -14,12 +14,14 @@ export async function usernameAvailable(username) {
 
 export async function registerUser({ fullName, username, email, password, phone }) {
   const clean = normalizeUsername(username);
+  const phoneDigits = String(phone || '').replace(/\D/g, '').slice(-9);
+  const optionalPhone = /^9\d{8}$/.test(phoneDigits) ? `+51${phoneDigits}` : '';
   if (!await usernameAvailable(clean)) throw new Error("Ese nombre de usuario no está disponible.");
   const { data, error } = await supabase.auth.signUp({
     email: email.trim().toLowerCase(), password,
     options: {
       emailRedirectTo: `${PUBLIC_ENV.SITE_URL}/auth-callback.html`,
-      data: { full_name: fullName.trim(), username: clean, account_type: 'personal', phone_pending: String(phone || '').trim() }
+      data: { full_name: fullName.trim(), username: clean, account_type: 'personal', phone_pending: optionalPhone }
     }
   });
   if (error) throw error;

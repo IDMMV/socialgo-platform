@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Completa tu perfil · MiZona.pe</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" href="assets/favicon-32.png" type="image/png"/>
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png"/>
+<link rel="stylesheet" href="css/global.css"/>
+<link rel="stylesheet" href="css/mizona-unified.css"/>
+<link rel="stylesheet" href="css/mizona-phase2.css"/>
+<link rel="stylesheet" href="css/auth-security.css"/>
+<link rel="stylesheet" href="css/mizona-logo.css"/>
+<link rel="stylesheet" href="css/mizona-stability.css"/>
+<style>
+.onboard-card{width:min(100%,680px)}.onboard-head{text-align:center;margin-bottom:22px}.onboard-logo{width:min(230px,70%);margin-bottom:18px}.google-confirmed{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;font-weight:800;font-size:13px}.google-confirmed svg{width:18px}.profile-preview{display:flex;align-items:center;gap:14px;padding:14px;border:1px solid #e2e8f0;background:#f8fafc;border-radius:14px;margin:18px 0}.profile-preview img,.avatar-fallback{width:58px;height:58px;border-radius:50%;object-fit:cover}.avatar-fallback{display:flex;align-items:center;justify-content:center;background:#dbeafe;color:#185fa5;font-size:20px;font-weight:900}.profile-preview strong,.profile-preview small{display:block}.profile-preview small{color:#64748b;margin-top:4px}.onboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.onboard-grid label{display:block;font-weight:700;color:#475569}.onboard-grid input{width:100%;margin-top:7px}.full{grid-column:1/-1}.username-help{display:block;margin-top:6px;font-size:12px;color:#64748b}.terms-row{display:flex!important;gap:10px;align-items:flex-start;padding:13px;border:1px solid #dbeafe;background:#eff6ff;border-radius:12px}.terms-row input{width:18px;height:18px;min-height:0;margin:1px 0 0;flex:0 0 18px}.primary{width:100%;min-height:56px;border:0;border-radius:12px;background:#185fa5;color:#fff;font-size:16px;font-weight:900;cursor:pointer}.primary:disabled{opacity:.65}.skip-note{text-align:center;color:#64748b;font-size:13px;margin-top:14px}@media(max-width:640px){.onboard-grid{grid-template-columns:1fr}.full{grid-column:auto}}
+</style>
+</head>
+<body class="auth-page">
+<main class="auth-card onboard-card">
+  <div class="onboard-head">
+    <img class="onboard-logo" src="assets/mizona-logo-horizontal.svg" alt="MiZona.pe"/>
+    <h1>Completa tu perfil</h1>
+    <div class="google-confirmed"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.23c0-.71-.06-1.4-.18-2.06H12v3.9h5.24a4.48 4.48 0 0 1-1.94 2.94v2.53h3.14c1.84-1.69 2.91-4.19 2.91-7.31Z"/><path fill="#34A853" d="M12 21.75c2.62 0 4.82-.87 6.43-2.36l-3.14-2.53c-.87.58-1.98.92-3.29.92-2.53 0-4.67-1.71-5.44-4.01H3.32v2.61A9.72 9.72 0 0 0 12 21.75Z"/><path fill="#FBBC05" d="M6.56 13.77A5.85 5.85 0 0 1 6.25 12c0-.61.11-1.21.31-1.77V7.62H3.32A9.73 9.73 0 0 0 2.25 12c0 1.57.38 3.05 1.07 4.38l3.24-2.61Z"/><path fill="#EA4335" d="M12 6.22c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.82 3.31 14.62 2.25 12 2.25a9.72 9.72 0 0 0-8.68 5.37l3.24 2.61c.77-2.3 2.91-4.01 5.44-4.01Z"/></svg> Cuenta verificada por Google</div>
+  </div>
+  <div class="notice" hidden id="msg"></div>
+  <div class="profile-preview"><img id="avatar" hidden alt="Foto de Google"><div class="avatar-fallback" id="avatarFallback">MZ</div><div><strong id="googleName">Usuario de MiZona</strong><small id="googleEmail"></small></div></div>
+  <form id="profileForm">
+    <div class="onboard-grid">
+      <label>Nombre visible<input id="fullName" maxlength="80" autocomplete="name" required></label>
+      <label>Nombre de usuario<input id="username" maxlength="24" minlength="3" pattern="[a-zA-Z0-9_.]+" autocomplete="username" required><small class="username-help" id="usernameHelp">Será tu dirección pública: @usuario</small></label>
+      <label>Distrito (opcional)<input id="district" maxlength="80" placeholder="Ej.: Los Olivos"></label>
+      <label>Zona o urbanización (opcional)<input id="zone" maxlength="100" placeholder="Ej.: Urb. El Naranjal"></label>
+      <label class="full">Celular (opcional)<input id="phone" inputmode="numeric" maxlength="9" pattern="9[0-9]{8}" placeholder="999 999 999"><small class="username-help">Es privado. No se usa para iniciar sesión ni para recibir notificaciones push.</small></label>
+      <label class="terms-row full"><input id="terms" type="checkbox" required><span>Acepto los términos de MiZona y me comprometo a usar las alertas responsablemente.</span></label>
+      <button class="primary full" id="saveButton" type="submit">Guardar y continuar</button>
+    </div>
+  </form>
+  <p class="skip-note">Después podrás activar las notificaciones de OneSignal en este dispositivo.</p>
+</main>
+<script type="module">
+import { supabase } from './js/supabase.js';
+import { usernameAvailable, normalizeUsername } from './js/auth.js';
+
+const msg=document.getElementById('msg');
+const form=document.getElementById('profileForm');
+const fullName=document.getElementById('fullName');
+const username=document.getElementById('username');
+const usernameHelp=document.getElementById('usernameHelp');
+const district=document.getElementById('district');
+const zone=document.getElementById('zone');
+const phone=document.getElementById('phone');
+const terms=document.getElementById('terms');
+const saveButton=document.getElementById('saveButton');
+let currentUsername='';
+let availabilityTimer;
+
+function show(text,type='error'){msg.hidden=false;msg.className='notice '+type;msg.textContent=text}
+function initials(value){return String(value||'MZ').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'MZ'}
+
+phone.addEventListener('input',()=>{phone.value=phone.value.replace(/\D/g,'').slice(0,9)});
+username.addEventListener('input',()=>{
+  username.value=normalizeUsername(username.value).replace(/[^a-z0-9_.]/g,'').slice(0,24);
+  clearTimeout(availabilityTimer);
+  availabilityTimer=setTimeout(async()=>{
+    const value=normalizeUsername(username.value);
+    if(!/^[a-z0-9_.]{3,24}$/.test(value)){usernameHelp.textContent='Usa entre 3 y 24 letras, números, punto o guion bajo.';usernameHelp.style.color='#b91c1c';return}
+    if(value===currentUsername){usernameHelp.textContent='✓ Puedes conservar este usuario o elegir otro.';usernameHelp.style.color='#166534';return}
+    try{const available=await usernameAvailable(value);usernameHelp.textContent=available?'✓ Usuario disponible':'Este usuario ya está ocupado.';usernameHelp.style.color=available?'#166534':'#b91c1c'}catch{usernameHelp.textContent='No se pudo comprobar en este momento.';usernameHelp.style.color='#64748b'}
+  },350);
+});
+
+async function init(){
+  const {data:{session}}=await supabase.auth.getSession();
+  if(!session?.user){location.replace('login.html');return}
+  const user=session.user;
+  document.getElementById('googleEmail').textContent=user.email||'';
+  const meta=user.user_metadata||{};
+  const displayName=meta.full_name||meta.name||user.email?.split('@')[0]||'Usuario de MiZona';
+  document.getElementById('googleName').textContent=displayName;
+  const avatarUrl=meta.avatar_url||meta.picture||'';
+  if(avatarUrl){const avatar=document.getElementById('avatar');avatar.src=avatarUrl;avatar.hidden=false;document.getElementById('avatarFallback').hidden=true}else document.getElementById('avatarFallback').textContent=initials(displayName);
+
+  const ensured=await supabase.rpc('mizona_asegurar_perfil');
+  if(ensured.error){show('Primero ejecuta el SQL V6.1 Google en Supabase: '+ensured.error.message);return}
+  const profile=ensured.data||{};
+  if(profile.perfil_completo===true){location.replace('index.html');return}
+  currentUsername=profile.username||'';
+  fullName.value=profile.nombre_visible||displayName;
+  username.value=currentUsername;
+  district.value=profile.distrito||'';
+  zone.value=profile.zona||'';
+  phone.value=String(profile.telefono_contacto||'').replace(/^\+?51/,'').replace(/\D/g,'').slice(-9);
+  username.dispatchEvent(new Event('input'));
+}
+
+form.addEventListener('submit',async(event)=>{
+  event.preventDefault();msg.hidden=true;
+  const cleanUsername=normalizeUsername(username.value);
+  const digits=phone.value.replace(/\D/g,'');
+  if(!/^[a-z0-9_.]{3,24}$/.test(cleanUsername)){show('El nombre de usuario no es válido.');return}
+  if(digits&&!/^9\d{8}$/.test(digits)){show('El celular opcional debe tener 9 dígitos y empezar con 9.');return}
+  if(!terms.checked){show('Debes aceptar los términos para continuar.');return}
+  saveButton.disabled=true;saveButton.textContent='Guardando...';
+  try{
+    const {data,error}=await supabase.rpc('mizona_completar_perfil_google',{
+      p_username:cleanUsername,
+      p_nombre:fullName.value.trim(),
+      p_distrito:district.value.trim(),
+      p_zona:zone.value.trim(),
+      p_phone:digits,
+      p_terms:true
+    });
+    if(error) throw error;
+    await supabase.auth.updateUser({data:{full_name:fullName.value.trim(),username:cleanUsername,terms_accepted:true,signup_method:'google'}}).catch(()=>{});
+    show('Perfil completado. Ahora activa las notificaciones en este dispositivo.','success');
+    setTimeout(()=>location.replace('notificaciones.html?bienvenida=google'),900);
+  }catch(error){show(error?.message||'No se pudo guardar el perfil.');saveButton.disabled=false;saveButton.textContent='Guardar y continuar'}
+});
+
+init();
+</script>
+</body>
+</html>

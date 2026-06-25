@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v12-email-push-phone-optional";
+const CACHE_NAME = "mizona-v13-google-login";
 
 const CORE = [
   "./",
@@ -35,6 +35,8 @@ const CORE = [
   "./publicar.html",
   "./login.html",
   "./registro.html",
+  "./auth-callback.html",
+  "./completar-perfil.html",
   "./recuperar.html",
   "./restablecer.html",
   "./manifest.json",

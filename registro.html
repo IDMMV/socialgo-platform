@@ -5,7 +5,7 @@
 <title>Crear cuenta · MiZona.pe</title>
 <link rel="manifest" href="manifest.json"><link rel="stylesheet" href="css/global.css"><link rel="stylesheet" href="css/mizona-unified.css"><link rel="stylesheet" href="css/mizona-phase2.css"><link rel="stylesheet" href="css/auth-security.css"><link rel="stylesheet" href="css/mizona-logo.css"><link rel="stylesheet" href="css/mizona-stability.css">
 <link rel="icon" href="assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<style>.phone-optional-row{display:flex;align-items:stretch;border:1px solid #cbd5e1;border-radius:10px;overflow:hidden;background:#fff}.phone-optional-row span{display:flex;align-items:center;padding:0 12px;background:#eef4fb;border-right:1px solid #cbd5e1;font-weight:800;color:#0f3f78}.phone-optional-row input{border:0!important;border-radius:0!important;min-width:0;flex:1}</style>
+<style>.phone-optional-row{display:flex;align-items:stretch;border:1px solid #cbd5e1;border-radius:10px;overflow:hidden;background:#fff}.phone-optional-row span{display:flex;align-items:center;padding:0 12px;background:#eef4fb;border-right:1px solid #cbd5e1;font-weight:800;color:#0f3f78}.phone-optional-row input{border:0!important;border-radius:0!important;min-width:0;flex:1}.google-btn{width:100%;min-height:54px;border:1px solid #cbd5e1;border-radius:11px;background:#fff;color:#172033;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 4px 14px rgba(15,23,42,.05)}.google-btn:hover{background:#f8fafc;border-color:#94a3b8}.google-btn:disabled{opacity:.65;cursor:not-allowed}.google-btn svg{width:22px;height:22px}.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:#94a3b8;font-size:13px;font-weight:700}.auth-divider:before,.auth-divider:after{content:"";height:1px;background:#e2e8f0;flex:1}</style>
 </head>
 <body class="auth-page">
 <main class="auth-card auth-card-wide">
@@ -13,6 +13,8 @@
   <h1>Crear cuenta</h1>
   <p class="auth-intro">Todos comienzan con una cuenta personal. Después podrás solicitar autorización para ofrecer servicios o registrar un negocio.</p>
   <div class="notice" hidden id="msg"></div>
+  <button class="google-btn" id="btnGoogle" type="button" aria-label="Continuar con Google"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.23c0-.71-.06-1.4-.18-2.06H12v3.9h5.24a4.48 4.48 0 0 1-1.94 2.94v2.53h3.14c1.84-1.69 2.91-4.19 2.91-7.31Z"/><path fill="#34A853" d="M12 21.75c2.62 0 4.82-.87 6.43-2.36l-3.14-2.53c-.87.58-1.98.92-3.29.92-2.53 0-4.67-1.71-5.44-4.01H3.32v2.61A9.72 9.72 0 0 0 12 21.75Z"/><path fill="#FBBC05" d="M6.56 13.77A5.85 5.85 0 0 1 6.25 12c0-.61.11-1.21.31-1.77V7.62H3.32A9.73 9.73 0 0 0 2.25 12c0 1.57.38 3.05 1.07 4.38l3.24-2.61Z"/><path fill="#EA4335" d="M12 6.22c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.82 3.31 14.62 2.25 12 2.25a9.72 9.72 0 0 0-8.68 5.37l3.24 2.61c.77-2.3 2.91-4.01 5.44-4.01Z"/></svg><span>Continuar con Google</span></button>
+  <div class="auth-divider"><span>o crea tu cuenta con correo</span></div>
   <form id="form"><div class="auth-grid">
     <label>Nombre completo<input id="fullName" maxlength="80" autocomplete="name" required></label>
     <label>Nombre de usuario<input id="username" maxlength="24" minlength="3" pattern="[a-zA-Z0-9_.]+" autocomplete="username" required><small id="help">Letras, números, punto o guion bajo.</small></label>
@@ -27,9 +29,11 @@
   <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
 </main>
 <script type="module">
-import {registerUser,usernameAvailable} from './js/auth.js';
+import {registerUser,usernameAvailable,signInWithGoogle} from './js/auth.js';
 import {initPasswordToggles,bindPasswordStrength} from './js/password-ui.js';
 initPasswordToggles();bindPasswordStrength(password,strength);
+const btnGoogle=document.getElementById('btnGoogle');
+btnGoogle.addEventListener('click',async()=>{msg.hidden=true;btnGoogle.disabled=true;const label=btnGoogle.querySelector('span');const old=label.textContent;label.textContent='Abriendo Google...';try{await signInWithGoogle('index.html')}catch(x){msg.hidden=false;msg.className='notice error';msg.textContent=x?.message||'No se pudo iniciar con Google.';btnGoogle.disabled=false;label.textContent=old}});
 let t; username.oninput=()=>{clearTimeout(t);t=setTimeout(async()=>{try{help.textContent=await usernameAvailable(username.value)?'✓ Disponible':'No disponible'}catch{help.textContent='No se pudo comprobar'}},400)};
 phone.addEventListener('input',()=>{phone.value=phone.value.replace(/\D/g,'').slice(0,9)});
 form.onsubmit=async e=>{e.preventDefault();msg.hidden=true;if(password.value!==password2.value){msg.hidden=false;msg.className='notice error';msg.textContent='Las contraseñas no coinciden.';return}const digits=phone.value.replace(/\D/g,'');if(digits&&(!/^9\d{8}$/.test(digits))){msg.hidden=false;msg.className='notice error';msg.textContent='El celular opcional debe tener 9 dígitos y empezar con 9.';return}try{const d=await registerUser({fullName:fullName.value,username:username.value,email:email.value,password:password.value,phone:digits});msg.hidden=false;msg.className='notice ok';msg.textContent=d.session?'Cuenta creada. Ya puedes ingresar y activar tus notificaciones.':'Cuenta creada. Revisa tu correo y confirma la cuenta antes de iniciar sesión.';if(d.session)setTimeout(()=>location.href='index.html',900);else form.reset()}catch(x){msg.hidden=false;msg.className='notice error';msg.textContent=x.message}};

@@ -21,7 +21,7 @@ export async function registerUser({ fullName, username, email, password, phone 
     email: email.trim().toLowerCase(), password,
     options: {
       emailRedirectTo: `${PUBLIC_ENV.SITE_URL}/auth-callback.html`,
-      data: { full_name: fullName.trim(), username: clean, account_type: 'personal', phone_pending: optionalPhone }
+      data: { full_name: fullName.trim(), username: clean, account_type: 'personal', phone_pending: optionalPhone, terms_accepted: true, signup_method: 'email' }
     }
   });
   if (error) throw error;
@@ -30,6 +30,23 @@ export async function registerUser({ fullName, username, email, password, phone 
 
 export async function loginUser(email, password) {
   const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+  if (error) throw error;
+  return data;
+}
+
+
+export async function signInWithGoogle(next = "index.html") {
+  const safeNext = String(next || "index.html");
+  const relativeNext = (!safeNext.includes("://") && !safeNext.startsWith("//")) ? safeNext : "index.html";
+  localStorage.setItem("mizona_oauth_next", relativeNext);
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${PUBLIC_ENV.SITE_URL}/auth-callback.html`,
+      queryParams: { prompt: "select_account" }
+    }
+  });
   if (error) throw error;
   return data;
 }

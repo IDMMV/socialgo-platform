@@ -119,6 +119,18 @@
     margin-top:10px;
   }
   .primary:disabled{opacity:.7;cursor:not-allowed}
+
+  .google-btn{
+    width:100%;min-height:56px;border:1px solid #cbd5e1;border-radius:12px;
+    background:#fff;color:#172033;font-size:16px;font-weight:800;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:12px;transition:.15s ease;
+    box-shadow:0 4px 14px rgba(15,23,42,.05);
+  }
+  .google-btn:hover{background:#f8fafc;border-color:#94a3b8;box-shadow:0 8px 20px rgba(15,23,42,.08)}
+  .google-btn:disabled{opacity:.65;cursor:not-allowed}
+  .google-btn svg{width:22px;height:22px;flex:0 0 22px}
+  .auth-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:#94a3b8;font-size:13px;font-weight:700}
+  .auth-divider::before,.auth-divider::after{content:"";height:1px;background:#e2e8f0;flex:1}
   .auth-links{
     text-align:center;
     margin-top:18px;
@@ -171,6 +183,18 @@
   <h1>Iniciar sesión</h1>
   <div class="notice" hidden id="msg"></div>
 
+
+  <button class="google-btn" id="btnGoogle" type="button" aria-label="Continuar con Google">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="#4285F4" d="M21.35 12.23c0-.71-.06-1.4-.18-2.06H12v3.9h5.24a4.48 4.48 0 0 1-1.94 2.94v2.53h3.14c1.84-1.69 2.91-4.19 2.91-7.31Z"/>
+      <path fill="#34A853" d="M12 21.75c2.62 0 4.82-.87 6.43-2.36l-3.14-2.53c-.87.58-1.98.92-3.29.92-2.53 0-4.67-1.71-5.44-4.01H3.32v2.61A9.72 9.72 0 0 0 12 21.75Z"/>
+      <path fill="#FBBC05" d="M6.56 13.77A5.85 5.85 0 0 1 6.25 12c0-.61.11-1.21.31-1.77V7.62H3.32A9.73 9.73 0 0 0 2.25 12c0 1.57.38 3.05 1.07 4.38l3.24-2.61Z"/>
+      <path fill="#EA4335" d="M12 6.22c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.82 3.31 14.62 2.25 12 2.25a9.72 9.72 0 0 0-8.68 5.37l3.24 2.61c.77-2.3 2.91-4.01 5.44-4.01Z"/>
+    </svg>
+    <span>Continuar con Google</span>
+  </button>
+  <div class="auth-divider"><span>o usa tu correo</span></div>
+
   <form id="loginForm" autocomplete="on">
     <label for="email">Correo
       <input autocomplete="email" id="email" name="email" required type="email"/>
@@ -203,79 +227,84 @@
   </div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-(function(){
-  const SUPABASE_URL = 'https://fhqdxethubaycijtbzry.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_0wSXACcq0lqcKsjqUf9xVQ_7a3c72oH';
-  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      flowType: 'pkce'
-    }
-  });
+<script type="module">
+import { supabase as sb } from './js/supabase.js';
+import { signInWithGoogle } from './js/auth.js';
 
-  const form = document.getElementById('loginForm');
-  const email = document.getElementById('email');
-  const password = document.getElementById('password');
-  const btnLogin = document.getElementById('btnLogin');
-  const msg = document.getElementById('msg');
-  const btnEye = document.getElementById('btnEye');
-  const eyeOpen = document.getElementById('eyeOpen');
-  const eyeClosed = document.getElementById('eyeClosed');
+const form = document.getElementById('loginForm');
+const email = document.getElementById('email');
+const password = document.getElementById('password');
+const btnLogin = document.getElementById('btnLogin');
+const btnGoogle = document.getElementById('btnGoogle');
+const msg = document.getElementById('msg');
+const btnEye = document.getElementById('btnEye');
+const eyeOpen = document.getElementById('eyeOpen');
+const eyeClosed = document.getElementById('eyeClosed');
 
-  function showMessage(text, type){
-    msg.hidden = false;
-    msg.className = 'notice ' + (type || '');
-    msg.textContent = text;
+function showMessage(text, type){
+  msg.hidden = false;
+  msg.className = 'notice ' + (type || '');
+  msg.textContent = text;
+}
+
+function safeNext(){
+  const params = new URLSearchParams(location.search);
+  const next = params.get('next');
+  if(next && !next.includes('://') && !next.startsWith('//')) return next;
+  return 'index.html';
+}
+
+btnGoogle.addEventListener('click', async function(){
+  msg.hidden = true;
+  btnGoogle.disabled = true;
+  const label = btnGoogle.querySelector('span');
+  const oldText = label.textContent;
+  label.textContent = 'Abriendo Google...';
+  try{
+    await signInWithGoogle(safeNext());
+  }catch(err){
+    showMessage(err?.message || 'No se pudo iniciar con Google. Revisa la configuración e inténtalo nuevamente.', 'error');
+    btnGoogle.disabled = false;
+    label.textContent = oldText;
   }
+});
 
-  function safeNext(){
-    const params = new URLSearchParams(location.search);
-    const next = params.get('next');
-    if(next && !next.includes('://') && !next.startsWith('//')) return next;
-    return 'index.html';
+btnEye.addEventListener('click', function(){
+  const visible = password.type === 'text';
+  password.type = visible ? 'password' : 'text';
+  btnEye.setAttribute('aria-label', visible ? 'Mostrar contraseña' : 'Ocultar contraseña');
+  btnEye.setAttribute('title', visible ? 'Mostrar contraseña' : 'Ocultar contraseña');
+  eyeOpen.style.display = visible ? 'block' : 'none';
+  eyeClosed.style.display = visible ? 'none' : 'block';
+  password.focus();
+});
+
+form.addEventListener('submit', async function(e){
+  e.preventDefault();
+  msg.hidden = true;
+  btnLogin.disabled = true;
+  btnLogin.textContent = 'Ingresando...';
+
+  try{
+    const { data, error } = await sb.auth.signInWithPassword({
+      email: email.value.trim(),
+      password: password.value
+    });
+    if(error) throw error;
+    if(!data || !data.user) throw new Error('No se pudo iniciar sesión. Inténtalo nuevamente.');
+
+    showMessage('Ingreso correcto. Redirigiendo...', 'success');
+    setTimeout(function(){ location.href = safeNext(); }, 450);
+  }catch(err){
+    const txt = String(err && err.message ? err.message : err);
+    let friendly = txt;
+    if(/invalid login credentials/i.test(txt)) friendly = 'Correo o contraseña incorrectos. Verifica los datos e intenta nuevamente.';
+    if(/email not confirmed/i.test(txt)) friendly = 'Tu correo todavía no está confirmado. Revisa tu bandeja de entrada.';
+    showMessage(friendly, 'error');
+    btnLogin.disabled = false;
+    btnLogin.textContent = 'Ingresar';
   }
-
-  btnEye.addEventListener('click', function(){
-    const visible = password.type === 'text';
-    password.type = visible ? 'password' : 'text';
-    btnEye.setAttribute('aria-label', visible ? 'Mostrar contraseña' : 'Ocultar contraseña');
-    btnEye.setAttribute('title', visible ? 'Mostrar contraseña' : 'Ocultar contraseña');
-    eyeOpen.style.display = visible ? 'block' : 'none';
-    eyeClosed.style.display = visible ? 'none' : 'block';
-    password.focus();
-  });
-
-  form.addEventListener('submit', async function(e){
-    e.preventDefault();
-    msg.hidden = true;
-    btnLogin.disabled = true;
-    btnLogin.textContent = 'Ingresando...';
-
-    try{
-      const { data, error } = await sb.auth.signInWithPassword({
-        email: email.value.trim(),
-        password: password.value
-      });
-      if(error) throw error;
-      if(!data || !data.user) throw new Error('No se pudo iniciar sesión. Inténtalo nuevamente.');
-
-      showMessage('Ingreso correcto. Redirigiendo...', 'success');
-      setTimeout(function(){ location.href = safeNext(); }, 450);
-    }catch(err){
-      const txt = String(err && err.message ? err.message : err);
-      let friendly = txt;
-      if(/invalid login credentials/i.test(txt)) friendly = 'Correo o contraseña incorrectos. Verifica los datos e intenta nuevamente.';
-      if(/email not confirmed/i.test(txt)) friendly = 'Tu correo todavía no está confirmado. Revisa tu bandeja de entrada.';
-      showMessage(friendly, 'error');
-      btnLogin.disabled = false;
-      btnLogin.textContent = 'Ingresar';
-    }
-  });
-})();
+});
 </script>
 </body>
 </html>

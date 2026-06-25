@@ -1,7 +1,99 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Confirmando cuenta</title>
-<link href="manifest.json" rel="manifest"/><link href="css/global.css" rel="stylesheet"/><link href="css/mizona-unified.css" rel="stylesheet"/>
-<link href="css/mizona-phase2.css" rel="stylesheet"/>
-<link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/mizona-stability.css">
-</head><body class="auth-page"><main class="auth-card"><h1>Confirmando tu cuenta</h1><p class="notice" id="status">Espera un momento…</p></main><script type="module">import{supabase}from'./js/supabase.js';const{data,error}=await supabase.auth.getSession();status.textContent=error?error.message:(data.session?'Cuenta confirmada. Entrando…':'Correo confirmado. Ya puedes iniciar sesión.');setTimeout(()=>location.href=data.session?'perfil.html':'login.html',1200);</script><script src="./js/mizona-core.js" type="module"></script>
-</body></html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Ingresando a MiZona.pe</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" href="assets/favicon-32.png" type="image/png"/>
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png"/>
+<link rel="stylesheet" href="css/global.css"/>
+<link rel="stylesheet" href="css/mizona-unified.css"/>
+<link rel="stylesheet" href="css/mizona-phase2.css"/>
+<link rel="stylesheet" href="css/mizona-logo.css"/>
+<link rel="stylesheet" href="css/mizona-stability.css"/>
+<style>
+.callback-card{text-align:center;max-width:520px}.callback-logo{width:min(230px,70%);margin:0 auto 22px}.callback-spinner{width:48px;height:48px;border:5px solid #dbeafe;border-top-color:#185fa5;border-radius:50%;margin:18px auto;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.callback-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}.callback-actions a{padding:11px 16px;border-radius:10px;text-decoration:none;font-weight:800;background:#185fa5;color:#fff}
+</style>
+</head>
+<body class="auth-page">
+<main class="auth-card callback-card">
+  <img class="callback-logo" src="assets/mizona-logo-horizontal.svg" alt="MiZona.pe"/>
+  <div class="callback-spinner" id="spinner"></div>
+  <h1>Confirmando tu acceso</h1>
+  <p class="notice" id="status">Espera un momento mientras conectamos tu cuenta…</p>
+  <div class="callback-actions" id="actions" hidden><a href="login.html">Volver a iniciar sesión</a></div>
+</main>
+<script type="module">
+import { supabase } from './js/supabase.js';
+
+const status = document.getElementById('status');
+const spinner = document.getElementById('spinner');
+const actions = document.getElementById('actions');
+const query = new URLSearchParams(location.search);
+const hash = new URLSearchParams(location.hash.replace(/^#/,''));
+
+function showError(message){
+  spinner.hidden = true;
+  actions.hidden = false;
+  status.className = 'notice error';
+  status.textContent = message;
+}
+
+function safeStoredNext(){
+  const value = localStorage.getItem('mizona_oauth_next') || 'index.html';
+  localStorage.removeItem('mizona_oauth_next');
+  if(value.includes('://') || value.startsWith('//')) return 'index.html';
+  return value;
+}
+
+async function waitForSession(){
+  const code = query.get('code');
+  if(code){
+    const exchanged = await supabase.auth.exchangeCodeForSession(code);
+    if(exchanged.error) throw exchanged.error;
+    if(exchanged.data?.session) return exchanged.data.session;
+  }
+  for(let i=0;i<20;i++){
+    const { data, error } = await supabase.auth.getSession();
+    if(error) throw error;
+    if(data?.session) return data.session;
+    await new Promise(resolve=>setTimeout(resolve,120));
+  }
+  return null;
+}
+
+try{
+  const oauthError = query.get('error_description') || hash.get('error_description') || query.get('error') || hash.get('error');
+  if(oauthError) throw new Error(decodeURIComponent(oauthError));
+
+  const session = await waitForSession();
+  if(!session?.user){
+    status.textContent = 'Correo confirmado. Ya puedes iniciar sesión.';
+    spinner.hidden = true;
+    setTimeout(()=>location.replace('login.html'),1200);
+  }else{
+    let profile = null;
+    const ensured = await supabase.rpc('mizona_asegurar_perfil');
+    if(!ensured.error && ensured.data) profile = ensured.data;
+    if(!profile){
+      const result = await supabase.from('perfiles').select('username,perfil_completo').eq('id',session.user.id).maybeSingle();
+      if(result.error) throw result.error;
+      profile = result.data;
+    }
+    if(!profile) throw new Error('La cuenta ingresó correctamente, pero no se pudo crear el perfil de MiZona. Ejecuta el SQL V6.1 Google.');
+
+    const provider = session.user.app_metadata?.provider || '';
+    const complete = profile.perfil_completo !== false;
+    status.className = 'notice success';
+    status.textContent = provider === 'google' ? 'Google confirmó tu cuenta correctamente.' : 'Cuenta confirmada correctamente.';
+    const destination = complete ? safeStoredNext() : 'completar-perfil.html';
+    setTimeout(()=>location.replace(destination),700);
+  }
+}catch(error){
+  console.error(error);
+  showError(error?.message || 'No se pudo completar el acceso. Inténtalo nuevamente.');
+}
+</script>
+</body>
+</html>

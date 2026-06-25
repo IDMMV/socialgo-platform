@@ -1,6 +1,7 @@
 import { supabase, getCurrentUser } from './supabase.js';
 import { initMiZonaUI, toast, escapeHtml, timeAgo } from './mizona-ui-v2.js';
 import { createAlertLocationPicker } from './alert-location-picker.js';
+import { initNearbyExperience, getStoredNearbyLocation, getNearbyRadius, distanceMeters, formatDistance } from './nearby-location.js';
 
 initMiZonaUI();
 
@@ -90,7 +91,7 @@ applyPrivacyDefault();
 function statusLabel(alert) {
   if (alert.tipo_fuente === 'oficial') return { cls: 'oficial', text: 'Fuente oficial' };
   const labels = {
-    reportada: ['reportada', 'Reportada'],
+    reportada: ['reportada', 'Sin verificar'],
     en_revision: ['en_revision', 'En revisión'],
     verificada: ['verificada', 'Verificada'],
     resuelta: ['resuelta', 'Resuelta'],
@@ -144,7 +145,24 @@ async function loadAlerts() {
     return;
   }
 
-  list.innerHTML = data.map(alert => {
+  const point = getStoredNearbyLocation();
+  const radius = getNearbyRadius();
+  let visibleAlerts = data.map(alert => ({
+    ...alert,
+    _distanceMeters: point ? distanceMeters(point, { lat: Number(alert.latitud), lng: Number(alert.longitud) }) : NaN
+  }));
+  if (point && radius) {
+    visibleAlerts = visibleAlerts
+      .filter(alert => Number.isFinite(alert._distanceMeters) && alert._distanceMeters <= radius)
+      .sort((a,b) => a._distanceMeters - b._distanceMeters);
+  }
+  if (!visibleAlerts.length) {
+    list.innerHTML = `<div class="mz-empty"><strong>No hay alertas dentro de ${radius >= 1000 ? `${radius/1000} km` : `${radius} m`}.</strong><br><button class="mz-btn ghost" data-expand-alert-radius style="margin-top:9px">Ampliar a 1 km</button></div>`;
+    list.querySelector('[data-expand-alert-radius]')?.addEventListener('click', () => window.MiZonaNearby?.setRadius(1000));
+    return;
+  }
+
+  list.innerHTML = visibleAlerts.map(alert => {
     const status = statusLabel(alert);
     const id = String(alert.id);
     const isAuthor = currentUser && String(alert.autor_id) === String(currentUser.id);
@@ -166,6 +184,7 @@ async function loadAlerts() {
       ${isAuthor && alert.motivo_moderacion ? `<div class="mz-rejection-box"><strong>Motivo de moderación</strong>${escapeHtml(alert.motivo_moderacion)}</div>` : ''}
       <div class="mz-feed-meta">
         <span>📍 ${escapeHtml(alert.zona_referencia || alert.distrito)}</span>
+        ${Number.isFinite(alert._distanceMeters) ? `<span class="mz-distance-chip"><i class="ti ti-current-location"></i> A ${formatDistance(alert._distanceMeters)}</span>` : ''}
         <span>🛡 ${escapeHtml(locationPrivacy)}</span>
         <span>👥 ${countText(alert.total_confirmaciones, 'confirmación', 'confirmaciones')}</span>
         <span>🔔 ${countText(alert.total_seguidores, 'seguidor', 'seguidores')}</span>
@@ -213,14 +232,7 @@ async function confirmAlert(alertId, button) {
   button.disabled = true;
   button.textContent = 'Guardando...';
   try {
-    const point = await new Promise(resolve => {
-      if (!navigator.geolocation) return resolve(null);
-      navigator.geolocation.getCurrentPosition(
-        position => resolve({ lat: position.coords.latitude, lng: position.coords.longitude }),
-        () => resolve(null),
-        { enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 }
-      );
-    });
+    const point = getStoredNearbyLocation();
     const { data, error } = await supabase.rpc('confirmar_alerta', {
       p_alerta_id: alertId,
       p_latitud: point?.lat ?? null,
@@ -390,7 +402,10 @@ finalPublishButton?.addEventListener('click', async () => {
 
 form?.addEventListener('input', () => { duplicateCheckPassed = false; pendingPayload = null; });
 
+await initNearbyExperience({ reason: 'Activa tu ubicación para mostrar primero alertas e incidentes que estén a 500 metros de ti.' });
 await loadAlerts();
+window.addEventListener('mizona:location', loadAlerts);
+window.addEventListener('mizona:radius-change', loadAlerts);
 const channel = supabase.channel('mizona-alertas-v5')
   .on('postgres_changes', { event: '*', schema: 'public', table: 'alertas' }, loadAlerts)
   .on('postgres_changes', { event: '*', schema: 'public', table: 'alerta_actualizaciones' }, loadAlerts)

@@ -35,8 +35,9 @@
 <link href="css/mizona-master-shell.css" rel="stylesheet"/>
 <link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/mejoras-v2.css">
 <link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
+<link rel="stylesheet" href="css/mizona-stability.css">
 </head>
-<body>
+<body class="auth-pending">
 <div class="mz-layout-2col">
 <aside class="mz-sidebar">
 <div class="mz-logo"><img alt="MiZona.pe" class="mz-logo-img" src="assets/mizona-logo-blanco.svg"/></div>
@@ -149,6 +150,7 @@ import {
   removePushDevice,
   refreshNotificationLocation
 } from './js/push-notifications.js';
+import { dispatchPushEvent } from './js/push-dispatch.js';
 
 const user = await getCurrentUser();
 if (!user) location.replace('login.html?next=notificaciones.html');
@@ -197,7 +199,7 @@ async function loadPreferences(){
     const p=await getNotificationPreferences();
     $('#prefAlertas').checked=p.alertas_activas;
     document.querySelectorAll('[name=category]').forEach(input=>input.checked=(p.categorias_alerta||[]).includes(input.value));
-    $('#prefRadius').value=String(p.radio_metros||1500);
+    $('#prefRadius').value=String(p.radio_metros||500);
     $('#prefFrequency').value=p.resumen_frecuencia||'inmediato';
     $('#prefVerifiedOnly').checked=Boolean(p.solo_verificadas);
     $('#prefFollowedAlerts').checked=p.alertas_seguidas!==false;
@@ -252,7 +254,7 @@ $('#disablePush').addEventListener('click',async()=>{const btn=$('#disablePush')
 $('#refreshLocation').addEventListener('click',async()=>{const btn=$('#refreshLocation');setBusy(btn,true,'Ubicando…');try{await refreshNotificationLocation();toast('Tu zona de notificaciones fue actualizada.');}catch(error){toast(error.message,'error');}finally{setBusy(btn,false);}});
 $('#savePreferences').addEventListener('click',async()=>{const btn=$('#savePreferences');setBusy(btn,true,'Guardando…');try{await saveNotificationPreferences({alertas_activas:$('#prefAlertas').checked,categorias_alerta:[...document.querySelectorAll('[name=category]:checked')].map(input=>input.value),radio_metros:Number($('#prefRadius').value),resumen_frecuencia:$('#prefFrequency').value,solo_verificadas:$('#prefVerifiedOnly').checked,alertas_seguidas:$('#prefFollowedAlerts').checked,cambios_estado_alerta:$('#prefAlertStatus').checked,confirmaciones_alerta:$('#prefConfirmations').checked,mensajes:$('#prefMessages').checked,amistades:$('#prefFriends').checked,negocios:$('#prefBusiness').checked,ofertas:$('#prefOffers').checked,horario_silencioso_inicio:$('#quietStart').value,horario_silencioso_fin:$('#quietEnd').value,emergencias_en_silencio:$('#prefEmergencyQuiet').checked,zona_horaria:'America/Lima'});toast('Preferencias guardadas.');}catch(error){toast(error.message,'error');}finally{setBusy(btn,false);}});
 
-$('#testPush').addEventListener('click',async()=>{const btn=$('#testPush');setBusy(btn,true,'Enviando…');try{const {error}=await supabase.rpc('mizona_test_push');if(error)throw error;toast('Prueba enviada. Debe llegar en unos segundos.');}catch(error){toast(error.message,'error');}finally{setBusy(btn,false);}});
+$('#testPush').addEventListener('click',async()=>{const btn=$('#testPush');setBusy(btn,true,'Enviando…');try{const {data:eventId,error}=await supabase.rpc('mizona_test_push');if(error)throw error;const result=await dispatchPushEvent(eventId);if(result?.sent>0)toast('Prueba enviada correctamente al dispositivo.');else if(result?.skipped>0)toast('La prueba se creó, pero no hay un dispositivo activo o tus preferencias la omitieron.','error');else toast('Evento procesado. Revisa el celular y el historial de entregas.');await Promise.all([loadDevices(),loadPushInbox()]);}catch(error){toast(`No se pudo enviar la prueba: ${error.message}`,'error');}finally{setBusy(btn,false);}});
 $('#reloadDevices').addEventListener('click',loadDevices);
 $('#markAllRead').addEventListener('click',async()=>{await Promise.all([supabase.from('notification_inbox').update({leida:true,leida_en:new Date().toISOString()}).eq('user_id',user.id).eq('leida',false),supabase.from('notificaciones').update({leida:true}).eq('usuario_id',user.id).eq('leida',false)]);toast('Todo marcado como leído.');loadPushInbox();loadSocialInbox();});
 document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b===btn));$('#pushInbox').hidden=btn.dataset.tab!=='push';$('#socialInbox').hidden=btn.dataset.tab!=='social';}));

@@ -14,8 +14,10 @@
 <link href="css/mizona-master-shell.css" rel="stylesheet"/>
 <link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/mejoras-v2.css">
 <link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
+<link rel="stylesheet" href="css/mizona-stability.css">
+<link rel="stylesheet" href="css/integral-modules.css">
 </head>
-<body>
+<body class="auth-pending">
 <main class="page-shell mz-chat-page">
 <header class="mz-legacy-header">
 <a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a>
@@ -31,6 +33,10 @@
 <input autocomplete="off" id="conversationSearch" placeholder="Buscar conversación" type="search"/>
 </label>
 </div>
+<section class="chat-request-panel" id="chatRequestPanel" hidden>
+  <strong>Solicitudes de conversación</strong>
+  <div id="chatRequestItems"></div>
+</section>
 <div id="conversationsItems">
 <div class="chat-empty"><div><i class="ti ti-loader-2"></i><span>Cargando conversaciones…</span></div></div>
 </div>
@@ -38,7 +44,7 @@
 <section class="chat-panel">
 <header class="chat-header" id="chatHeader">
 <button aria-label="Volver a conversaciones" class="chat-back" id="chatBack" type="button"><i class="ti ti-arrow-left"></i></button>
-<div class="chat-header-profile"><strong>Selecciona una conversación</strong><small>Elige un contacto para comenzar</small></div>
+<div class="chat-header-profile"><strong>Selecciona una conversación</strong><small>Elige un contacto para comenzar</small></div><div class="chat-safety-actions" id="chatSafetyActions" hidden><button class="mz-btn secondary" id="blockChatUser" type="button">Bloquear</button><button class="mz-btn secondary" id="reportChatUser" type="button">Reportar</button></div>
 </header>
 <div class="messages-list" id="messagesList">
 <div class="chat-empty"><div><i class="ti ti-messages"></i><strong>Tu mensajería de MiZona</strong><p>Selecciona una conversación o contacta a un proveedor.</p></div></div>
@@ -53,6 +59,7 @@
 <script type="module">
     import { applyBrand } from "./js/brand.js";
     import { supabase, getCurrentUser } from "./js/supabase.js";
+    import { dispatchPushEvent } from "./js/push-dispatch.js";
 
     applyBrand();
 
@@ -67,12 +74,23 @@
     const chatLayout = document.querySelector("#chatLayout");
     const conversationsItems = document.querySelector("#conversationsItems");
     const conversationSearch = document.querySelector("#conversationSearch");
+    const chatRequestPanel = document.querySelector("#chatRequestPanel");
+    const chatRequestItems = document.querySelector("#chatRequestItems");
     const messagesList = document.querySelector("#messagesList");
     const chatHeader = document.querySelector("#chatHeader");
     const chatBack = document.querySelector("#chatBack");
     const form = document.querySelector("#messageForm");
     const input = document.querySelector("#messageInput");
     const sendButton = document.querySelector("#sendButton");
+    const safetyActions = document.querySelector("#chatSafetyActions");
+    const blockButton = document.querySelector("#blockChatUser");
+    const reportButton = document.querySelector("#reportChatUser");
+    const { data: myProfile } = await supabase.from("perfiles").select("telefono_verificado").eq("id", user.id).maybeSingle();
+    if (!myProfile?.telefono_verificado) {
+      input.placeholder = "Verifica tu celular para enviar mensajes";
+      const verify = document.createElement("a"); verify.href = "verificar-telefono.html?next=mensajes.html"; verify.className = "mz-btn primary"; verify.textContent = "Verificar celular";
+      form.appendChild(verify);
+    }
 
     let activeConversationId = params.get("c");
     let requestedContact = params.get("contacto") || params.get("contact");
@@ -100,6 +118,40 @@
         return;
       }
       conversationsItems.innerHTML = `<div class="chat-error">No se pudieron cargar las conversaciones: ${escapeHtml(error?.message || "Error desconocido")}</div>`;
+    }
+
+
+    async function loadChatRequests() {
+      const { data, error } = await supabase
+        .from("solicitudes_chat_recibidas")
+        .select("*")
+        .order("creado_en", { ascending: false });
+      if (error) {
+        chatRequestPanel.hidden = true;
+        return;
+      }
+      const requests = data || [];
+      chatRequestPanel.hidden = !requests.length;
+      chatRequestItems.innerHTML = requests.map(item => `
+        <article class="chat-request-item">
+          ${item.avatar_url ? `<img class="avatar" src="${escapeHtml(item.avatar_url)}" alt="">` : `<div class="avatar">${escapeHtml((item.nombre_visible || item.username || "U")[0].toUpperCase())}</div>`}
+          <div><strong>${escapeHtml(item.nombre_visible || item.username || "Usuario")}</strong><small>@${escapeHtml(item.username || "usuario")}</small></div>
+          <div class="chat-request-actions"><button class="mz-btn success" data-chat-accept="${item.id}" type="button">Aceptar</button><button class="mz-btn secondary" data-chat-reject="${item.id}" type="button">Rechazar</button></div>
+        </article>`).join("");
+      chatRequestItems.querySelectorAll("[data-chat-accept]").forEach(button => button.addEventListener("click", () => respondChatRequest(button.dataset.chatAccept, true)));
+      chatRequestItems.querySelectorAll("[data-chat-reject]").forEach(button => button.addEventListener("click", () => respondChatRequest(button.dataset.chatReject, false)));
+    }
+
+    async function respondChatRequest(id, accept) {
+      const { data, error } = await supabase.rpc("mizona_responder_solicitud_chat", { p_id: id, p_aceptar: accept });
+      if (error) { alert(error.message); return; }
+      if (data?.event_id) dispatchPushEvent(data.event_id).catch(() => {});
+      await loadChatRequests();
+      if (accept && data?.conversation_id) {
+        activeConversationId = data.conversation_id;
+        await loadConversations({ autoOpen: false });
+        await openConversation(data.conversation_id);
+      }
     }
 
     async function queryConversations() {
@@ -227,15 +279,22 @@
     }
 
     async function startConversation(otherUserId) {
-      const { data, error } = await supabase.rpc("crear_o_obtener_conversacion", { p_otro_usuario: otherUserId });
+      const { data, error } = await supabase.rpc("mizona_solicitar_o_abrir_chat", { p_otro_usuario: otherUserId });
       if (error) {
         showConversationError(error);
         return;
       }
-      activeConversationId = data;
-      history.replaceState(null, "", `mensajes.html?c=${encodeURIComponent(data)}`);
+      if (data?.event_id) dispatchPushEvent(data.event_id).catch(() => {});
+      if (data?.estado === "pendiente") {
+        conversationsItems.innerHTML = `<div class="chat-setup-note"><strong>Solicitud enviada.</strong><br>La conversación se abrirá cuando la otra persona la acepte. Puedes bloquear o cancelar el contacto desde tu perfil.</div>`;
+        return;
+      }
+      const conversationId = data?.conversation_id;
+      if (!conversationId) return;
+      activeConversationId = conversationId;
+      history.replaceState(null, "", `mensajes.html?c=${encodeURIComponent(conversationId)}`);
       await loadConversations({ autoOpen: false });
-      await openConversation(data, false);
+      await openConversation(conversationId, false);
     }
 
     async function openConversation(id, updateUrl = true) {
@@ -244,13 +303,15 @@
 
       renderConversations(conversationSearch.value);
       chatLayout.classList.add("chat-open");
-      input.disabled = false;
-      sendButton.disabled = false;
+      input.disabled = !myProfile?.telefono_verificado;
+      sendButton.disabled = !myProfile?.telefono_verificado;
+      safetyActions.hidden = false;
 
       const current = conversations.find(item => item.conversacion_id === id);
       chatHeader.querySelector(".chat-header-profile").innerHTML = current
-        ? `<strong>${escapeHtml(current.otro_nombre || current.otro_username || "Conversación")}</strong><small>@${escapeHtml(current.otro_username || "usuario")}</small>`
+        ? `<strong>${escapeHtml(current.otro_nombre || current.otro_username || "Conversación")}</strong><small>@${escapeHtml(current.otro_username || "usuario")} · conversación privada</small>`
         : `<strong>Conversación</strong><small>Mensajes privados</small>`;
+      safetyActions.dataset.userId = current?.otro_usuario_id || "";
 
       await loadMessages();
       subscribeRealtime();
@@ -326,10 +387,9 @@
       if (!content || !activeConversationId) return;
 
       sendButton.disabled = true;
-      const { error } = await supabase.from("mensajes").insert({
-        conversacion_id: activeConversationId,
-        remitente_id: user.id,
-        contenido: content
+      const { data: sendResult, error } = await supabase.rpc("mizona_enviar_mensaje", {
+        p_conversacion: activeConversationId,
+        p_contenido: content
       });
 
       if (error) {
@@ -337,6 +397,7 @@
         messagesList.insertAdjacentHTML("beforeend", `<div class="chat-error">No se pudo enviar: ${escapeHtml(detail)}</div>`);
       } else {
         input.value = "";
+        if (sendResult?.event_id) dispatchPushEvent(sendResult.event_id).catch(() => {});
         await loadMessages();
         await loadConversations({ autoOpen: false });
       }
@@ -345,10 +406,26 @@
       input.focus();
     });
 
+
+    blockButton.addEventListener("click", async () => {
+      const other = safetyActions.dataset.userId;
+      if (!other || !confirm("¿Bloquear a este usuario? Ya no podrán enviarse mensajes.")) return;
+      const { error } = await supabase.rpc("mizona_bloquear_usuario", { p_usuario: other, p_bloquear: true });
+      if (error) alert(error.message); else { alert("Usuario bloqueado."); location.href = "mensajes.html"; }
+    });
+    reportButton.addEventListener("click", async () => {
+      const other = safetyActions.dataset.userId; if (!other) return;
+      const motivo = prompt("Motivo del reporte: spam, acoso, estafa u otro"); if (!motivo) return;
+      const detalle = prompt("Detalle adicional (opcional)") || "";
+      const { error } = await supabase.rpc("mizona_reportar_chat", { p_usuario: other, p_conversacion: activeConversationId, p_motivo: motivo, p_detalle: detalle });
+      if (error) alert(error.message); else alert("Reporte enviado al administrador.");
+    });
+
     conversationSearch.addEventListener("input", () => renderConversations(conversationSearch.value));
     chatBack.addEventListener("click", () => chatLayout.classList.remove("chat-open"));
     addEventListener("beforeunload", () => { if (realtimeChannel) supabase.removeChannel(realtimeChannel); });
 
+    await loadChatRequests();
     await loadConversations();
   </script>
 <script src="./js/mizona-core.js" type="module"></script>

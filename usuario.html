@@ -11,8 +11,9 @@
 <link href="css/mizona-phase2.css" rel="stylesheet"/>
 <link href="css/mizona-master-shell.css" rel="stylesheet"/>
 <link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
+<link rel="stylesheet" href="css/mizona-stability.css">
 </head>
-<body>
+<body class="auth-pending">
 <main class="page-shell">
 <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
 <a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"/></a>
@@ -31,6 +32,7 @@
 <script type="module">
     import { applyBrand } from "./js/brand.js";
     import { supabase, getCurrentUser } from "./js/supabase.js";
+    import { openOrRequestChat } from "./js/chat-access.js";
 
     applyBrand();
 
@@ -104,12 +106,8 @@
         });
 
         document.querySelector("#messageButton")?.addEventListener("click", async () => {
-          const { data, error } = await supabase.rpc("crear_o_obtener_conversacion", {
-            p_otro_usuario: profile.id
-          });
-
-          if (error) alert(error.message);
-          else location.href = `mensajes.html?c=${data}`;
+          try { await openOrRequestChat(profile.id); }
+          catch (error) { alert(error.message); }
         });
 
         const { data: posts, error: postsError } = await supabase

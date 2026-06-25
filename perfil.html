@@ -39,8 +39,10 @@
 @media(max-width:640px){.mz-row{grid-template-columns:1fr}}
 </style>
 <link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
+<link rel="stylesheet" href="css/mizona-stability.css">
+<link rel="stylesheet" href="css/nearby-location.css">
 </head>
-<body>
+<body class="auth-pending">
 <div id="mz-global-toast" class="mz-toast"></div>
 <input type="file" id="inp-avatar" accept="image/*" hidden>
 <input type="file" id="inp-portada" accept="image/*" hidden>
@@ -191,6 +193,20 @@
       <div id="act-contenido" style="padding:12px 14px;min-height:100px"></div>
     </div>
 
+
+    <!-- UBICACIÓN Y CERCANÍA -->
+    <div class="mz-card" id="ubicacion">
+      <div class="mz-card-head" style="padding:10px 14px;border-bottom:1px solid var(--border2)">
+        <div style="font-size:11px;font-weight:700;color:var(--txt-primary);display:flex;align-items:center;gap:5px">
+          <i class="ti ti-current-location" style="color:var(--az)"></i> Ubicación y contenido cercano
+        </div>
+      </div>
+      <div class="mz-nearby-bar" data-nearby-controls style="margin:12px"></div>
+      <div style="padding:0 18px 14px;font-size:9px;line-height:1.55;color:var(--txt-third)">
+        MiZona usa tu ubicación para ordenar alertas, servicios, ofertas, solicitudes y empleos cercanos. El radio inicial es 500 m. Tu posición exacta no se publica y puedes cambiar el distrito manualmente desde Editar perfil.
+      </div>
+    </div>
+
     <!-- SEGURIDAD -->
     <div class="mz-card">
       <div class="mz-card-head" style="padding:10px 14px;border-bottom:1px solid var(--border2)">
@@ -205,6 +221,18 @@
       <div class="security-item">
         <div><div class="sec-label">Notificaciones push</div><div class="sec-sub">Alertas en tiempo real de tu zona</div></div>
         <button class="sec-btn sec-btn-az" onclick="location.href='notificaciones.html'">Configurar</button>
+      </div>
+      <div class="security-item">
+        <div><div class="sec-label">Celular verificado</div><div class="sec-sub">Necesario para alertas, mensajes y avisos push</div></div>
+        <button class="sec-btn sec-btn-az" onclick="location.href='verificar-telefono.html'">Verificar</button>
+      </div>
+      <div class="security-item">
+        <div><div class="sec-label">Contactos de confianza</div><div class="sec-sub">Recibirán tus solicitudes de ayuda</div></div>
+        <button class="sec-btn sec-btn-az" onclick="location.href='contactos-confianza.html'">Administrar</button>
+      </div>
+      <div class="security-item">
+        <div><div class="sec-label">Ofrecer servicios</div><div class="sec-sub">Solicita aprobación antes de publicar</div></div>
+        <button class="sec-btn sec-btn-az" onclick="location.href='proveedor.html'">Solicitar</button>
       </div>
       <div class="security-item">
         <div><div class="sec-label">Pregunta de recuperación</div><div class="sec-sub">Seguridad adicional para tu cuenta</div></div>
@@ -233,6 +261,7 @@ import { PUBLIC_ENV } from './js/env.public.js';
 import { getNivelInfo, renderBadgeNivel, renderBarraNivel } from './js/niveles-mizona.js';
 import { escapeHtml } from './js/mizona-ui-v2.js';
 import { getTema, setTema, toggleTema as _toggle } from './js/tema-mizona.js';
+import { initNearbyExperience } from './js/nearby-location.js';
 
 const sb = supabase.createClient(PUBLIC_ENV.SUPABASE_URL, PUBLIC_ENV.SUPABASE_PUBLISHABLE_KEY);
 let usuario = null, perfil = null;
@@ -475,6 +504,7 @@ window.cambiarPass = async function() {
   toast('✅ Enlace enviado a tu correo');
 };
 
+initNearbyExperience({ auto:false, interactive:true });
 init();
 </script>
 <script type="module" src="./js/mizona-core.js"></script>

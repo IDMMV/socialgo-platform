@@ -5,7 +5,13 @@ export const supabase = createClient(PUBLIC_ENV.SUPABASE_URL, PUBLIC_ENV.SUPABAS
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
 
-export async function getCurrentUser() {
+export async function getCurrentUser({ validate = false } = {}) {
+  // getSession lee primero la sesión local y evita el parpadeo de la interfaz.
+  // Usa validate=true solo en operaciones sensibles que deban validar contra el servidor.
+  if (!validate) {
+    const { data } = await supabase.auth.getSession();
+    return data?.session?.user || null;
+  }
   const { data, error } = await supabase.auth.getUser();
   return error ? null : data.user;
 }

@@ -14,7 +14,7 @@ let authListenerInstalled = false;
 const DEFAULT_PREFERENCES = Object.freeze({
   alertas_activas: true,
   categorias_alerta: ["robo", "accidente", "agua", "luz", "mascota", "persona", "incendio"],
-  radio_metros: 1500,
+  radio_metros: 500,
   solo_verificadas: false,
   alertas_seguidas: true,
   cambios_estado_alerta: true,
@@ -283,6 +283,8 @@ export async function requestPushPermission({ saveLocation = true } = {}) {
   if (!isOneSignalConfigured()) throw makeError("Primero configura el App ID de OneSignal.", "missing_app_id");
   const user = await getCurrentUser();
   if (!user) throw makeError("Debes iniciar sesión para activar notificaciones.", "login_required");
+  const { data: profile } = await supabase.from("perfiles").select("telefono_verificado").eq("id", user.id).maybeSingle();
+  if (!profile?.telefono_verificado) throw makeError("Verifica tu celular antes de activar notificaciones.", "phone_verification_required");
   if (isIos() && !isStandalone()) {
     throw makeError("En iPhone o iPad, agrega MiZona a la pantalla de inicio y ábrela desde su icono.", "ios_install_required");
   }
@@ -355,7 +357,7 @@ export async function saveNotificationPreferences(values) {
   const allowed = {
     alertas_activas: Boolean(values.alertas_activas),
     categorias_alerta: Array.isArray(values.categorias_alerta) ? values.categorias_alerta : DEFAULT_PREFERENCES.categorias_alerta,
-    radio_metros: Math.max(500, Math.min(20000, Number(values.radio_metros || 1500))),
+    radio_metros: Math.max(500, Math.min(20000, Number(values.radio_metros || 500))),
     solo_verificadas: Boolean(values.solo_verificadas),
     alertas_seguidas: values.alertas_seguidas !== false,
     cambios_estado_alerta: values.cambios_estado_alerta !== false,

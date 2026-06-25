@@ -15,8 +15,10 @@
 <link href="css/mizona-master-shell.css" rel="stylesheet"/>
 <link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/mejoras-v2.css">
 <link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
+<link rel="stylesheet" href="css/mizona-stability.css">
+<link rel="stylesheet" href="css/nearby-location.css">
 </head>
-<body>
+<body class="auth-pending">
 <div class="mz-app">
 <aside class="mz-sidebar">
 <a class="mz-brand" href="index.html"><img alt="MiZona.pe" class="mz-logo-img" src="assets/mizona-logo-blanco.svg"/></a>
@@ -42,6 +44,7 @@
 </div>
 </header>
 <div class="mz-content">
+<section class="mz-nearby-bar" data-nearby-controls></section>
 <div class="mz-page-title">
 <div><h1>Servicios cerca de ti</h1><p>Encuentra profesionales y negocios de confianza en tu distrito.</p></div>
 <button class="mz-btn primary" id="openServiceFormSecondary"><i class="ti ti-speakerphone"></i> Ofrecer mi servicio</button>
@@ -84,6 +87,7 @@
 <label class="mz-field full"><span>Descripción</span><textarea maxlength="800" name="descripcion" placeholder="Experiencia, trabajos que realizas y horarios" rows="4"></textarea></label>
 <label class="mz-field"><span>Zona de atención</span><input maxlength="120" name="zona_atencion" placeholder="Distritos o urbanizaciones"/></label>
 <label class="mz-field"><span>WhatsApp</span><input inputmode="tel" maxlength="18" name="whatsapp" placeholder="999 999 999"/></label>
+<input type="hidden" name="latitud"><input type="hidden" name="longitud">
 <label class="mz-field"><span>Tarifa desde</span><input min="0" name="tarifa_desde" placeholder="S/ 0" step="0.01" type="number"/></label>
 <label class="mz-field"><span>Tarifa hasta</span><input min="0" name="tarifa_hasta" placeholder="S/ 0" step="0.01" type="number"/></label>
 </div>

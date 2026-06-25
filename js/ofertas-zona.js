@@ -1,4 +1,5 @@
 import { supabase, getCurrentUser } from './supabase.js';
+import { initNearbyExperience, getStoredNearbyLocation, getNearbyRadius, distanceMeters, formatDistance } from './nearby-location.js';
 
 const state = {
   offers: [],
@@ -9,7 +10,8 @@ const state = {
   query: '',
   district: '',
   sort: 'recent',
-  shown: 12
+  shown: 12,
+  point: getStoredNearbyLocation()
 };
 
 const $ = (s, root=document) => root.querySelector(s);
@@ -34,7 +36,9 @@ function businessFor(offer) {
     categoria: offer.categoria || 'otros',
     distrito: offer.distrito || '',
     logo_url: '',
-    slug: ''
+    slug: '',
+    latitud: offer.latitud || null,
+    longitud: offer.longitud || null
   };
 }
 
@@ -58,7 +62,10 @@ function offerCard(offer) {
   const couponButton = offer.permite_cupon
     ? `<button class="coupon" type="button" data-coupon="${offer.id}"><i class="ti ti-ticket"></i> Obtener cupón</button>`
     : `<a href="oferta.html?id=${encodeURIComponent(offer.id)}">Ver oferta</a>`;
-  const distance = business.distrito || offer.distrito || 'Tu zona';
+  const meters = Number(offer._distanceMeters);
+  const distance = Number.isFinite(meters)
+    ? `<span class="mz-distance-chip"><i class="ti ti-current-location"></i> A ${formatDistance(meters)}</span>`
+    : `<span><i class="ti ti-map-pin"></i> ${esc(business.distrito || offer.distrito || 'Ubicación por confirmar')}</span>`;
   const stock = Number.isFinite(Number(offer.stock)) && offer.stock !== null
     ? `<span class="bo-offer-tag">Stock: ${Math.max(0,Number(offer.stock))}</span>` : '';
 
@@ -77,7 +84,7 @@ function offerCard(offer) {
         ${offer.precio_normal && offer.precio_oferta ? `<span class="old">${money(offer.precio_normal)}</span>` : ''}
       </div>
       ${stock}
-      <div class="bo-offer-meta"><span><i class="ti ti-calendar"></i> ${dateText(offer.vence_en)}</span><span><i class="ti ti-map-pin"></i> ${esc(distance)}</span></div>
+      <div class="bo-offer-meta"><span><i class="ti ti-calendar"></i> ${dateText(offer.vence_en)}</span>${distance}</div>
       <div class="bo-offer-actions"><a href="oferta.html?id=${encodeURIComponent(offer.id)}">Ver oferta</a>${couponButton}</div>
     </div>
   </article>`;
@@ -105,7 +112,20 @@ function featuredMarkup(offer) {
 }
 
 function filteredOffers() {
-  let list = [...state.offers];
+  let list = [...state.offers].map(offer => {
+    const business = businessFor(offer);
+    const lat = Number(offer.latitud ?? business.latitud);
+    const lng = Number(offer.longitud ?? business.longitud);
+    const meters = state.point ? distanceMeters(state.point, { lat, lng }) : NaN;
+    return { ...offer, _distanceMeters: meters };
+  });
+  const radius = getNearbyRadius();
+  if (state.point && radius) {
+    const exact = list.filter(offer => Number.isFinite(offer._distanceMeters) && offer._distanceMeters <= radius);
+    const localDistrict = normalize(localStorage.getItem('mizona_zona') || '');
+    const legacy = list.filter(offer => !Number.isFinite(offer._distanceMeters) && localDistrict && normalize(offer.distrito || businessFor(offer).distrito) === localDistrict);
+    list = exact.length ? exact : legacy;
+  }
   if (state.category) list = list.filter(o => normalize(o.categoria || businessFor(o).categoria) === normalize(state.category));
   if (state.district) list = list.filter(o => normalize(o.distrito || businessFor(o).distrito) === normalize(state.district));
   if (state.query) {
@@ -180,7 +200,7 @@ async function loadCatalog() {
     if (ids.length) {
       const {data:businesses,error:businessError} = await supabase
         .from('negocios')
-        .select('id,slug,nombre_comercial,categoria,logo_url,distrito,verificado,destacado,estado')
+        .select('id,slug,nombre_comercial,categoria,logo_url,distrito,verificado,destacado,estado,latitud,longitud')
         .in('id',ids);
       if (businessError) throw businessError;
       (businesses || []).forEach(b=>state.businesses.set(b.id,b));
@@ -196,7 +216,7 @@ async function loadCatalog() {
     }
 
     const discounts = state.offers.map(discountFor).filter(Boolean);
-    $('#activeOfferCount').textContent = state.offers.length;
+    $('#activeOfferCount').textContent = filteredOffers().length;
     $('#averageDiscount').textContent = discounts.length ? `${Math.round(discounts.reduce((a,b)=>a+b,0)/discounts.length)}%` : '0%';
     renderBusinesses();
     render();
@@ -275,4 +295,8 @@ $('#loadMoreOffers')?.addEventListener('click',()=>{state.shown+=12;render();});
 $$('[data-close-modal]').forEach(btn=>btn.addEventListener('click',()=>btn.closest('.bo-modal-backdrop').classList.remove('open')));
 $('#couponModal')?.addEventListener('click',e=>{if(e.target.id==='couponModal')e.currentTarget.classList.remove('open');});
 
+window.addEventListener('mizona:location', event => { state.point = event.detail.point; render(); renderBusinesses(); });
+window.addEventListener('mizona:radius-change', () => { state.shown = 12; render(); });
+await initNearbyExperience({ reason: 'Activa tu ubicación para mostrar primero promociones de negocios que estén a 500 metros de ti.' });
+state.point = getStoredNearbyLocation();
 loadCatalog();

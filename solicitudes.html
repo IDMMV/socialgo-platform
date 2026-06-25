@@ -15,8 +15,10 @@
 <link href="css/mizona-master-shell.css" rel="stylesheet"/>
 <link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/mejoras-v2.css">
 <link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
+<link rel="stylesheet" href="css/mizona-stability.css">
+<link rel="stylesheet" href="css/nearby-location.css">
 </head>
-<body>
+<body class="auth-pending">
 <div class="mz-app">
 <aside class="mz-sidebar">
 <a class="mz-brand" href="index.html"><img alt="MiZona.pe" class="mz-logo-img" src="assets/mizona-logo-blanco.svg"/></a>
@@ -41,6 +43,7 @@
 </div>
 </header>
 <div class="mz-content">
+<section class="mz-nearby-bar" data-nearby-controls></section>
 <div class="mz-page-title"><div><h1>Solicitudes de la comunidad</h1><p>Pide ayuda y recibe cotizaciones de profesionales cercanos.</p></div><button class="mz-btn primary" id="openRequestFormSecondary"><i class="ti ti-clipboard-plus"></i> Publicar solicitud</button></div>
 <section class="mz-card">
 <div class="mz-card-pad">
@@ -71,6 +74,7 @@
 <label class="mz-field"><span>Fecha necesaria</span><input name="fecha_necesaria" type="date"/></label>
 <label class="mz-field"><span>Presupuesto desde</span><input min="0" name="presupuesto_desde" placeholder="S/ 0" step="0.01" type="number"/></label>
 <label class="mz-field"><span>Presupuesto hasta</span><input min="0" name="presupuesto_hasta" placeholder="S/ 0" step="0.01" type="number"/></label>
+<input type="hidden" name="latitud"><input type="hidden" name="longitud">
 </div>
 </div>
 <div class="mz-dialog-actions"><button class="mz-btn ghost" data-close-dialog="" type="button">Cancelar</button><button class="mz-btn primary" type="submit"><i class="ti ti-send"></i> Publicar solicitud</button></div>

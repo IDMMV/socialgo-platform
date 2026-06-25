@@ -17,6 +17,7 @@ let following = false;
 let confirmed = false;
 let utility = null;
 let map = null;
+let exactShared = false;
 
 function statusInfo(value) {
   return {
@@ -33,16 +34,27 @@ async function loadSession() {
   user = await getCurrentUser();
   if (!user) return;
   document.body.classList.remove('estado-guest'); document.body.classList.add('estado-logged');
-  const { data } = await supabase.from('perfiles').select('id,username,nombre_visible,full_name,is_admin').eq('id',user.id).maybeSingle();
-  profile = data || null;
+  const [{ data }, { data: adminFlag }] = await Promise.all([
+    supabase.from('perfiles').select('id,username,nombre_visible').eq('id',user.id).maybeSingle(),
+    Promise.resolve(supabase.rpc('is_admin')).catch(()=>({data:false}))
+  ]);
+  profile = { ...(data || {}), is_admin: Boolean(adminFlag) };
 }
 
 async function loadAlert() {
   if (!id) { main.innerHTML='<div class="mz-empty">Falta el identificador de la alerta.</div>'; return; }
   await loadSession();
-  const { data, error } = await supabase.from('alertas').select('id,autor_id,tipo_fuente,categoria,titulo,descripcion,distrito,zona_referencia,latitud,longitud,precision_ubicacion,estado,total_confirmaciones,total_seguidores,total_util_si,total_util_no,motivo_moderacion,resolucion_estado,created_at,updated_at').eq('id',id).maybeSingle();
+  const { data, error } = await supabase.from('alertas').select('id,autor_id,tipo_fuente,categoria,tipo_detalle,ocurre_ahora,destino_alerta,radio_metros,titulo,descripcion,distrito,zona_referencia,latitud,longitud,precision_ubicacion,estado,total_confirmaciones,total_seguidores,total_util_si,total_util_no,motivo_moderacion,resolucion_estado,created_at,updated_at').eq('id',id).maybeSingle();
   if (error || !data) { main.innerHTML=`<div class="mz-empty">${escapeHtml(error?.message || 'La alerta no está disponible.')}</div>`; return; }
   alertData = data;
+  exactShared = false;
+  if (user) {
+    const { data: shared } = await Promise.resolve(supabase.rpc('mizona_ubicacion_emergencia_contacto',{p_alerta_id:id})).catch(()=>({data:null}));
+    const row = Array.isArray(shared) ? shared[0] : shared;
+    if (row?.latitud != null && row?.longitud != null) {
+      alertData.latitud = row.latitud; alertData.longitud = row.longitud; alertData.precision_ubicacion = 'exacta'; exactShared = true;
+    }
+  }
   await loadUserState();
   renderMain(); renderMap(); await Promise.all([loadTimeline(),loadResolution()]); renderParticipation(); renderAuthorTools();
 }
@@ -66,7 +78,7 @@ function renderMain() {
     <h1 class="mz-detail-title">${escapeHtml(alertData.titulo)}</h1>
     <div class="mz-detail-description">${escapeHtml(alertData.descripcion)}</div>
     ${isAuthor && alertData.motivo_moderacion ? `<div class="mz-rejection-box"><strong>Motivo indicado por moderación</strong>${escapeHtml(alertData.motivo_moderacion)}</div>`:''}
-    <div class="mz-detail-meta"><span>📍 ${escapeHtml(alertData.zona_referencia||alertData.distrito)}</span><span>🛡 ${escapeHtml(privacyText(alertData.precision_ubicacion))}</span><span>🕒 Actualizada ${timeAgo(alertData.updated_at)}</span></div>
+    <div class="mz-detail-meta"><span>📍 ${escapeHtml(alertData.zona_referencia||alertData.distrito)}</span><span>🛡 ${escapeHtml(privacyText(alertData.precision_ubicacion))}</span>${exactShared?'<span>🔐 Ubicación temporal compartida contigo</span>':''}<span>🕒 Actualizada ${timeAgo(alertData.updated_at)}</span></div>
   </div>`;
   privacyBadge.textContent=privacyText(alertData.precision_ubicacion);
 }

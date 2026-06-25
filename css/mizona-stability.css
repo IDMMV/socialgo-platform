@@ -1,0 +1,39 @@
+/* MiZona — estabilidad visual, sesión única y respuesta adaptable */
+[hidden]{display:none!important}
+html{background:#f4f7fb}
+html[data-auth-state="unknown"] .auth-conditional{visibility:hidden}
+body.auth-pending .hide-guest,body.auth-pending .hide-logged{visibility:hidden!important}
+body.estado-logged .hide-logged{display:none!important}
+body.estado-guest .hide-guest{display:none!important}
+body.estado-logged .hide-guest{display:flex!important}
+body.estado-guest .hide-logged{display:flex!important}
+.mz-sidebar,.mz3-sidebar{contain:layout paint;will-change:auto}
+.mz-sidebar-user,.mz3-account,.mz-u-account,.mz-u-guest,.mz3-guest{transition:none!important}
+.mz-session-skeleton{background:linear-gradient(90deg,#17304f 25%,#264563 50%,#17304f 75%);background-size:200% 100%;animation:mz-shimmer 1.2s linear infinite;color:transparent!important;border-radius:6px}
+@keyframes mz-shimmer{to{background-position:-200% 0}}
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.12s}
+
+/* Evita que el usuario tenga que usar zoom 50 %. */
+.mz3-content .mz-content,.mz3-content .mz-feed-body,.mz3-content>.page-shell,.mz3-content>.main>.body,.mz3-content>.main>.content{width:min(1280px,100%)!important;max-width:1280px!important;padding:20px clamp(12px,2vw,24px)!important}
+@media (max-width:1180px){
+  .mz-layout{grid-template-columns:var(--mz-sidebar-final-w) minmax(0,1fr)!important}
+  .mz-layout>.mz-rightbar,.mz-layout>.mz-right,.mz-layout>aside:last-child:not(.mz-sidebar){display:none!important}
+}
+@media (max-width:900px){
+  .mz-sidebar,.mz3-sidebar,aside.mz-sidebar,aside.mz3-sidebar{position:fixed!important;width:min(84vw,300px)!important;min-width:min(84vw,300px)!important;max-width:min(84vw,300px)!important;transform:translateX(-105%)}
+  body.mz3-drawer-open .mz3-sidebar,body.sidebar-open .mz-sidebar{transform:translateX(0)}
+}
+
+/* Registro en dos columnas en escritorio y una en celular. */
+.auth-card.auth-card-wide{width:min(760px,calc(100vw - 28px));max-width:760px}
+.auth-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px}
+.auth-grid .full{grid-column:1/-1}
+.auth-card label{min-width:0}
+.auth-card input,.auth-card select{width:100%;box-sizing:border-box}
+@media(max-width:680px){.auth-grid{grid-template-columns:1fr}.auth-grid .full{grid-column:auto}.auth-card.auth-card-wide{width:min(520px,calc(100vw - 20px))}}
+
+/* Cabecera de cuenta conectada */
+.mz-account-actions{display:flex;gap:8px;flex-wrap:wrap;padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.075)}
+.mz-account-actions a,.mz-account-actions button{flex:1;min-height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.13);background:transparent;color:#b8c5d6;font:700 9px/1 system-ui;text-decoration:none;display:grid;place-items:center;cursor:pointer}
+.mz-account-actions .primary{background:#1f6fb8;border-color:#1f6fb8;color:#fff}

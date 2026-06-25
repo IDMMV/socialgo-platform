@@ -12,14 +12,14 @@ export async function usernameAvailable(username) {
   return Boolean(data);
 }
 
-export async function registerUser({ fullName, username, email, password, accountType }) {
+export async function registerUser({ fullName, username, email, password, phone }) {
   const clean = normalizeUsername(username);
   if (!await usernameAvailable(clean)) throw new Error("Ese nombre de usuario no está disponible.");
   const { data, error } = await supabase.auth.signUp({
     email: email.trim().toLowerCase(), password,
     options: {
       emailRedirectTo: `${PUBLIC_ENV.SITE_URL}/auth-callback.html`,
-      data: { full_name: fullName.trim(), username: clean, account_type: accountType }
+      data: { full_name: fullName.trim(), username: clean, account_type: 'personal', phone_pending: String(phone || '').trim() }
     }
   });
   if (error) throw error;

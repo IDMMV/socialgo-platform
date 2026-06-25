@@ -53,7 +53,7 @@ function readServiceKey(): string {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SUPABASE_SERVICE_KEY = readServiceKey();
 const ONESIGNAL_APP_ID = Deno.env.get("ONESIGNAL_APP_ID") || "";
-const ONESIGNAL_API_KEY = Deno.env.get("ONESIGNAL_API_KEY") || "";
+const ONESIGNAL_API_KEY = Deno.env.get("ONESIGNAL_REST_API_KEY") || Deno.env.get("ONESIGNAL_API_KEY") || "";
 const WEBHOOK_SECRET = Deno.env.get("MIZONA_WEBHOOK_SECRET") || "";
 const SITE_URL = (Deno.env.get("MIZONA_SITE_URL") || "https://mizona.pe").replace(/\/$/, "");
 
@@ -123,7 +123,7 @@ function preferenceAllows(event: NotificationEvent, pref: Preferences | null) {
 
   if (event.event_type === "alerta_confirmada" && pref.confirmaciones_alerta === false) return false;
   if (event.event_type === "social_mensaje" && pref.mensajes === false) return false;
-  if (["social_solicitud_amistad", "social_amistad_aceptada"].includes(event.event_type) && pref.amistades === false) return false;
+  if (["social_solicitud_amistad", "social_amistad_aceptada", "social_solicitud_chat", "social_respuesta_chat", "contacto_confianza_solicitud", "contacto_confianza_respuesta"].includes(event.event_type) && pref.amistades === false) return false;
   if (event.event_type.startsWith("negocio_") && pref.negocios === false) return false;
   if (event.event_type.startsWith("oferta_") && pref.ofertas === false) return false;
 
@@ -152,6 +152,17 @@ async function fetchEvent(body: Record<string, unknown>): Promise<NotificationEv
 
 async function applyNotificationPreferences(userIds: string[], event: NotificationEvent): Promise<string[]> {
   if (!userIds.length) return [];
+  // MiZona solo entrega avisos push a cuentas con celular verificado.
+  const { data: verifiedRows, error: verifiedError } = await supabase
+    .from("perfiles")
+    .select("id")
+    .in("id", userIds)
+    .eq("telefono_verificado", true);
+  if (!verifiedError) {
+    const verified = new Set((verifiedRows || []).map((row: any) => String(row.id)));
+    userIds = userIds.filter((id) => verified.has(String(id)));
+  }
+  if (!userIds.length) return [];
   const { data, error } = await supabase
     .from("notification_preferences")
     .select("user_id,solo_verificadas,alertas_seguidas,cambios_estado_alerta,confirmaciones_alerta")
@@ -178,8 +189,9 @@ async function recipientsForEvent(event: NotificationEvent): Promise<string[]> {
   }
 
   if (event.event_type.startsWith("alerta_") && event.latitud != null && event.longitud != null && event.categoria) {
+    const requestedRadius = Number(event.payload?.radio_metros || 0);
     const maxRadius = event.event_type === "alerta_nueva"
-      ? (event.prioridad === "critical" ? 1500 : 1000)
+      ? Math.max(100, Math.min(5000, requestedRadius || (event.prioridad === "critical" ? 1500 : 1000)))
       : event.event_type === "alerta_verificada"
         ? (event.prioridad === "critical" ? 10000 : 5000)
         : 5000;
@@ -282,7 +294,7 @@ async function insertSkipped(eventId: number, rows: Array<{ user_id: string; mot
 
 async function sendOneSignal(event: NotificationEvent, subscriptionIds: string[]) {
   if (!ONESIGNAL_APP_ID || !ONESIGNAL_API_KEY) {
-    throw new Error("Faltan ONESIGNAL_APP_ID u ONESIGNAL_API_KEY en los secretos de la Edge Function.");
+    throw new Error("Faltan ONESIGNAL_APP_ID u ONESIGNAL_REST_API_KEY en los secretos de la Edge Function.");
   }
 
   const response = await fetch("https://api.onesignal.com/notifications?c=push", {
@@ -318,10 +330,17 @@ async function sendOneSignal(event: NotificationEvent, subscriptionIds: string[]
 }
 
 async function processEvent(event: NotificationEvent) {
-  await supabase
+  // Reclamo atómico: evita duplicados cuando el webhook y el navegador intentan
+  // procesar el mismo evento casi al mismo tiempo.
+  const { data: claimed, error: claimError } = await supabase
     .from("notification_events")
     .update({ estado: "processing", intentos: Number(event.intentos || 0) + 1, error: null })
-    .eq("id", event.id);
+    .eq("id", event.id)
+    .in("estado", ["pending", "failed"])
+    .select("id")
+    .maybeSingle();
+  if (claimError) throw claimError;
+  if (!claimed) return { eventId: event.id, recipients: 0, sent: 0, skipped: 0, repeated: true };
 
   const allRecipients = await recipientsForEvent(event);
   if (!allRecipients.length) {
@@ -410,9 +429,15 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Método no permitido" }, 405);
 
-  if (WEBHOOK_SECRET) {
-    const received = req.headers.get("x-mizona-webhook-secret") || "";
-    if (received !== WEBHOOK_SECRET) return json({ error: "Webhook no autorizado" }, 401);
+  const receivedSecret = req.headers.get("x-mizona-webhook-secret") || "";
+  const webhookAuthorized = Boolean(WEBHOOK_SECRET && receivedSecret === WEBHOOK_SECRET);
+  let callerId: string | null = null;
+  if (!webhookAuthorized) {
+    const bearer = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
+    if (!bearer) return json({ error: "Autorización requerida" }, 401);
+    const { data: authData, error: authError } = await supabase.auth.getUser(bearer);
+    if (authError || !authData.user) return json({ error: "Sesión no válida" }, 401);
+    callerId = authData.user.id;
   }
 
   let body: Record<string, any> = {};
@@ -420,6 +445,9 @@ Deno.serve(async (req) => {
     body = await req.json() as Record<string, any>;
     const event = await fetchEvent(body);
     if (!event) return json({ error: "No se encontró el evento" }, 400);
+    if (!webhookAuthorized && callerId !== event.actor_id && callerId !== event.recipient_id) {
+      return json({ error: "No puedes procesar este evento" }, 403);
+    }
 
     if (["sent", "partial", "skipped"].includes(event.estado)) {
       return json({ ok: true, repeated: true, eventId: event.id });

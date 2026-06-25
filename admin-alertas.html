@@ -6,11 +6,21 @@
 <link rel="manifest" href="manifest.json"><link rel="icon" href="assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"><link rel="stylesheet" href="css/global.css"><link rel="stylesheet" href="css/mizona.css"><link rel="stylesheet" href="css/mizona-master-shell.css"><link rel="stylesheet" href="css/mizona-logo.css"><link rel="stylesheet" href="css/alertas-inteligentes.css">
 <link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
+<link rel="stylesheet" href="css/mizona-stability.css">
 </head>
-<body>
+<body class="auth-pending">
 <main class="page-shell" hidden id="adminAlertContent">
 <header class="admin-toolbar"><a class="brand mz-official-brand" href="index.html"><img alt="MiZona.pe" class="mz-brand-horizontal" src="assets/mizona-logo-horizontal.svg"></a><div class="modal-actions"><a class="secondary" href="admin.html">Panel general</a><a class="secondary" href="alertas.html">Ver alertas</a></div></header>
 <section class="page-card"><h1>Moderación de alertas</h1><p class="notice">Revisa información ciudadana, explica cada decisión y permite que el autor corrija una alerta rechazada.</p><div class="mz-admin-alert-grid"><div class="mz-admin-stat"><span>Reportadas</span><strong id="statReported">—</strong></div><div class="mz-admin-stat"><span>En revisión</span><strong id="statReview">—</strong></div><div class="mz-admin-stat"><span>Verificadas</span><strong id="statVerified">—</strong></div><div class="mz-admin-stat"><span>Resueltas</span><strong id="statResolved">—</strong></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><select id="stateFilter" style="padding:9px;border:1px solid var(--bd);border-radius:9px"><option value="pending">Pendientes primero</option><option value="all">Todos los estados</option><option value="reportada">Reportadas</option><option value="en_revision">En revisión</option><option value="verificada">Verificadas</option><option value="resuelta">Resueltas</option><option value="falsa">Descartadas</option><option value="ocultada">Retiradas</option></select><button class="secondary" id="reloadAlerts" type="button">Actualizar</button></div><div class="mz-admin-alert-list" id="adminAlertList"><div class="notice">Cargando alertas…</div></div></section>
+
+<section class="page-card" style="margin-top:18px">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div><h2 style="margin-bottom:4px">Fotografías y aportes de vecinos</h2><p class="notice" style="margin:0">Las fotografías quedan ocultas para la comunidad hasta que un administrador las apruebe.</p></div>
+    <div class="mz-admin-stat" style="min-width:120px"><span>Pendientes</span><strong id="statEvidence">—</strong></div>
+  </div>
+  <div id="evidenceModerationList" class="mz-evidence-admin-grid" style="margin-top:14px"><div class="notice">Cargando aportes…</div></div>
+</section>
+
 <section class="page-card" style="margin-top:18px"><h2>Sugerencias de los vecinos</h2><p class="notice">Clasifica las ideas y problemas enviados desde el centro de sugerencias.</p><div class="admin-table-wrap" id="suggestionsAdmin">Cargando sugerencias…</div></section>
 </main>
 <section class="auth-page" id="adminAccess"><div class="auth-card"><h1>Verificando acceso</h1><p class="notice">Comprobando permisos administrativos…</p></div></section>

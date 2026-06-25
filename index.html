@@ -17,8 +17,11 @@
 <link href="assets/favicon-32.png" rel="icon" type="image/png"/><link href="assets/apple-touch-icon.png" rel="apple-touch-icon"/><link href="css/mizona-logo.css" rel="stylesheet"/><link rel="stylesheet" href="css/negocios-ofertas.css">
 <link rel="stylesheet" href="css/mejoras-v2.css">
 <link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
+<link rel="stylesheet" href="css/mizona-stability.css">
+<link rel="stylesheet" href="css/emergency-center.css">
+<link rel="stylesheet" href="css/nearby-location.css">
 </head>
-<body class="estado-guest">
+<body class="auth-pending">
 <div class="mz-toast" id="mz-toast"></div>
 <!-- MODAL ALERTA -->
 <div class="mz-modal-overlay" id="modal-alerta">
@@ -139,6 +142,7 @@
 <div class="mz-icon-btn hide-logged" onclick="location.href='login.html'"><i class="ti ti-user"></i></div>
 </div>
 <div class="mz-feed-body">
+<section class="mz-nearby-bar" data-nearby-controls></section>
 <!-- PÁNICO -->
 <div class="mz-panic" onclick="activarPanico()">
 <div class="mz-panic-pulse">🆘</div>
@@ -314,6 +318,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script type="module">
 import { PUBLIC_ENV } from './js/env.public.js';
+import { openOrRequestChat } from './js/chat-access.js';
+import { initNearbyExperience, getStoredNearbyLocation, getNearbyRadius, distanceMeters, formatDistance } from './js/nearby-location.js';
 
 const sb = supabase.createClient(PUBLIC_ENV.SUPABASE_URL, PUBLIC_ENV.SUPABASE_PUBLISHABLE_KEY);
 
@@ -378,6 +384,9 @@ setInterval(tickTimer, 60000); tickTimer();
 
 // ===== MAPA =====
 let mapaInst = null, todosMarkers = [];
+let homePoint = getStoredNearbyLocation();
+let homeRadius = getNearbyRadius();
+let alertasHomeCache = [];
 const coloresMapa = { robo:'#E24B4A', agua:'#185FA5', luz:'#185FA5', mascota:'#d97706', incendio:'#ef4444', otro:'#8b5cf6', accidente:'#f59e0b', persona:'#9b5cf6' };
 const alertasDemo = [
   {lat:-11.9525,lng:-77.068,tipo:'robo',titulo:'Robo de celular',meta:'Jr. Las Palmeras · Hace 12 min',verificada:false,conf:3},
@@ -399,25 +408,28 @@ function initMapa() {
   if (mapaInst) return;
   mapaInst = L.map('mapa-alertas', {zoomControl:true,scrollWheelZoom:false,attributionControl:false}).setView([-11.9525,-77.0662],14);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(mapaInst);
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(pos => {
-      mapaInst.setView([pos.coords.latitude,pos.coords.longitude],15);
-      L.divIcon({html:`<div style="width:14px;height:14px;background:var(--rj);border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px rgba(220,38,38,.25)"></div>`,iconSize:[14,14],iconAnchor:[7,7],className:''});
-    }, ()=>{});
+  if (homePoint) {
+    mapaInst.setView([homePoint.lat,homePoint.lng],16);
+    const meIcon=L.divIcon({html:`<div style="width:14px;height:14px;background:var(--rj);border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px rgba(220,38,38,.25)"></div>`,iconSize:[14,14],iconAnchor:[7,7],className:''});
+    L.marker([homePoint.lat,homePoint.lng],{icon:meIcon}).addTo(mapaInst).bindTooltip('Tú estás aquí');
+    if(homeRadius) L.circle([homePoint.lat,homePoint.lng],{radius:homeRadius,color:'#185FA5',weight:1.5,fillOpacity:.06,dashArray:'6 5'}).addTo(mapaInst);
   }
   cargarAlertasEnMapa(alertasDemo);
   cargarAlertasSupabase();
 }
 
 function cargarAlertasEnMapa(alertas) {
+  alertasHomeCache = Array.isArray(alertas) ? alertas : [];
   todosMarkers.forEach(m=>mapaInst.removeLayer(m)); todosMarkers=[];
-  alertas.forEach(a => {
+  let visibles = alertasHomeCache.map(a => ({...a,_distanceMeters:homePoint?distanceMeters(homePoint,{lat:Number(a.lat),lng:Number(a.lng)}):NaN}));
+  if(homePoint&&homeRadius) visibles=visibles.filter(a=>Number.isFinite(a._distanceMeters)&&a._distanceMeters<=homeRadius).sort((a,b)=>a._distanceMeters-b._distanceMeters);
+  visibles.forEach(a => {
     if (!a.lat||!a.lng) return;
     const m = L.marker([a.lat,a.lng],{icon:crearIconoMapa(a.tipo,a.verificada)}).addTo(mapaInst);
-    m.bindPopup(`<div style="min-width:190px;font-family:inherit"><div style="font-size:8px;font-weight:700;background:${a.verificada?'#f0fdf4':'#fff7ed'};color:${a.verificada?'#14532d':'#9a3412'};border-radius:20px;padding:1px 7px;display:inline-block;margin-bottom:4px">${a.verificada?'✓ Verificada':'Reportada · '+a.conf+' confirmaron'}</div><div style="font-size:11px;font-weight:700;color:#1e293b;margin-bottom:2px">${a.titulo}</div><div style="font-size:9px;color:#94a3b8">${a.meta}</div><a href="alerta.html?id=${encodeURIComponent(a.id||'')}" style="display:block;text-align:center;text-decoration:none;width:100%;background:#185FA5;color:#fff;border:none;border-radius:5px;padding:6px;font-size:9px;font-weight:700;margin-top:6px">Ver y participar</a></div>`);
+    m.bindPopup(`<div style="min-width:190px;font-family:inherit"><div style="font-size:8px;font-weight:700;background:${a.verificada?'#f0fdf4':'#fff7ed'};color:${a.verificada?'#14532d':'#9a3412'};border-radius:20px;padding:1px 7px;display:inline-block;margin-bottom:4px">${a.verificada?'✓ Verificada':'Reportada · '+a.conf+' confirmaron'}</div><div style="font-size:11px;font-weight:700;color:#1e293b;margin-bottom:2px">${a.titulo}</div><div style="font-size:9px;color:#94a3b8">${a.meta}</div>${Number.isFinite(a._distanceMeters)?`<div style="font-size:9px;color:#6d35e8;font-weight:800;margin-top:4px">A ${formatDistance(a._distanceMeters)}</div>`:''}<a href="alerta.html?id=${encodeURIComponent(a.id||'')}" style="display:block;text-align:center;text-decoration:none;width:100%;background:#185FA5;color:#fff;border:none;border-radius:5px;padding:6px;font-size:9px;font-weight:700;margin-top:6px">Ver y participar</a></div>`);
     m._tipoAlerta = a.tipo; todosMarkers.push(m);
   });
-  document.getElementById('mapa-count').textContent = `${alertas.length} alertas activas`;
+  document.getElementById('mapa-count').textContent = `${visibles.length} en ${homeRadius ? (homeRadius>=1000?homeRadius/1000+' km':homeRadius+' m') : 'tu distrito'}`;
 }
 
 async function cargarAlertasSupabase() {
@@ -447,18 +459,23 @@ async function cargarServiciosInicio() {
   if(!box) return;
   try {
     const {data,error}=await sb.from('servicios_mizona')
-      .select('id,propietario_id,nombre,categoria,verificado,calificacion,total_resenas')
+      .select('id,propietario_id,nombre,categoria,verificado,calificacion,total_resenas,latitud,longitud')
       .eq('estado','activo')
       .order('verificado',{ascending:false})
       .order('calificacion',{ascending:false})
       .limit(3);
     if(error) throw error;
-    const cards=(data||[]).map(item=>`<div class="mz-svc-card">
+    let servicios=(data||[]).map(item=>({...item,_distanceMeters:homePoint?distanceMeters(homePoint,{lat:Number(item.latitud),lng:Number(item.longitud)}):NaN}));
+    if(homePoint&&homeRadius){
+      const cercanos=servicios.filter(item=>Number.isFinite(item._distanceMeters)&&item._distanceMeters<=homeRadius).sort((a,b)=>a._distanceMeters-b._distanceMeters);
+      if(cercanos.length) servicios=cercanos;
+    }
+    const cards=servicios.slice(0,3).map(item=>`<div class="mz-svc-card">
       <div class="mz-svc-av" style="background:var(--az-bg);color:#1d4ed8">${escInicio(inicialesInicio(item.nombre))}</div>
       <div class="mz-svc-name">${escInicio(item.nombre)}</div>
       <div class="mz-svc-trade">${escInicio(item.categoria||'Servicio')}</div>
       <div class="mz-verificado">${item.verificado?'✓ Verificado':'Disponible'}</div>
-      <div class="mz-svc-stars">${Number(item.calificacion||0)>0?'★ '+Number(item.calificacion).toFixed(1)+' · ('+Number(item.total_resenas||0)+')':'Nuevo en MiZona'}</div>
+      <div class="mz-svc-stars">${Number.isFinite(item._distanceMeters)?'A '+formatDistance(item._distanceMeters):Number(item.calificacion||0)>0?'★ '+Number(item.calificacion).toFixed(1)+' · ('+Number(item.total_resenas||0)+')':'Nuevo en MiZona'}</div>
       <button class="mz-svc-btn" type="button" data-contact-owner="${escInicio(item.propietario_id)}" data-contact-name="${escInicio(item.nombre)}">Contactar</button>
     </div>`).join('');
     box.innerHTML=(cards||`<div class="mz-svc-card"><div class="mz-svc-av"><i class="ti ti-tool"></i></div><div class="mz-svc-name">Aún no hay servicios</div><div class="mz-svc-trade">Sé el primero en publicar</div></div>`)+`<div class="mz-svc-card" style="border:1px dashed var(--bd);background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer" onclick="location.href='servicios.html#registrar'"><i class="ti ti-plus" style="font-size:22px;color:var(--txt3);margin-bottom:6px"></i><div style="font-size:9px;color:var(--txt3);text-align:center">¿Ofreces un servicio? <strong style="color:var(--az)">Regístrate</strong></div></div>`;
@@ -486,12 +503,11 @@ window.contactarSvc = async function(usuarioId, nombre='este proveedor') {
   const { data:{ user } } = await sb.auth.getUser();
   if(!usuarioId){ location.href='servicios.html'; return; }
   if(user?.id===usuarioId){ mostrarToast('Este servicio te pertenece.'); return; }
-  const {data,error}=await sb.rpc('crear_o_obtener_conversacion',{p_otro_usuario:usuarioId});
-  if(error){
-    mostrarToast(/recursion/i.test(error.message||'') ? 'Actualiza la Fase 2 en Supabase para habilitar el chat.' : 'No se pudo abrir el chat: '+error.message);
-    return;
+  try {
+    await openOrRequestChat(usuarioId, { context:'Consulta sobre servicio', notify: mostrarToast });
+  } catch (error) {
+    mostrarToast('No se pudo abrir el chat: '+error.message);
   }
-  location.href='mensajes.html?c='+encodeURIComponent(data);
 };
 async function obtenerUsuarioYPerfil() {
   const { data: { session } } = await sb.auth.getSession();
@@ -536,9 +552,16 @@ window.publicarSolicitud = async function() {
     presupuesto_desde:pres.desde,
     presupuesto_hasta:pres.hasta,
     urgencia,
-    estado:'abierta'
+    estado:'abierta',
+    latitud:homePoint?Number(homePoint.lat.toFixed(3)):null,
+    longitud:homePoint?Number(homePoint.lng.toFixed(3)):null,
+    precision_ubicacion:'aprox_150m'
   };
-  const {error}=await sb.from('solicitudes_mizona').insert(payload);
+  let {error}=await sb.from('solicitudes_mizona').insert(payload);
+  if(error&&/latitud|longitud|precision_ubicacion/i.test(error.message||'')){
+    delete payload.latitud;delete payload.longitud;delete payload.precision_ubicacion;
+    ({error}=await sb.from('solicitudes_mizona').insert(payload));
+  }
   if(error){mostrarToast('No se pudo publicar: '+error.message);return;}
   cerrarModal('modal-solicitud');
   ['sol-titulo','sol-desc','sol-pres'].forEach(id=>document.getElementById(id).value='');
@@ -558,9 +581,13 @@ const st=document.createElement('style');
 st.textContent='@keyframes blink-map{0%,100%{opacity:1}50%{opacity:.3}}.estado-guest .hide-guest{display:none}.estado-logged .hide-logged{display:none}';
 document.head.appendChild(st);
 
+await initNearbyExperience({reason:'Activa tu ubicación para mostrar automáticamente todo lo que hay alrededor de 500 metros.'});
+homePoint=getStoredNearbyLocation();homeRadius=getNearbyRadius();
 initAuth();
 initMapa();
 cargarServiciosInicio();
+window.addEventListener('mizona:location',event=>{homePoint=event.detail.point;if(mapaInst){mapaInst.remove();mapaInst=null;initMapa();}else initMapa();cargarAlertasEnMapa(alertasHomeCache);cargarServiciosInicio();});
+window.addEventListener('mizona:radius-change',event=>{homeRadius=event.detail.radius;cargarAlertasEnMapa(alertasHomeCache);cargarServiciosInicio();});
 </script>
 <script src="./js/inicio-ofertas.js" type="module"></script>
 <script src="./js/mizona-core.js" type="module"></script>
@@ -660,6 +687,7 @@ const tagDistrito = document.getElementById('dist-tag');
 tagDistrito?.addEventListener('click', abrirDistrito);
 tagDistrito?.addEventListener('keydown', e => { if (e.key==='Enter' || e.key===' ') { e.preventDefault(); abrirDistrito(); } });
 </script>
+<script type="module" src="js/emergency-center.js"></script>
 <script type="module" src="js/mizona-sidebar-uniforme.js"></script>
 </body>
 </html>

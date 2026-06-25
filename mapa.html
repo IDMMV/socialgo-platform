@@ -59,8 +59,10 @@
 <link rel="stylesheet" href="css/alertas-inteligentes.css">
 <link rel="stylesheet" href="css/mejoras-v2.css">
 <link rel="stylesheet" href="css/mizona-sidebar-uniforme.css">
+<link rel="stylesheet" href="css/mizona-stability.css">
+<link rel="stylesheet" href="css/nearby-location.css">
 </head>
-<body>
+<body class="auth-pending">
 <div class="mz-layout-2col">
 
   <!-- SIDEBAR -->
@@ -101,6 +103,7 @@
       <div class="mz-dist-tag" id="dist-tag-mapa"><i class="ti ti-map-pin"></i><span id="dist-mapa">Cargando...</span></div>
     </div>
 
+    <section class="mz-nearby-bar" data-nearby-controls style="margin:12px"></section>
     <div class="mz-card" style="margin:12px;border-radius:var(--r);overflow:hidden">
       <div class="mz-card-head">
         <div class="mz-card-title"><i class="ti ti-map-pin"></i> Alertas en tu zona</div>
@@ -108,7 +111,7 @@
           <span style="font-size:9px;font-weight:700;color:var(--vd);display:flex;align-items:center;gap:3px">
             <span style="width:6px;height:6px;background:var(--vd);border-radius:50%;animation:blink 1.5s ease-in-out infinite;display:inline-block"></span> En vivo
           </span>
-          <span id="mapZoneInfo" style="font-size:9px;font-weight:700;color:var(--az2);background:#EEF2FF;border:1px solid #D8E1FF;padding:4px 8px;border-radius:999px;display:none">Radio: 1.5 km</span>
+          <span id="mapZoneInfo" style="font-size:9px;font-weight:700;color:var(--az2);background:#EEF2FF;border:1px solid #D8E1FF;padding:4px 8px;border-radius:999px;display:none">Radio: 500 m</span>
           <span id="mapCount" style="font-size:10px;font-weight:700;color:var(--txt2)">0 alertas</span>
         </div>
       </div>
@@ -125,13 +128,13 @@
 
       <div class="mz-map-radio-bar" aria-label="Seleccionar radio de búsqueda">
         <span class="mz-map-radio-label"><i class="ti ti-radar"></i> Radio:</span>
-        <button type="button" class="mz-radio-btn" data-radio="500" onclick="cambiarRadio(500,this)">500 m</button>
+        <button type="button" class="mz-radio-btn active" data-radio="500" onclick="cambiarRadio(500,this)">500 m</button>
         <button type="button" class="mz-radio-btn" data-radio="1000" onclick="cambiarRadio(1000,this)">1 km</button>
-        <button type="button" class="mz-radio-btn active" data-radio="1500" onclick="cambiarRadio(1500,this)">1.5 km</button>
+        <button type="button" class="mz-radio-btn" data-radio="1500" onclick="cambiarRadio(1500,this)">1.5 km</button>
         <button type="button" class="mz-radio-btn" data-radio="2000" onclick="cambiarRadio(2000,this)">2 km</button>
         <button type="button" class="mz-radio-btn" data-radio="5000" onclick="cambiarRadio(5000,this)">5 km</button>
         <button type="button" class="mz-radio-btn" data-radio="0" onclick="cambiarRadio(0,this)">Toda la zona</button>
-        <span class="mz-map-radio-help" id="radioHelp">Mostrando alertas a 1.5 km de tu ubicación</span>
+        <span class="mz-map-radio-help" id="radioHelp">Mostrando alertas a 500 m de tu ubicación</span>
       </div>
 
       <div id="mapaCompleto"></div>
@@ -166,11 +169,13 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script type="module">
 import { PUBLIC_ENV } from './js/env.public.js';
+import { initNearbyExperience, getStoredNearbyLocation, getNearbyRadius, setNearbyRadius, requestNearbyLocation } from './js/nearby-location.js';
+import { initIncidentSheet, openIncidentSheet } from './js/incident-sheet.js';
 const sb = supabase.createClient(PUBLIC_ENV.SUPABASE_URL, PUBLIC_ENV.SUPABASE_PUBLISHABLE_KEY);
 
 const colores = {robo:'#E24B4A',accidente:'#f59e0b',agua:'#185FA5',luz:'#185FA5',mascota:'#d97706',incendio:'#ef4444',persona:'#9b5cf6',otro:'#8b5cf6'};
-const RADIO_PREDETERMINADO = 1500;
-let radioZonaMetros = RADIO_PREDETERMINADO;
+const RADIO_PREDETERMINADO = 500;
+let radioZonaMetros = getNearbyRadius() || RADIO_PREDETERMINADO;
 let mapaInst = null, todosMarkers = [], miPos = null, alertasCache = [], filtroActual = 'todas';
 let confirmacionesPropias = new Set();
 let seguimientosPropios = new Set();
@@ -297,14 +302,7 @@ window.confirmarAlertaMapa = async function(alertaId, button) {
   button.textContent = 'Guardando...';
 
   try {
-    const coords = await new Promise(resolve => {
-      if (!navigator.geolocation) return resolve(null);
-      navigator.geolocation.getCurrentPosition(
-        pos => resolve({ lat:pos.coords.latitude, lng:pos.coords.longitude }),
-        () => resolve(null),
-        { enableHighAccuracy:false, timeout:5000, maximumAge:300000 }
-      );
-    });
+    const coords = getStoredNearbyLocation();
 
     const { data, error } = await sb.rpc('confirmar_alerta', {
       p_alerta_id: alertaId,
@@ -348,8 +346,11 @@ function crearIcono(tipo, verificada) {
 
 async function initMapa() {
   mapaInst = L.map('mapaCompleto',{zoomControl:true,scrollWheelZoom:true}).setView([-12.046,-77.043],13);
+  window.mapaInst = mapaInst;
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(mapaInst);
-  usarUbicacion();
+  initIncidentSheet({ onRefresh: () => sincronizarConteos(true) });
+  const point = await initNearbyExperience({ reason:'Activa tu ubicación para abrir el mapa centrado en ti y mostrar primero incidentes dentro de 500 metros.' });
+  if (point) colocarUbicacion(point, true);
   await cargarConfirmacionesPropias();
   await cargarAlertas();
   iniciarSincronizacion();
@@ -396,48 +397,53 @@ function actualizarCirculoZona(ajustarVista = false) {
 }
 
 window.cambiarRadio = function(metros, btn) {
-  radioZonaMetros = Number(metros) || 0;
+  radioZonaMetros = setNearbyRadius(Number(metros) || 0);
   document.querySelectorAll('.mz-radio-btn').forEach(b=>b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   actualizarCirculoZona(true);
   renderAlertas();
 };
 
-window.usarUbicacion = function() {
-  if (!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition(pos => {
-    const {latitude:lat, longitude:lng} = pos.coords;
-    miPos = [lat,lng];
-    mapaInst.setView([lat,lng],15);
-
-    if (window._miPosMarker) mapaInst.removeLayer(window._miPosMarker);
-
-    const ico = L.divIcon({
-      html:`<div style="width:16px;height:16px;background:#E24B4A;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 5px rgba(220,38,38,.25)"></div>`,
-      iconSize:[16,16],iconAnchor:[8,8],className:''
-    });
-
-    window._miPosMarker = L.marker([lat,lng],{icon:ico}).addTo(mapaInst).bindPopup(`<b>📍 Tú estás aquí</b><br><span style="font-size:12px;color:#64748b">Radio mostrado: ${etiquetaRadio(radioZonaMetros)}</span>`);
-    actualizarCirculoZona(true);
-    renderAlertas();
-
-    // Actualizar distrito aproximado
-    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es`)
-      .then(r=>r.json())
-      .then(d=>{
-        const dist = d.address?.suburb || d.address?.district || d.address?.city_district || d.address?.city || 'Tu zona';
-        document.getElementById('dist-mapa').textContent = dist;
-      }).catch(()=>{});
-  }, ()=>{
-    document.getElementById('dist-mapa').textContent = 'Ubicación no disponible';
+function colocarUbicacion(point, ajustar=true) {
+  if (!point || !mapaInst) return;
+  const lat = Number(point.lat), lng = Number(point.lng);
+  miPos = [lat,lng];
+  if (ajustar) mapaInst.setView([lat,lng],16);
+  if (window._miPosMarker) mapaInst.removeLayer(window._miPosMarker);
+  const ico = L.divIcon({
+    html:`<div style="width:16px;height:16px;background:#E24B4A;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 5px rgba(220,38,38,.25)"></div>`,
+    iconSize:[16,16],iconAnchor:[8,8],className:''
   });
+  window._miPosMarker = L.marker([lat,lng],{icon:ico}).addTo(mapaInst).bindTooltip('Tú estás aquí');
+  actualizarCirculoZona(ajustar);
+  renderAlertas();
+  fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es`)
+    .then(r=>r.json()).then(d=>{
+      const dist=d.address?.suburb||d.address?.district||d.address?.city_district||d.address?.city||'Tu zona';
+      document.getElementById('dist-mapa').textContent=dist;
+      localStorage.setItem('mizona_zona',dist);
+    }).catch(()=>{});
+}
+
+window.usarUbicacion = async function() {
+  const point = await requestNearbyLocation({ force:true, interactive:true });
+  if (point) colocarUbicacion(point,true);
+  else document.getElementById('dist-mapa').textContent='Ubicación no disponible';
 };
+
+window.addEventListener('mizona:location', event => colocarUbicacion(event.detail.point, false));
+window.addEventListener('mizona:radius-change', event => {
+  radioZonaMetros = event.detail.radius;
+  document.querySelectorAll('.mz-radio-btn').forEach(button => button.classList.toggle('active', Number(button.dataset.radio) === radioZonaMetros));
+  actualizarCirculoZona(true);
+  renderAlertas();
+});
 
 async function cargarAlertas({silencioso=false} = {}) {
   try {
     const {data,error} = await sb
       .from('alertas')
-      .select('id,categoria,titulo,distrito,zona_referencia,estado,latitud,longitud,precision_ubicacion,created_at,total_confirmaciones,total_seguidores,autor_id')
+      .select('id,categoria,titulo,descripcion,distrito,zona_referencia,estado,latitud,longitud,precision_ubicacion,created_at,total_confirmaciones,total_seguidores,autor_id')
       .in('estado',['reportada','verificada','en_revision'])
       .not('latitud','is',null)
       .order('created_at',{ascending:false})
@@ -450,6 +456,9 @@ async function cargarAlertas({silencioso=false} = {}) {
       lng:parseFloat(a.longitud),
       tipo:normalizarTipo(a.categoria),
       titulo:a.titulo,
+      descripcion:a.descripcion || '',
+      distrito:a.distrito || '',
+      zona_referencia:a.zona_referencia || '',
       meta:`${a.zona_referencia || a.distrito || ''} · ${timeAgo(a.created_at)}`,
       verificada:a.estado === 'verificada',
       estado:a.estado,
@@ -558,21 +567,14 @@ function cargarEnMapa(alertas) {
     const siguiendo = alertaId && seguimientosPropios.has(alertaId);
     const estadoTexto = a.estado === 'verificada' ? 'Verificada' : a.estado === 'resuelta' ? 'Resuelta' : a.estado === 'en_revision' ? 'En revisión' : 'Reportada';
     const privacidadTexto = ({exacta:'Punto preciso',aprox_50m:'Aprox. 50 m',aprox_150m:'Aprox. 150 m',solo_zona:'Solo zona'})[a.precision] || 'Aproximada';
-    m.bindPopup(`<div style="min-width:240px;font-family:inherit">
-      <div id="badge-${alertaId}" style="font-size:8px;font-weight:700;background:${a.verificada?'#f0fdf4':'#fff7ed'};color:${a.verificada?'#14532d':'#9a3412'};border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:5px">${estadoTexto}</div>
-      <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:3px">${escaparTexto(a.titulo)}</div>
-      <div style="font-size:10px;color:#94a3b8;margin-bottom:4px">${escaparTexto(a.meta)}</div>
-      ${Number.isFinite(a._dist) ? `<div style="font-size:9px;color:#7c3aed;font-weight:700;margin-bottom:6px">📍 A ${a._dist >= 1000 ? (a._dist/1000).toFixed(1)+' km' : Math.round(a._dist)+' m'} de tu ubicación</div>` : ''}
-      <div style="font-size:9px;color:#64748b;margin-bottom:4px">🛡 ${privacidadTexto}</div>
-      <div id="confirmaciones-${alertaId}" style="font-size:10px;color:#475569;font-weight:700;margin-bottom:8px">👥 ${textoConfirmaciones(a.conf)} · 🔔 ${a.seguidores || 0} siguiendo</div>
-      ${esAutor
-        ? `<div style="width:100%;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;border-radius:6px;padding:7px 8px;font-size:10px;font-weight:700;text-align:center;margin-bottom:5px">📝 Tú reportaste esta alerta</div>`
-        : `<button onclick="confirmarAlertaMapa('${alertaId}', this)" ${(alertaId && !yaConfirmada && a.estado!=='resuelta') ? '' : 'disabled'} style="width:100%;background:${yaConfirmada ? '#1D9E75' : (alertaId ? '#185FA5' : '#94a3b8')};color:#fff;border:none;border-radius:6px;padding:6px;font-size:10px;font-weight:700;cursor:${(alertaId && !yaConfirmada) ? 'pointer' : 'not-allowed'};margin-bottom:5px">${yaConfirmada ? '✓ Ya confirmado' : '✓ También lo vi'}</button>`}
-      <button onclick="seguirAlertaMapa('${alertaId}', this)" style="width:100%;background:${siguiendo?'#ede9fe':'#f8fafc'};color:${siguiendo?'#5b21b6':'#475569'};border:1px solid #e2e8f0;border-radius:6px;padding:5px;font-size:10px;font-weight:700;cursor:pointer;margin-bottom:5px">${siguiendo?'🔔 Siguiendo':'🔔 Seguir alerta'}</button>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px"><a href="alerta.html?id=${encodeURIComponent(alertaId)}" style="text-align:center;text-decoration:none;background:#185FA5;color:#fff;border-radius:6px;padding:6px;font-size:10px;font-weight:700">Ver detalles</a><button onclick="compartirAlertaMapa('${shareText}')" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:6px;padding:5px;font-size:10px;cursor:pointer">Compartir</button></div>
-    </div>`);
+    m.on('click', () => openIncidentSheet({
+      ...a,
+      id: alertaId,
+      privacidadTexto,
+      _dist: a._dist
+    }, { onRefresh: () => sincronizarConteos(true) }));
     m._tipo = normalizarTipo(a.tipo); m._alertaId = alertaId; todosMarkers.push(m);
-    if (new URLSearchParams(location.search).get('alerta') === alertaId) { setTimeout(() => { mapaInst.setView([a.lat,a.lng],17); m.openPopup(); }, 350); }
+    if (new URLSearchParams(location.search).get('alerta') === alertaId) { setTimeout(() => { mapaInst.setView([a.lat,a.lng],17); m.fire('click'); }, 350); }
   });
   const tieneUbicacion = !!miPos;
   const filtroTxt = filtroActual === 'todas' ? 'eventos' : filtroActual + (filtroActual.endsWith('s') ? '' : 's');

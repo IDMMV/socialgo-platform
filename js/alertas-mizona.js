@@ -2,6 +2,7 @@ import { supabase, getCurrentUser } from './supabase.js';
 import { initMiZonaUI, toast, escapeHtml, timeAgo } from './mizona-ui-v2.js';
 import { createAlertLocationPicker } from './alert-location-picker.js';
 import { initNearbyExperience, getStoredNearbyLocation, getNearbyRadius, distanceMeters, formatDistance } from './nearby-location.js';
+import { dispatchPushEvents } from './push-dispatch.js';
 
 initMiZonaUI();
 
@@ -34,6 +35,11 @@ const locationPicker = createAlertLocationPicker({
   districtInput: form?.elements?.distrito,
   latInput: form?.elements?.latitud,
   lngInput: form?.elements?.longitud,
+  originLatInput: form?.elements?.origen_latitud,
+  originLngInput: form?.elements?.origen_longitud,
+  searchButtonId: 'locationSearchButton',
+  radiusStatusId: 'locationRadiusStatus',
+  maxDistanceMeters: 500,
   onConfirm: () => showStatus('Ubicación seleccionada. Ya puedes revisar la alerta.')
 });
 
@@ -285,7 +291,9 @@ function getFormPayload() {
     zona_referencia: String(data.get('zona_referencia') || '').trim(),
     latitud: data.get('latitud') ? Number(data.get('latitud')) : null,
     longitud: data.get('longitud') ? Number(data.get('longitud')) : null,
-    precision_ubicacion: String(data.get('precision_ubicacion') || 'aprox_50m')
+    precision_ubicacion: String(data.get('precision_ubicacion') || 'aprox_50m'),
+    origen_latitud: data.get('origen_latitud') ? Number(data.get('origen_latitud')) : null,
+    origen_longitud: data.get('origen_longitud') ? Number(data.get('origen_longitud')) : null
   };
 }
 
@@ -294,6 +302,9 @@ function validatePayload(payload) {
   if (payload.descripcion.length < 10) throw new Error('Describe mejor lo ocurrido.');
   if (!payload.distrito) throw new Error('Indica el distrito.');
   if (!Number.isFinite(payload.latitud) || !Number.isFinite(payload.longitud)) throw new Error('Selecciona el punto donde ocurrió el evento.');
+  if (!Number.isFinite(payload.origen_latitud) || !Number.isFinite(payload.origen_longitud)) throw new Error('Activa tu ubicación actual para validar el radio de 500 m.');
+  const reportDistance = distanceMeters({lat:payload.origen_latitud,lng:payload.origen_longitud},{lat:payload.latitud,lng:payload.longitud});
+  if (!Number.isFinite(reportDistance) || reportDistance > 550) throw new Error(`El evento está a ${formatDistance(reportDistance)} de ti. Solo puedes reportar dentro de aproximadamente 500 m.`);
 }
 
 async function detectDuplicates(payload) {
@@ -371,7 +382,7 @@ finalPublishButton?.addEventListener('click', async () => {
   finalPublishButton.disabled = true;
   finalPublishButton.innerHTML = '<i class="ti ti-loader-2"></i> Publicando...';
   try {
-    const { data, error } = await supabase.rpc('crear_alerta_mizona', {
+    const { data, error } = await supabase.rpc('crear_alerta_mizona_v64', {
       p_categoria: pendingPayload.categoria,
       p_titulo: pendingPayload.titulo,
       p_descripcion: pendingPayload.descripcion,
@@ -379,11 +390,16 @@ finalPublishButton?.addEventListener('click', async () => {
       p_zona_referencia: pendingPayload.zona_referencia || null,
       p_latitud: pendingPayload.latitud,
       p_longitud: pendingPayload.longitud,
-      p_precision_ubicacion: pendingPayload.precision_ubicacion
+      p_precision_ubicacion: pendingPayload.precision_ubicacion,
+      p_origen_latitud: pendingPayload.origen_latitud,
+      p_origen_longitud: pendingPayload.origen_longitud
     });
     if (error) throw error;
+    const alertId = data?.alerta_id || data;
+    const pushResults = await dispatchPushEvents(data?.event_ids || []).catch(error => [{ok:false,error:error?.message||String(error)}]);
+    const pushSent = pushResults.some(item => Number(item?.sent || 0) > 0);
     closeModal(publishModal);
-    showStatus('Alerta publicada. Se mostrará como reportada hasta ser revisada.');
+    showStatus(pushSent ? 'Alerta publicada y notificación enviada.' : 'Alerta publicada. Si no recibes el aviso, prueba OneSignal desde la pantalla Notificaciones.');
     form.reset();
     applyPrivacyDefault();
     locationPicker.clear();
@@ -391,7 +407,7 @@ finalPublishButton?.addEventListener('click', async () => {
     pendingPayload = null;
     await loadAlerts();
     toast('Alerta publicada correctamente.');
-    setTimeout(() => { if (data) location.href = `alerta.html?id=${encodeURIComponent(data)}`; }, 700);
+    setTimeout(() => { if (alertId) location.href = `alerta.html?id=${encodeURIComponent(alertId)}`; }, 900);
   } catch (error) {
     showStatus(error.message || 'No se pudo publicar la alerta.', true);
     toast(error.message || 'No se pudo publicar.', 'error');

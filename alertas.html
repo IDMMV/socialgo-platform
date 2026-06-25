@@ -152,7 +152,7 @@
                   <option value="robo">Robo o asalto</option><option value="accidente">Accidente</option><option value="agua">Corte o fuga de agua</option><option value="luz">Corte de luz</option><option value="persona">Persona desaparecida</option><option value="mascota">Mascota perdida</option><option value="incendio">Incendio</option><option value="otro">Otro</option>
                 </select>
               </label>
-              <label class="mz-field"><span>Distrito</span><input name="distrito" id="form-distrito" value="Ventanilla" required></label>
+              <label class="mz-field"><span>Distrito</span><input name="distrito" id="form-distrito" placeholder="Ej.: Ventanilla" required></label>
               <label class="mz-field full"><span>Título <button type="button" class="mz-voz-btn" data-voz-para="titulo" title="Dictar con micrófono"><i class="ti ti-microphone"></i> Dictar</button></span><input name="titulo" id="titulo" maxlength="120" required placeholder="Describe brevemente lo ocurrido"></label>
               <label class="mz-field full"><span>Descripción <button type="button" class="mz-voz-btn" data-voz-para="descripcion" title="Dictar descripción con micrófono"><i class="ti ti-microphone"></i> Dictar</button></span><textarea name="descripcion" id="descripcion" rows="5" maxlength="1200" required placeholder="Incluye hora, referencia y detalles útiles. No publiques acusaciones ni datos sensibles."></textarea></label>
               <label class="mz-field full"><span>Zona o referencia <button type="button" class="mz-voz-btn" data-voz-para="zona_referencia" title="Dictar referencia"><i class="ti ti-microphone"></i> Dictar</button></span><input name="zona_referencia" id="zona_referencia" placeholder="Ej.: Av. Las Palmeras, cerca del mercado"></label>
@@ -166,6 +166,7 @@
                 <small class="mz-privacy-help" id="privacyHelp">En robos y reportes sensibles, MiZona desplaza públicamente el marcador para proteger domicilios.</small>
               </label>
               <input name="latitud" id="alertLatitude" type="hidden"><input name="longitud" id="alertLongitude" type="hidden">
+              <input name="origen_latitud" id="reporterLatitude" type="hidden"><input name="origen_longitud" id="reporterLongitude" type="hidden">
               <div class="mz-field full">
                 <span>Ubicación del evento</span>
                 <div class="mz-location-summary" id="locationSummary"></div>
@@ -208,7 +209,8 @@
   <div class="mz-smart-dialog">
     <div class="mz-smart-head"><div><h2>Selecciona dónde ocurrió</h2><div style="font-size:9px;color:var(--txt3);margin-top:2px">En computadora haz clic. En celular mantén presionado el punto.</div></div><button class="mz-smart-close" type="button" data-close-location>✕</button></div>
     <div class="mz-smart-body">
-      <div class="mz-map-instruction"><i class="ti ti-hand-click"></i> Puedes acercar, mover el mapa y arrastrar el marcador. La dirección escrita es opcional; las coordenadas son el dato principal.</div>
+      <div class="mz-map-instruction"><i class="ti ti-shield-check"></i> Por seguridad, solo puedes reportar un evento ocurrido aproximadamente dentro de 500 m de tu ubicación actual. Escribe distrito y referencia; luego busca o toca el punto en el mapa.</div>
+      <div class="mz-location-searchbar"><button type="button" class="mz-btn ghost" id="locationSearchButton"><i class="ti ti-search"></i> Buscar distrito y referencia</button><div id="locationRadiusStatus" class="mz-radius-status loading"><i class="ti ti-current-location"></i> Validaremos tu ubicación al abrir el mapa.</div></div>
       <div id="mzLocationMap"></div>
       <div class="mz-map-selected"><div id="locationSelectedText">Aún no elegiste un punto.</div><button type="button" class="mz-btn ghost" id="locationGpsButton"><i class="ti ti-current-location"></i> Mi ubicación</button></div>
     </div>

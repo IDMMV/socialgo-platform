@@ -152,17 +152,7 @@ async function fetchEvent(body: Record<string, unknown>): Promise<NotificationEv
 
 async function applyNotificationPreferences(userIds: string[], event: NotificationEvent): Promise<string[]> {
   if (!userIds.length) return [];
-  // MiZona solo entrega avisos push a cuentas con celular verificado.
-  const { data: verifiedRows, error: verifiedError } = await supabase
-    .from("perfiles")
-    .select("id")
-    .in("id", userIds)
-    .eq("telefono_verificado", true);
-  if (!verifiedError) {
-    const verified = new Set((verifiedRows || []).map((row: any) => String(row.id)));
-    userIds = userIds.filter((id) => verified.has(String(id)));
-  }
-  if (!userIds.length) return [];
+  // V6.4: Web Push depende de una suscripción OneSignal activa, no de un número telefónico.
   const { data, error } = await supabase
     .from("notification_preferences")
     .select("user_id,solo_verificadas,alertas_seguidas,cambios_estado_alerta,confirmaciones_alerta")

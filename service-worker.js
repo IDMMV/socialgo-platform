@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v15-perfil-social-v63";
+const CACHE_NAME = "mizona-v16-mapa-push-v64";
 
 const CORE = [
   "./",

@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v14-scroll-publicaciones";
+const CACHE_NAME = "mizona-v15-perfil-social-v63";
 
 const CORE = [
   "./",

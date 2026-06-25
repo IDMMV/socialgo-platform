@@ -149,8 +149,8 @@ import {
   listPushDevices,
   removePushDevice,
   refreshNotificationLocation
-} from './js/push-notifications.js';
-import { dispatchPushEvent } from './js/push-dispatch.js';
+} from './js/push-notifications.js?v=5.1';
+import { dispatchPushEvent } from './js/push-dispatch.js?v=5.1';
 
 const user = await getCurrentUser();
 if (!user) location.replace('login.html?next=notificaciones.html');
@@ -259,11 +259,28 @@ $('#reloadDevices').addEventListener('click',loadDevices);
 $('#markAllRead').addEventListener('click',async()=>{await Promise.all([supabase.from('notification_inbox').update({leida:true,leida_en:new Date().toISOString()}).eq('user_id',user.id).eq('leida',false),supabase.from('notificaciones').update({leida:true}).eq('usuario_id',user.id).eq('leida',false)]);toast('Todo marcado como leído.');loadPushInbox();loadSocialInbox();});
 document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b===btn));$('#pushInbox').hidden=btn.dataset.tab!=='push';$('#socialInbox').hidden=btn.dataset.tab!=='social';}));
 
-if(isOneSignalConfigured()) bootstrapPushNotifications().catch(()=>{});
-await Promise.all([renderStatus(),loadPreferences(),loadDevices(),loadPushInbox(),loadSocialInbox()]);
+const statusFallback=setTimeout(()=>{
+  if($('#pushBadge')?.textContent==='Comprobando'){
+    $('#pushBadge').textContent='Reintentar';
+    $('#pushBadge').className='device-badge off';
+    $('#pushStatusTitle').textContent='La comprobación está tardando demasiado';
+    $('#pushStatusText').textContent='Pulsa “Activar en este dispositivo” para reintentar. MiZona conservará el resto de tus preferencias.';
+  }
+},22000);
+try{
+  await renderStatus();
+}catch(error){
+  $('#pushBadge').textContent='Error';
+  $('#pushBadge').className='device-badge off';
+  $('#pushStatusTitle').textContent='No se pudo iniciar OneSignal';
+  $('#pushStatusText').textContent=error?.message||'Error desconocido';
+}finally{
+  clearTimeout(statusFallback);
+}
+await Promise.allSettled([loadPreferences(),loadDevices(),loadPushInbox(),loadSocialInbox()]);
 supabase.channel(`push-inbox-${user.id}`).on('postgres_changes',{event:'*',schema:'public',table:'notification_inbox',filter:`user_id=eq.${user.id}`},()=>loadPushInbox()).subscribe();
 </script>
-<script src="./js/mizona-core.js" type="module"></script>
+<script src="./js/mizona-core.js?v=5.1" type="module"></script>
 <script src="./js/mizona-master-shell.js" type="module"></script>
 <script type="module" src="./js/tema-mizona.js"></script>
 <script type="module" src="js/mizona-sidebar-uniforme.js"></script>

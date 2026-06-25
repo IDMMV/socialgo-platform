@@ -569,6 +569,6 @@ await refreshMessagesBadge();
 
 if ("serviceWorker" in navigator && APP_CONFIG.enablePWA) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./OneSignalSDKWorker.js").catch(console.error);
+    navigator.serviceWorker.register("./OneSignalSDKWorker.js", { updateViaCache: "none" }).catch(console.error);
   });
 }

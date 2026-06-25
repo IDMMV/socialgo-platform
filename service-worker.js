@@ -1,4 +1,4 @@
-const CACHE_NAME = "mizona-v10-operativa";
+const CACHE_NAME = "mizona-v11-phone-push";
 
 const CORE = [
   "./",
@@ -147,30 +147,40 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (request.mode === "navigate") {
+  const isCode = /\.(?:html?|js|mjs|css|json)$/i.test(url.pathname) ||
+    /OneSignalSDKWorker\.js$/i.test(url.pathname) ||
+    /service-worker\.js$/i.test(url.pathname);
+
+  // HTML, JS, CSS y configuración: red primero para que las correcciones
+  // lleguen al celular sin quedarse atrapadas en una versión antigua.
+  if (request.mode === "navigate" || isCode) {
     event.respondWith((async () => {
       try {
-        const fresh = await fetch(request);
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(request, fresh.clone());
+        const fresh = await fetch(request, { cache: "no-store" });
+        if (fresh.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          event.waitUntil(cache.put(request, fresh.clone()));
+        }
         return fresh;
       } catch {
-        return (await caches.match(request)) || (await caches.match("./index.html"));
+        return (await caches.match(request)) ||
+          (request.mode === "navigate" ? await caches.match("./index.html") : null) ||
+          new Response("Recurso no disponible", { status: 503 });
       }
     })());
     return;
   }
 
+  // Imágenes y recursos pesados: caché rápida con actualización en segundo plano.
   event.respondWith((async () => {
     const cached = await caches.match(request);
-    const network = fetch(request).then(async (response) => {
+    const network = fetch(request).then(async response => {
       if (response.ok) {
         const cache = await caches.open(CACHE_NAME);
-        cache.put(request, response.clone());
+        event.waitUntil(cache.put(request, response.clone()));
       }
       return response;
     }).catch(() => null);
-
     return cached || (await network) || new Response("Recurso no disponible", { status: 503 });
   })());
 });

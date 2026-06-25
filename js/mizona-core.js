@@ -43,7 +43,7 @@ window.mzToast = function mzToast(message, type = 'ok') {
 
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
   addEventListener('load', () => {
-    navigator.serviceWorker.register('./OneSignalSDKWorker.js').catch((error) => {
+    navigator.serviceWorker.register('./OneSignalSDKWorker.js', { updateViaCache: 'none' }).catch((error) => {
       console.info('MiZona: PWA no disponible.', error?.message || error);
     });
   });

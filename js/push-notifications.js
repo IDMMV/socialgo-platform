@@ -8,6 +8,7 @@ const WORKER_SCOPE = "/";
 
 let initPromise = null;
 let sdkInstance = null;
+let sdkReadyPromise = null;
 let listenersInstalled = false;
 let authListenerInstalled = false;
 
@@ -40,38 +41,58 @@ function makeError(message, code) {
   return error;
 }
 
-function loadSdkScript() {
-  if (window.OneSignal) return Promise.resolve();
-  const existing = document.getElementById(ONESIGNAL_SCRIPT_ID);
-  if (existing) {
-    return new Promise((resolve, reject) => {
-      existing.addEventListener("load", resolve, { once: true });
-      existing.addEventListener("error", () => reject(makeError("No se pudo cargar OneSignal.", "sdk_load_failed")), { once: true });
-      if (window.OneSignalDeferred) setTimeout(resolve, 0);
-    });
-  }
+function loadSdkInstance() {
+  if (sdkInstance) return Promise.resolve(sdkInstance);
+  if (sdkReadyPromise) return sdkReadyPromise;
 
   window.OneSignalDeferred = window.OneSignalDeferred || [];
-  return new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.id = ONESIGNAL_SCRIPT_ID;
-    script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
-    script.defer = true;
-    script.onload = resolve;
-    script.onerror = () => reject(makeError("No se pudo cargar OneSignal.", "sdk_load_failed"));
-    document.head.appendChild(script);
+  sdkReadyPromise = new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = (fn, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      fn(value);
+    };
+    const timer = setTimeout(() => {
+      finish(reject, makeError('OneSignal tardó demasiado en cargar. Revisa la conexión y vuelve a intentarlo.', 'sdk_timeout'));
+    }, 20000);
+
+    // OneSignal recomienda poner la operación en OneSignalDeferred antes de
+    // cargar el SDK. Cuando el SDK ya está cargado, los push posteriores se
+    // ejecutan inmediatamente.
+    window.OneSignalDeferred.push(function (OneSignal) {
+      finish(resolve, OneSignal);
+    });
+
+    let script = document.getElementById(ONESIGNAL_SCRIPT_ID);
+    if (!script) {
+      script = document.createElement('script');
+      script.id = ONESIGNAL_SCRIPT_ID;
+      script.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
+      script.defer = true;
+      script.dataset.mizonaVersion = '5.1';
+      document.head.appendChild(script);
+    }
+    script.addEventListener('error', () => {
+      finish(reject, makeError('No se pudo cargar OneSignal. Verifica internet, bloqueadores y DNS.', 'sdk_load_failed'));
+    }, { once: true });
+  }).catch(error => {
+    sdkReadyPromise = null;
+    throw error;
   });
+
+  return sdkReadyPromise;
 }
 
-function getSdkInstance() {
-  return new Promise((resolve, reject) => {
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    const timeout = setTimeout(() => reject(makeError("OneSignal tardó demasiado en iniciar.", "sdk_timeout")), 15000);
-    window.OneSignalDeferred.push(function (OneSignal) {
-      clearTimeout(timeout);
-      resolve(OneSignal);
-    });
-  });
+function withTimeout(promise, message, ms = 25000) {
+  let timer;
+  return Promise.race([
+    Promise.resolve(promise),
+    new Promise((_, reject) => {
+      timer = setTimeout(() => reject(makeError(message, 'operation_timeout')), ms);
+    })
+  ]).finally(() => clearTimeout(timer));
 }
 
 function isIos() {
@@ -256,23 +277,26 @@ export async function bootstrapPushNotifications() {
 
   initPromise = (async () => {
     await verifyWorkerFile();
-    await loadSdkScript();
-    const OneSignal = await getSdkInstance();
-    await OneSignal.init({
+    const OneSignal = await loadSdkInstance();
+    await withTimeout(OneSignal.init({
       appId: APP_ID,
       serviceWorkerPath: WORKER_PATH,
       serviceWorkerParam: { scope: WORKER_SCOPE },
       notifyButton: { enable: false },
-      allowLocalhostAsSecureOrigin: true
-    });
+      allowLocalhostAsSecureOrigin: true,
+      autoResubscribe: true
+    }), 'OneSignal no terminó de inicializar el dispositivo.');
     sdkInstance = OneSignal;
     installSdkListeners(OneSignal);
     installAuthListener();
-    await syncIdentity(OneSignal);
+    await withTimeout(syncIdentity(OneSignal), 'No se pudo asociar este dispositivo con tu cuenta.');
     await markOpenedFromUrl();
     await syncCurrentDevice().catch(() => null);
     return { configured: true, OneSignal };
-  })();
+  })().catch(error => {
+    initPromise = null;
+    throw error;
+  });
 
   return initPromise;
 }
@@ -299,15 +323,23 @@ export async function requestPushPermission({ saveLocation = true } = {}) {
   }
 
   const { OneSignal } = await bootstrapPushNotifications();
-  await OneSignal.login(user.id);
-  await OneSignal.Notifications.requestPermission();
+  await withTimeout(OneSignal.login(user.id), 'No se pudo identificar tu cuenta en OneSignal.');
+  await withTimeout(OneSignal.Notifications.requestPermission(), 'El navegador no respondió a la solicitud de permiso.');
 
   if (!OneSignal.Notifications.permission) {
     throw makeError("El permiso de notificaciones no fue concedido.", "permission_denied");
   }
 
   if (!OneSignal.User.PushSubscription.optedIn) {
-    await OneSignal.User.PushSubscription.optIn();
+    await withTimeout(OneSignal.User.PushSubscription.optIn(), 'OneSignal no pudo activar la suscripción.');
+  }
+
+  const waitStarted = Date.now();
+  while (!OneSignal.User.PushSubscription.id && Date.now() - waitStarted < 12000) {
+    await new Promise(resolve => setTimeout(resolve, 350));
+  }
+  if (!OneSignal.User.PushSubscription.id) {
+    throw makeError('El permiso fue aceptado, pero OneSignal todavía no creó la suscripción. Cierra MiZona, vuelve a abrirla y pulsa Activar nuevamente.', 'subscription_missing');
   }
 
   const location = saveLocation ? await getCurrentLocation() : null;
@@ -334,7 +366,9 @@ export async function getPushStatus() {
     return { configured: false, supported: false, permission: false, optedIn: false, subscriptionId: null };
   }
   const { OneSignal } = await bootstrapPushNotifications();
-  const supported = Boolean(OneSignal.Notifications.isPushSupported());
+  const supported = typeof OneSignal.Notifications?.isPushSupported === 'function'
+    ? Boolean(OneSignal.Notifications.isPushSupported())
+    : ('serviceWorker' in navigator && 'Notification' in window);
   return {
     configured: true,
     supported,
